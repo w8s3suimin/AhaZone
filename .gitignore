@@ -30,3 +30,6 @@ dist-ssr
 desktop.ini
 */desktop.ini
 */*/desktop.ini
+
+.env
+.env.*
