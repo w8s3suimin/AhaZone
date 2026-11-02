@@ -9,7 +9,7 @@ import DynamicLabModal from './components/DynamicLabModal.vue';
 import PdfViewerModal from './components/PdfViewerModal.vue';
 import { INITIAL_RESOURCES } from './data/resources';
 import { EducationStage, ResourceType, SubjectId, ResourceItem } from './types';
-import { Search, Filter, CheckCircle2, RotateCcw } from 'lucide-vue-next';
+import { Search, Filter, CheckCircle2 } from 'lucide-vue-next';
 
 const resources = ref<ResourceItem[]>(INITIAL_RESOURCES);
 const stage = ref<EducationStage>('all');
@@ -18,8 +18,11 @@ const subject = ref<SubjectId>('all');
 const selectedChapter = ref<string | null>(null);
 const searchQuery = ref<string>('');
 
-// Curriculum Map Drawer State (Requirement 2)
-const isDrawerOpen = ref(false);
+// Desktop Sidebar State: Default TRUE (展開放在右側)
+const isDesktopSidebarOpen = ref(true);
+
+// Mobile Drawer State: Default FALSE (從右側滑出)
+const isMobileDrawerOpen = ref(false);
 
 // Modals state
 const activeLab = ref<ResourceItem | null>(null);
@@ -65,7 +68,7 @@ const filteredResources = computed(() => {
   });
 });
 
-// View mode logic (Requirement 4):
+// View mode logic:
 // If chapter is selected AND user has NOT explicitly selected a specific resourceType filter (i.e. resourceType === 'all') AND not searching:
 // Show Chapter Detail View (Concept summary + Attached resources below).
 // Otherwise: Show Resource Cards Grid View.
@@ -92,13 +95,15 @@ const handleExploreConic = () => {
 <template>
   <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-sky-500 selection:text-white">
     
-    <!-- Top Navigation (Clean, drawer button on left, no stage buttons) -->
+    <!-- Top Navigation (Mobile button on right, Desktop toggle on right) -->
     <Navbar
       :searchQuery="searchQuery"
       @update:searchQuery="(q) => searchQuery = q"
       :totalCount="resources.length"
       :selectedChapter="selectedChapter"
-      @toggleDrawer="isDrawerOpen = !isDrawerOpen"
+      :isDesktopSidebarOpen="isDesktopSidebarOpen"
+      @toggleDesktopSidebar="isDesktopSidebarOpen = !isDesktopSidebarOpen"
+      @openMobileDrawer="isMobileDrawerOpen = true"
       @reset="resetFilters"
     />
 
@@ -114,87 +119,115 @@ const handleExploreConic = () => {
         @exploreConic="handleExploreConic"
       />
 
-      <!-- Content Area -->
-      <div class="w-full">
+      <!-- Main Layout Grid: Left Content + Right Curriculum Sidebar on Desktop -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- Condition A: Chapter Concept Detail Mode (Requirement 4) -->
-        <ChapterDetail
-          v-if="isChapterDetailView && selectedChapter"
-          :chapterName="selectedChapter"
-          :resources="resources"
-          @back="selectedChapter = null"
-          @openLab="(item) => activeLab = item"
-          @openPdf="(item, ans) => activePdf = { resource: item, showAnswer: ans }"
-        />
-
-        <!-- Condition B: Resource Cards Grid Mode (When searching or filtering by resource type) -->
-        <div v-else class="space-y-6">
+        <!-- Main Content Area: Takes 8 cols when sidebar open, or full 12 cols when collapsed -->
+        <div 
+          class="transition-all duration-300"
+          :class="isDesktopSidebarOpen ? 'lg:col-span-8' : 'lg:col-span-12'"
+        >
           
-          <!-- Filter Bar Header -->
-          <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/50 border border-slate-800/80 px-4 py-3 rounded-2xl">
-            <div class="flex items-center gap-2 text-xs text-slate-300">
-              <Filter class="w-3.5 h-3.5 text-sky-400" />
-              <span>
-                共篩選出 <strong class="text-sky-300 font-bold">{{ filteredResources.length }}</strong> 筆資源
-              </span>
-              <span v-if="selectedChapter" class="text-slate-400">
-                （單元：<span class="text-amber-300">{{ selectedChapter }}</span>）
-              </span>
-              <span v-if="resourceType !== 'all'" class="text-slate-400">
-                （型態篩選中）
-              </span>
+          <!-- Condition A: Chapter Concept Detail Mode (Requirement 4) -->
+          <ChapterDetail
+            v-if="isChapterDetailView && selectedChapter"
+            :chapterName="selectedChapter"
+            :resources="resources"
+            @back="selectedChapter = null"
+            @openLab="(item) => activeLab = item"
+            @openPdf="(item, ans) => activePdf = { resource: item, showAnswer: ans }"
+          />
+
+          <!-- Condition B: Resource Cards Grid Mode -->
+          <div v-else class="space-y-6">
+            
+            <!-- Filter Bar Header -->
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/50 border border-slate-800/80 px-4 py-3 rounded-2xl">
+              <div class="flex items-center gap-2 text-xs text-slate-300">
+                <Filter class="w-3.5 h-3.5 text-sky-400" />
+                <span>
+                  共篩選出 <strong class="text-sky-300 font-bold">{{ filteredResources.length }}</strong> 筆資源
+                </span>
+                <span v-if="selectedChapter" class="text-slate-400">
+                  （單元：<span class="text-amber-300">{{ selectedChapter }}</span>）
+                </span>
+                <span v-if="resourceType !== 'all'" class="text-slate-400">
+                  （型態篩選中）
+                </span>
+              </div>
+
+              <button
+                v-if="stage !== 'all' || resourceType !== 'all' || subject !== 'all' || selectedChapter || searchQuery"
+                @click="resetFilters"
+                class="text-xs text-slate-400 hover:text-sky-300 transition-colors underline"
+              >
+                清除所有篩選條件
+              </button>
             </div>
 
-            <button
-              v-if="stage !== 'all' || resourceType !== 'all' || subject !== 'all' || selectedChapter || searchQuery"
-              @click="resetFilters"
-              class="text-xs text-slate-400 hover:text-sky-300 transition-colors underline"
+            <!-- Cards Grid -->
+            <div 
+              v-if="filteredResources.length > 0" 
+              class="grid grid-cols-1 gap-5"
+              :class="isDesktopSidebarOpen ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'"
             >
-              清除所有篩選條件
-            </button>
+              <ResourceCard
+                v-for="res in filteredResources"
+                :key="res.id"
+                :resource="res"
+                @openLab="(item) => activeLab = item"
+                @openPdf="(item, viewAns) => activePdf = { resource: item, showAnswer: viewAns }"
+              />
+            </div>
+
+            <!-- Empty State -->
+            <div v-else class="bg-slate-900/30 border border-dashed border-slate-800 rounded-3xl p-12 text-center">
+              <Search class="w-12 h-12 text-slate-600 mx-auto mb-4" />
+              <h3 class="text-lg font-bold text-slate-300 mb-2">找不到符合條件的教學資源</h3>
+              <p class="text-xs text-slate-500 max-w-md mx-auto mb-6">
+                可點選右側課綱單元地圖瀏覽章節重點筆記，或更換關鍵字重新搜尋。
+              </p>
+              <button
+                @click="resetFilters"
+                class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-xl transition-colors"
+              >
+                重置篩選條件
+              </button>
+            </div>
+
           </div>
 
-          <!-- Cards Grid -->
-          <div v-if="filteredResources.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            <ResourceCard
-              v-for="res in filteredResources"
-              :key="res.id"
-              :resource="res"
-              @openLab="(item) => activeLab = item"
-              @openPdf="(item, viewAns) => activePdf = { resource: item, showAnswer: viewAns }"
-            />
-          </div>
+        </div>
 
-          <!-- Empty State -->
-          <div v-else class="bg-slate-900/30 border border-dashed border-slate-800 rounded-3xl p-12 text-center">
-            <Search class="w-12 h-12 text-slate-600 mx-auto mb-4" />
-            <h3 class="text-lg font-bold text-slate-300 mb-2">找不到符合條件的教學資源</h3>
-            <p class="text-xs text-slate-500 max-w-md mx-auto mb-6">
-              可點擊左上角「課綱單元地圖」瀏覽特定單元重點，或更換關鍵字重新搜尋。
-            </p>
-            <button
-              @click="resetFilters"
-              class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-xl transition-colors"
-            >
-              重置篩選條件
-            </button>
-          </div>
-
+        <!-- Desktop Right Sidebar: Default EXPANDED on the RIGHT (4 cols on lg) -->
+        <div 
+          v-if="isDesktopSidebarOpen"
+          class="hidden lg:block lg:col-span-4 sticky top-20"
+        >
+          <CurriculumTree
+            mode="embedded"
+            :stage="stage"
+            @update:stage="(s) => stage = s"
+            :selectedChapter="selectedChapter"
+            @selectChapter="(ch) => selectedChapter = ch"
+            :resources="resources"
+          />
         </div>
 
       </div>
 
     </main>
 
-    <!-- Slide-over Curriculum Tree Drawer (Requirement 2 & 6) -->
+    <!-- Mobile Slide-over Drawer (Opens from the RIGHT side!) -->
     <CurriculumTree
-      :isOpen="isDrawerOpen"
+      mode="drawer"
+      :isOpen="isMobileDrawerOpen"
       :stage="stage"
       @update:stage="(s) => stage = s"
       :selectedChapter="selectedChapter"
-      @selectChapter="(ch) => { selectedChapter = ch; }"
+      @selectChapter="(ch) => selectedChapter = ch"
       :resources="resources"
-      @close="isDrawerOpen = false"
+      @close="isMobileDrawerOpen = false"
     />
 
     <!-- Footer -->
