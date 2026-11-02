@@ -7,6 +7,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       padding: 0;
@@ -16,32 +19,38 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      width: 100vw;
       overflow: hidden;
     }
     header {
       background: #1e293b;
-      padding: 10px 24px;
+      padding: 8px 20px;
       border-bottom: 1px solid #334155;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
     header h1 {
       margin: 0;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       color: #38bdf8;
     }
     .main-container {
       display: flex;
-      flex: 1;
+      flex: 1 1 0%;
+      min-height: 0;
       position: relative;
     }
     .panel {
-      flex: 1;
+      flex: 1 1 0%;
+      min-height: 0;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       position: relative;
       border-right: 1px solid #334155;
+      overflow: hidden;
     }
     .panel:last-child {
       border-right: none;
@@ -86,6 +95,10 @@
     #container3d {
       width: 100%;
       height: 100%;
+      overflow: hidden;
+    }
+    #container3d canvas {
+      display: block;
     }
     canvas#canvas2d {
       width: 100%;
@@ -109,22 +122,23 @@
     }
     .controls {
       background: #1e293b;
-      padding: 12px 24px;
+      padding: 8px 20px 10px 20px;
       border-top: 1px solid #334155;
       display: grid;
-      grid-template-columns: 1.2fr 1fr 300px;
-      gap: 20px;
+      grid-template-columns: 1.2fr 1fr 340px;
+      gap: 18px;
       align-items: center;
+      flex-shrink: 0;
     }
     .control-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 3px;
     }
     .label-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #94a3b8;
     }
     .label-row span.val {
@@ -138,6 +152,7 @@
       height: 6px;
       border-radius: 3px;
       outline: none;
+      margin: 3px 0;
     }
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
@@ -160,13 +175,17 @@
     .badge-ellipse   { background: #047857; color: #d1fae5; }
     .badge-circle    { background: #6d28d9; color: #ede9fe; }
     .info-box {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: #cbd5e1;
-      line-height: 1.45;
+      line-height: 1.4;
       background: #0f172a;
-      padding: 8px 12px;
+      padding: 6px 12px;
       border-radius: 6px;
       border: 1px solid #334155;
+      min-height: 54px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     @media (max-width: 768px) {
       .main-container { flex-direction: column; }
@@ -798,20 +817,52 @@
       }
     }
 
+    // 繪製左下角圖例面板 (半透明底色，避免與曲線交疊難以識別)
+    ctx2d.save();
+    ctx2d.fillStyle = "rgba(15, 23, 42, 0.85)";
+    ctx2d.strokeStyle = "#334155";
+    ctx2d.lineWidth = 1;
+    if (ctx2d.roundRect) {
+      ctx2d.beginPath();
+      ctx2d.roundRect(14, h - 52, 225, 40, 6);
+      ctx2d.fill();
+      ctx2d.stroke();
+    } else {
+      ctx2d.fillRect(14, h - 52, 225, 40);
+      ctx2d.strokeRect(14, h - 52, 225, 40);
+    }
+
     ctx2d.font = "12px sans-serif";
     ctx2d.fillStyle = "#facc15";
-    ctx2d.fillText("-- 基準面 π₀ 漸近線 (過頂點)", 20, h - 35);
+    ctx2d.fillText("-- 基準面 π₀ 漸近線 (過頂點)", 22, h - 33);
     ctx2d.fillStyle = "#38bdf8";
-    ctx2d.fillText("—— 平移截面 π_d 截痕", 20, h - 15);
+    ctx2d.fillText("—— 平移截面 π_d 截痕", 22, h - 16);
 
-    // 視圖狀態提示 (右下角)
-    ctx2d.font = "11px monospace";
-    ctx2d.fillStyle = "#64748b";
-    ctx2d.textAlign = "right";
+    // 視圖狀態提示 (右下角半透明晶片)
     const zoomText = `縮放: ${(zoom * 100).toFixed(0)}%`;
     const panText = (Math.abs(panX) > 1 || Math.abs(panY) > 1) ? ` 平移: (${panX.toFixed(0)}, ${-panY.toFixed(0)})` : '';
-    ctx2d.fillText(zoomText + panText, w - 16, h - 15);
+    const statusText = zoomText + panText;
+    ctx2d.font = "11px monospace";
+    const textW = ctx2d.measureText(statusText).width;
+
+    ctx2d.fillStyle = "rgba(15, 23, 42, 0.85)";
+    ctx2d.strokeStyle = "#334155";
+    ctx2d.lineWidth = 1;
+    if (ctx2d.roundRect) {
+      ctx2d.beginPath();
+      ctx2d.roundRect(w - textW - 24, h - 34, textW + 16, 22, 4);
+      ctx2d.fill();
+      ctx2d.stroke();
+    } else {
+      ctx2d.fillRect(w - textW - 24, h - 34, textW + 16, 22);
+      ctx2d.strokeRect(w - textW - 24, h - 34, textW + 16, 22);
+    }
+
+    ctx2d.fillStyle = "#94a3b8";
+    ctx2d.textAlign = "right";
+    ctx2d.fillText(statusText, w - 16, h - 19);
     ctx2d.textAlign = "left";
+    ctx2d.restore();
   }
 
   function onResize() {
