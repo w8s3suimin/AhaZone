@@ -91,6 +91,21 @@
       width: 100%;
       height: 100%;
       display: block;
+      cursor: grab;
+      touch-action: none;
+    }
+    .panel-actions {
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .btn-secondary {
+      background: #334155;
+      border-color: #64748b;
+    }
+    .btn-secondary:hover {
+      background: #475569;
+      border-color: #94a3b8;
     }
     .controls {
       background: #1e293b;
@@ -163,7 +178,7 @@
 
 <header>
   <h1>雙圓錐截面全域幾何分析 (0°~90° 嚴密共面與漸近對偶)</h1>
-  <div style="font-size: 0.85rem; color: #94a3b8;">圓錐半頂角 α = 45° ｜ <span style="color:#38bdf8;">左圖滑鼠左鍵旋轉、滾輪縮放</span></div>
+  <div style="font-size: 0.85rem; color: #94a3b8;">圓錐半頂角 α = 45° ｜ <span style="color:#38bdf8;">左圖：左鍵旋轉、滾輪縮放 ｜ 右圖：拖曳平移、滾輪縮放 (雙擊復位)</span></div>
 </header>
 
 <div class="main-container">
@@ -177,7 +192,10 @@
   <div class="panel">
     <div class="panel-header">
       <div class="panel-title" id="viewModeTitle">2D 視圖：空間剛體垂直投影 (漸近線真實對偶)</div>
-      <button class="toggle-btn" id="btnToggleView">切換為：曲線中心對稱視圖</button>
+      <div class="panel-actions">
+        <button class="toggle-btn btn-secondary" id="btnResetView" title="復位 2D 畫布平移與縮放 (雙擊畫布亦可)">重置視角</button>
+        <button class="toggle-btn" id="btnToggleView">切換為：曲線中心對稱視圖</button>
+      </div>
     </div>
     <canvas id="canvas2d"></canvas>
   </div>
@@ -271,9 +289,27 @@
   const curveTypeBadge = document.getElementById('curveTypeBadge');
   const metricsBox = document.getElementById('metricsBox');
   const btnToggleView = document.getElementById('btnToggleView');
+  const btnResetView = document.getElementById('btnResetView');
   const viewModeTitle = document.getElementById('viewModeTitle');
 
   let isProjectionMode = true;
+  let panX = 0;
+  let panY = 0;
+  let zoom = 1.0;
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let dragStartPanX = 0;
+  let dragStartPanY = 0;
+
+  function resetView2D() {
+    panX = 0;
+    panY = 0;
+    zoom = 1.0;
+    update();
+  }
+
+  btnResetView.addEventListener('click', resetView2D);
 
   btnToggleView.addEventListener('click', () => {
     isProjectionMode = !isProjectionMode;
@@ -284,7 +320,117 @@
       viewModeTitle.innerText = "2D 視圖：曲線中心固有對稱視圖";
       btnToggleView.innerText = "切換為：空間剛體垂直投影";
     }
+    resetView2D();
+  });
+
+  // 滑鼠拖曳平移 (Pan)
+  canvas2d.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return; // 僅滑鼠左鍵
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    dragStartPanX = panX;
+    dragStartPanY = panY;
+    canvas2d.style.cursor = 'grabbing';
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    panX = dragStartPanX + (e.clientX - dragStartX);
+    panY = dragStartPanY + (e.clientY - dragStartY);
     update();
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      canvas2d.style.cursor = 'grab';
+    }
+  });
+
+  // 雙擊畫布復位
+  canvas2d.addEventListener('dblclick', resetView2D);
+
+  // 滑鼠滾輪以游標為中心縮放 (Zoom)
+  canvas2d.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const rect = canvas2d.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const zoomFactor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+    const newZoom = Math.max(0.15, Math.min(25, zoom * zoomFactor));
+    if (newZoom !== zoom) {
+      const w = canvas2d.width;
+      const h = canvas2d.height;
+      panX = mouseX - w / 2 - (mouseX - w / 2 - panX) * (newZoom / zoom);
+      panY = mouseY - h / 2 - (mouseY - h / 2 - panY) * (newZoom / zoom);
+      zoom = newZoom;
+      update();
+    }
+  }, { passive: false });
+
+  // 觸控手勢支援 (單指平移、雙指縮放)
+  let touchStartDist = 0;
+  let touchStartZoom = 1.0;
+
+  canvas2d.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      isDragging = true;
+      dragStartX = e.touches[0].clientX;
+      dragStartY = e.touches[0].clientY;
+      dragStartPanX = panX;
+      dragStartPanY = panY;
+    } else if (e.touches.length === 2) {
+      isDragging = false;
+      touchStartDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      touchStartZoom = zoom;
+    }
+  }, { passive: false });
+
+  canvas2d.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (e.touches.length === 1 && isDragging) {
+      panX = dragStartPanX + (e.touches[0].clientX - dragStartX);
+      panY = dragStartPanY + (e.touches[0].clientY - dragStartY);
+      update();
+    } else if (e.touches.length === 2 && touchStartDist > 0) {
+      const currentDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      const rect = canvas2d.getBoundingClientRect();
+      const canvasMidX = midX - rect.left;
+      const canvasMidY = midY - rect.top;
+
+      const newZoom = Math.max(0.2, Math.min(15, touchStartZoom * (currentDist / touchStartDist)));
+      if (newZoom !== zoom) {
+        const w = canvas2d.width;
+        const h = canvas2d.height;
+        panX = canvasMidX - w / 2 - (canvasMidX - w / 2 - panX) * (newZoom / zoom);
+        panY = canvasMidY - h / 2 - (canvasMidY - h / 2 - panY) * (newZoom / zoom);
+        zoom = newZoom;
+        update();
+      }
+    }
+  }, { passive: false });
+
+  canvas2d.addEventListener('touchend', (e) => {
+    if (e.touches.length === 0) {
+      isDragging = false;
+      touchStartDist = 0;
+    } else if (e.touches.length === 1) {
+      isDragging = true;
+      dragStartX = e.touches[0].clientX;
+      dragStartY = e.touches[0].clientY;
+      dragStartPanX = panX;
+      dragStartPanY = panY;
+    }
   });
 
   function update() {
@@ -423,23 +569,69 @@
     }
   }
 
-  // ==================== 2D 畫布繪製 (支援雙重視角) ====================
+  // ==================== 2D 畫布繪製 (支援雙重視角與平移縮放) ====================
   function draw2D(theta, d, type) {
     const w = canvas2d.width;
     const h = canvas2d.height;
     ctx2d.clearRect(0, 0, w, h);
 
-    const cx = w / 2;
-    const cy = h / 2;
-    const scale = Math.min(w, h) / 8.5;
+    const baseScale = Math.min(w, h) / 8.5;
+    const scale = baseScale * zoom;
+    const cx = w / 2 + panX;
+    const cy = h / 2 + panY;
 
-    // 網格坐標軸
-    ctx2d.strokeStyle = "#1e293b";
+    // 計算當前視區在世界坐標下的範圍
+    const uLeft = (-cx) / scale;
+    const uRight = (w - cx) / scale;
+    const vTop = cy / scale;
+    const vBottom = (cy - h) / scale;
+
+    const uSpan = Math.max(8.0, Math.max(Math.abs(uLeft), Math.abs(uRight)) + 2);
+    const vMaxBound = Math.max(8.0, vTop + 3);
+    const vMinBound = Math.min(-8.0, vBottom - 3);
+
+    // 背景次要格線 (隨平移縮放自適應)
+    ctx2d.strokeStyle = "#162032";
     ctx2d.lineWidth = 1;
+    ctx2d.beginPath();
+    let gridStep = 1;
+    if (scale < 30) gridStep = 5;
+    else if (scale < 60) gridStep = 2;
+    else if (scale > 180) gridStep = 0.5;
+
+    const uGridStart = Math.floor(uLeft / gridStep) * gridStep;
+    const uGridEnd = Math.ceil(uRight / gridStep) * gridStep;
+    for (let u = uGridStart; u <= uGridEnd; u += gridStep) {
+      const gx = cx + u * scale;
+      ctx2d.moveTo(gx, 0);
+      ctx2d.lineTo(gx, h);
+    }
+    const vGridStart = Math.floor(vBottom / gridStep) * gridStep;
+    const vGridEnd = Math.ceil(vTop / gridStep) * gridStep;
+    for (let v = vGridStart; v <= vGridEnd; v += gridStep) {
+      const gy = cy - v * scale;
+      ctx2d.moveTo(0, gy);
+      ctx2d.lineTo(w, gy);
+    }
+    ctx2d.stroke();
+
+    // 主坐標軸 (u 軸與 v 軸)
+    ctx2d.strokeStyle = "#334155";
+    ctx2d.lineWidth = 1.5;
     ctx2d.beginPath();
     ctx2d.moveTo(0, cy); ctx2d.lineTo(w, cy);
     ctx2d.moveTo(cx, 0); ctx2d.lineTo(cx, h);
     ctx2d.stroke();
+
+    // 原點 (0,0) 標記
+    if (cx >= -30 && cx <= w + 30 && cy >= -30 && cy <= h + 30) {
+      ctx2d.fillStyle = "#64748b";
+      ctx2d.beginPath();
+      ctx2d.arc(cx, cy, 3, 0, Math.PI * 2);
+      ctx2d.fill();
+      ctx2d.font = "11px monospace";
+      ctx2d.fillText("O", cx + 5, cy + 14);
+    }
 
     const cosT = Math.cos(theta);
     const sinT = Math.sin(theta);
@@ -457,17 +649,15 @@
         </div>
       `;
 
-      // 漸近線 (黃虛線)
+      // 漸近線 (黃虛線，隨視圖範圍延伸)
       ctx2d.strokeStyle = "#facc15";
       ctx2d.lineWidth = 2;
       ctx2d.setLineDash([5, 4]);
       ctx2d.beginPath();
-      const vMax = 4.0;
-      const uMax = tanPsi * vMax;
-      ctx2d.moveTo(cx - uMax * scale, cy + vMax * scale);
-      ctx2d.lineTo(cx + uMax * scale, cy - vMax * scale);
-      ctx2d.moveTo(cx + uMax * scale, cy + vMax * scale);
-      ctx2d.lineTo(cx - uMax * scale, cy - vMax * scale);
+      ctx2d.moveTo(cx - tanPsi * vMaxBound * scale, cy - vMaxBound * scale);
+      ctx2d.lineTo(cx - tanPsi * vMinBound * scale, cy - vMinBound * scale);
+      ctx2d.moveTo(cx + tanPsi * vMaxBound * scale, cy - vMaxBound * scale);
+      ctx2d.lineTo(cx + tanPsi * vMinBound * scale, cy - vMinBound * scale);
       ctx2d.stroke();
       ctx2d.setLineDash([]);
 
@@ -476,10 +666,13 @@
       ctx2d.lineWidth = 2.5;
 
       if (isProjectionMode) {
-        function drawProjectedBranch(vStart, vEnd, step) {
+        const vTopVertex = d * (1 + Math.sin(2 * theta)) / diff;
+        const vBotVertex = d * (Math.sin(2 * theta) - 1) / diff;
+
+        function drawProjectedBranch(vStart, vTarget, step) {
           ctx2d.beginPath();
           let started = false;
-          for (let v = vStart; (step > 0 ? v <= vEnd : v >= vEnd); v += step) {
+          for (let v = vStart; (step > 0 ? v <= vTarget : v >= vTarget); v += step) {
             const uSq = diff * v * v - 2 * d * Math.sin(2 * theta) * v - d * d * diff;
             if (uSq >= 0) {
               const u = Math.sqrt(uSq);
@@ -489,25 +682,33 @@
               else ctx2d.lineTo(px, py);
             }
           }
-          for (let v = vEnd; (step > 0 ? v >= vStart : v <= vStart); v -= step) {
+          for (let v = vTarget; (step > 0 ? v >= vStart : v <= vStart); v -= step) {
             const uSq = diff * v * v - 2 * d * Math.sin(2 * theta) * v - d * d * diff;
             if (uSq >= 0) {
               const u = -Math.sqrt(uSq);
               const px = cx + u * scale;
               const py = cy - v * scale;
-              ctx2d.lineTo(px, py);
+              if (!started) { ctx2d.moveTo(px, py); started = true; }
+              else ctx2d.lineTo(px, py);
             }
           }
           ctx2d.stroke();
         }
-        drawProjectedBranch(0.1, 4.0, 0.05);
-        drawProjectedBranch(-0.1, -4.0, -0.05);
+
+        const vStep = Math.max(0.015, Math.min(0.06, (vMaxBound - vMinBound) / 350));
+        if (vMaxBound >= vTopVertex) {
+          drawProjectedBranch(vTopVertex, vMaxBound, vStep);
+        }
+        if (vMinBound <= vBotVertex) {
+          drawProjectedBranch(vBotVertex, vMinBound, -vStep);
+        }
 
       } else {
         const b = (d * sinT) / diff;
+        const uStep = Math.max(0.015, Math.min(0.06, uSpan / 150));
         ctx2d.beginPath();
         let started = false;
-        for (let u = -3.5; u <= 3.5; u += 0.05) {
+        for (let u = -uSpan; u <= uSpan; u += uStep) {
           const v = Math.sqrt(b * b + (u * u) / (tanPsi * tanPsi));
           const px = cx + u * scale;
           const py = cy - v * scale;
@@ -518,7 +719,7 @@
 
         ctx2d.beginPath();
         started = false;
-        for (let u = -3.5; u <= 3.5; u += 0.05) {
+        for (let u = -uSpan; u <= uSpan; u += uStep) {
           const v = -Math.sqrt(b * b + (u * u) / (tanPsi * tanPsi));
           const px = cx + u * scale;
           const py = cy - v * scale;
@@ -548,7 +749,8 @@
       ctx2d.beginPath();
       let started = false;
       const pScale = 0.55 / d;
-      for (let u = -3.5; u <= 3.5; u += 0.05) {
+      const uStep = Math.max(0.015, Math.min(0.06, uSpan / 150));
+      for (let u = -uSpan; u <= uSpan; u += uStep) {
         const v = -1.2 + pScale * u * u;
         const px = cx + u * scale;
         const py = cy - v * scale;
@@ -576,15 +778,17 @@
       ctx2d.strokeStyle = isCircle ? "#a855f7" : "#10b981";
       ctx2d.lineWidth = 2.5;
 
-      ctx2d.beginPath();
       const rX = aSemi * scale;
       const rY = bSemi * scale;
       const yPos = isProjectionMode ? cy - v0 * scale : cy;
 
-      ctx2d.ellipse(cx, yPos, Math.min(w * 0.45, rX), Math.min(h * 0.45, rY), 0, 0, Math.PI * 2);
-      ctx2d.stroke();
+      if (rX < 100000 && rY < 100000) {
+        ctx2d.beginPath();
+        ctx2d.ellipse(cx, yPos, rX, rY, 0, 0, Math.PI * 2);
+        ctx2d.stroke();
+      }
 
-      if (!isCircle && rY > rX) {
+      if (!isCircle && rY > rX && rY < 100000) {
         const cF = Math.sqrt(Math.max(0, rY * rY - rX * rX));
         ctx2d.fillStyle = "#ef4444";
         ctx2d.beginPath();
@@ -599,6 +803,15 @@
     ctx2d.fillText("-- 基準面 π₀ 漸近線 (過頂點)", 20, h - 35);
     ctx2d.fillStyle = "#38bdf8";
     ctx2d.fillText("—— 平移截面 π_d 截痕", 20, h - 15);
+
+    // 視圖狀態提示 (右下角)
+    ctx2d.font = "11px monospace";
+    ctx2d.fillStyle = "#64748b";
+    ctx2d.textAlign = "right";
+    const zoomText = `縮放: ${(zoom * 100).toFixed(0)}%`;
+    const panText = (Math.abs(panX) > 1 || Math.abs(panY) > 1) ? ` 平移: (${panX.toFixed(0)}, ${-panY.toFixed(0)})` : '';
+    ctx2d.fillText(zoomText + panText, w - 16, h - 15);
+    ctx2d.textAlign = "left";
   }
 
   function onResize() {
