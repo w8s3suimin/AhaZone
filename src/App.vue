@@ -4,11 +4,12 @@ import Navbar from './components/Navbar.vue';
 import CurriculumTree from './components/CurriculumTree.vue';
 import HeroBanner from './components/HeroBanner.vue';
 import ResourceCard from './components/ResourceCard.vue';
+import ChapterDetail from './components/ChapterDetail.vue';
 import DynamicLabModal from './components/DynamicLabModal.vue';
 import PdfViewerModal from './components/PdfViewerModal.vue';
 import { INITIAL_RESOURCES } from './data/resources';
 import { EducationStage, ResourceType, SubjectId, ResourceItem } from './types';
-import { Search, Filter, CheckCircle2 } from 'lucide-vue-next';
+import { Search, Filter, CheckCircle2, RotateCcw } from 'lucide-vue-next';
 
 const resources = ref<ResourceItem[]>(INITIAL_RESOURCES);
 const stage = ref<EducationStage>('all');
@@ -17,10 +18,14 @@ const subject = ref<SubjectId>('all');
 const selectedChapter = ref<string | null>(null);
 const searchQuery = ref<string>('');
 
+// Curriculum Map Drawer State (Requirement 2)
+const isDrawerOpen = ref(false);
+
 // Modals state
 const activeLab = ref<ResourceItem | null>(null);
 const activePdf = ref<{ resource: ResourceItem; showAnswer: boolean } | null>(null);
 
+// Filtered resources for card mode
 const filteredResources = computed(() => {
   return resources.value.filter((item) => {
     // Stage filter
@@ -32,10 +37,10 @@ const filteredResources = computed(() => {
     // Subject filter
     if (subject.value !== 'all' && item.subject !== subject.value) return false;
 
-    // Chapter filter
+    // Chapter filter (when in card mode)
     if (selectedChapter.value) {
-      const itemChapter = item.chapter.toLowerCase();
-      const sel = selectedChapter.value.toLowerCase();
+      const itemChapter = item.chapter.toLowerCase().replace(/\[.*?\]/g, '').trim();
+      const sel = selectedChapter.value.toLowerCase().replace(/\[.*?\]/g, '').trim();
       if (!itemChapter.includes(sel) && !sel.includes(itemChapter)) {
         return false;
       }
@@ -60,6 +65,14 @@ const filteredResources = computed(() => {
   });
 });
 
+// View mode logic (Requirement 4):
+// If chapter is selected AND user has NOT explicitly selected a specific resourceType filter (i.e. resourceType === 'all') AND not searching:
+// Show Chapter Detail View (Concept summary + Attached resources below).
+// Otherwise: Show Resource Cards Grid View.
+const isChapterDetailView = computed(() => {
+  return !!selectedChapter.value && resourceType.value === 'all' && !searchQuery.value.trim();
+});
+
 const resetFilters = () => {
   stage.value = 'all';
   resourceType.value = 'all';
@@ -79,15 +92,13 @@ const handleExploreConic = () => {
 <template>
   <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-sky-500 selection:text-white">
     
-    <!-- Top Navigation -->
+    <!-- Top Navigation (Clean, drawer button on left, no stage buttons) -->
     <Navbar
-      :stage="stage"
-      @update:stage="(s) => { stage = s; selectedChapter = null; }"
-      :resourceType="resourceType"
-      @update:resourceType="(t) => resourceType = t"
       :searchQuery="searchQuery"
       @update:searchQuery="(q) => searchQuery = q"
       :totalCount="resources.length"
+      :selectedChapter="selectedChapter"
+      @toggleDrawer="isDrawerOpen = !isDrawerOpen"
       @reset="resetFilters"
     />
 
@@ -103,21 +114,21 @@ const handleExploreConic = () => {
         @exploreConic="handleExploreConic"
       />
 
-      <!-- Content Layout: 108 Curriculum Sidebar + Resource List -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <!-- Content Area -->
+      <div class="w-full">
         
-        <!-- Left Column: 108 Curriculum Navigation (4 cols on lg) -->
-        <div class="lg:col-span-4 sticky top-20">
-          <CurriculumTree
-            :stage="stage"
-            :selectedChapter="selectedChapter"
-            @selectChapter="(ch) => selectedChapter = ch"
-            :resources="resources"
-          />
-        </div>
+        <!-- Condition A: Chapter Concept Detail Mode (Requirement 4) -->
+        <ChapterDetail
+          v-if="isChapterDetailView && selectedChapter"
+          :chapterName="selectedChapter"
+          :resources="resources"
+          @back="selectedChapter = null"
+          @openLab="(item) => activeLab = item"
+          @openPdf="(item, ans) => activePdf = { resource: item, showAnswer: ans }"
+        />
 
-        <!-- Right Column: Resource Cards (8 cols on lg) -->
-        <div class="lg:col-span-8 space-y-6">
+        <!-- Condition B: Resource Cards Grid Mode (When searching or filtering by resource type) -->
+        <div v-else class="space-y-6">
           
           <!-- Filter Bar Header -->
           <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/50 border border-slate-800/80 px-4 py-3 rounded-2xl">
@@ -128,6 +139,9 @@ const handleExploreConic = () => {
               </span>
               <span v-if="selectedChapter" class="text-slate-400">
                 （單元：<span class="text-amber-300">{{ selectedChapter }}</span>）
+              </span>
+              <span v-if="resourceType !== 'all'" class="text-slate-400">
+                （型態篩選中）
               </span>
             </div>
 
@@ -140,8 +154,8 @@ const handleExploreConic = () => {
             </button>
           </div>
 
-          <!-- Resources List -->
-          <div v-if="filteredResources.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <!-- Cards Grid -->
+          <div v-if="filteredResources.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <ResourceCard
               v-for="res in filteredResources"
               :key="res.id"
@@ -156,7 +170,7 @@ const handleExploreConic = () => {
             <Search class="w-12 h-12 text-slate-600 mx-auto mb-4" />
             <h3 class="text-lg font-bold text-slate-300 mb-2">找不到符合條件的教學資源</h3>
             <p class="text-xs text-slate-500 max-w-md mx-auto mb-6">
-              嘗試更換關鍵字、清除單元選擇，或在左側課綱地圖選取其他年級。
+              可點擊左上角「課綱單元地圖」瀏覽特定單元重點，或更換關鍵字重新搜尋。
             </p>
             <button
               @click="resetFilters"
@@ -172,6 +186,17 @@ const handleExploreConic = () => {
 
     </main>
 
+    <!-- Slide-over Curriculum Tree Drawer (Requirement 2 & 6) -->
+    <CurriculumTree
+      :isOpen="isDrawerOpen"
+      :stage="stage"
+      @update:stage="(s) => stage = s"
+      :selectedChapter="selectedChapter"
+      @selectChapter="(ch) => { selectedChapter = ch; }"
+      :resources="resources"
+      @close="isDrawerOpen = false"
+    />
+
     <!-- Footer -->
     <footer class="mt-16 bg-slate-950 border-t border-slate-900 py-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -181,14 +206,14 @@ const handleExploreConic = () => {
             <span class="text-slate-400 font-mono text-sm">｜ AhaZone</span>
           </div>
           <p class="text-xs text-slate-500">
-            專為台灣國中、高中 108 課綱數理體系打造的動態直觀學習庫 (Vue 3 + Vite)
+            專為台灣國中、高中 108 課綱數理體系打造的動態直觀學習庫
           </p>
         </div>
 
         <div class="flex items-center gap-4 text-xs text-slate-400">
           <span class="flex items-center gap-1.5">
             <CheckCircle2 class="w-3.5 h-3.5 text-emerald-400" />
-            <span>Ready for Vercel & GitHub</span>
+            <span>108 課綱數理整合平台</span>
           </span>
         </div>
       </div>
