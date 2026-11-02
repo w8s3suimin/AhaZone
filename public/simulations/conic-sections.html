@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>雙圓錐截面全域幾何分析 (完美咬合解析版) - 悟境 AhaZone</title>
+  <!-- Three.js 與軌道控制器 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0f172a;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      background: #1e293b;
+      padding: 10px 24px;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #38bdf8;
+    }
+    .main-container {
+      display: flex;
+      flex: 1;
+      position: relative;
+    }
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      border-right: 1px solid #334155;
+    }
+    .panel:last-child {
+      border-right: none;
+    }
+    .panel-header {
+      position: absolute;
+      top: 12px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .panel-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      pointer-events: auto;
+    }
+    .toggle-btn {
+      pointer-events: auto;
+      background: #0284c7;
+      color: #ffffff;
+      border: 1px solid #38bdf8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+    }
+    .toggle-btn:hover {
+      background: #0369a1;
+      border-color: #7dd3fc;
+    }
+    #container3d {
+      width: 100%;
+      height: 100%;
+    }
+    canvas#canvas2d {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .controls {
+      background: #1e293b;
+      padding: 12px 24px;
+      border-top: 1px solid #334155;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 300px;
+      gap: 20px;
+      align-items: center;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    .label-row span.val {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: #334155;
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+    .badge-hyperbola { background: #0369a1; color: #e0f2fe; }
+    .badge-parabola  { background: #b45309; color: #fef3c7; }
+    .badge-ellipse   { background: #047857; color: #d1fae5; }
+    .badge-circle    { background: #6d28d9; color: #ede9fe; }
+    .info-box {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+      background: #0f172a;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+    }
+    @media (max-width: 768px) {
+      .main-container { flex-direction: column; }
+      .controls { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>雙圓錐截面全域幾何分析 (0°~90° 嚴密共面咬合與漸近對偶)</h1>
+  <div style="font-size: 0.85rem; color: #94a3b8;">圓錐半頂角 α = 45° ｜ <span style="color:#38bdf8;">左圖滑鼠左鍵旋轉、滾輪縮放</span></div>
+</header>
+
+<div class="main-container">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">立體 3D 空間：沙漏雙錐、黃色面 π₀、青色截面 π_d</div>
+    </div>
+    <div id="container3d"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title" id="viewModeTitle">2D 視圖：空間剛體垂直投影 (漸近線真實對偶)</div>
+      <button class="toggle-btn" id="btnToggleView">切換為：曲線中心對稱視圖</button>
+    </div>
+    <canvas id="canvas2d"></canvas>
+  </div>
+</div>
+
+<div class="controls">
+  <!-- 傾角滑桿 -->
+  <div class="control-group">
+    <div class="label-row">
+      <span>截面與鉛直軸夾角 (θ)</span>
+      <span>
+        <span class="val" id="valTheta">0.0°</span>
+        <span id="curveTypeBadge" class="badge badge-hyperbola">雙曲線</span>
+      </span>
+    </div>
+    <input type="range" id="sliderTheta" min="0" max="90" step="0.5" value="0">
+    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#64748b;">
+      <span>0° (鉛直雙曲)</span>
+      <span>45° (平行母線臨界)</span>
+      <span>90° (水平正圓)</span>
+    </div>
+  </div>
+
+  <!-- 平移滑桿 -->
+  <div class="control-group">
+    <div class="label-row">
+      <span>平移距離 (d)</span>
+      <span class="val" id="valDist">0.80</span>
+    </div>
+    <input type="range" id="sliderDist" min="0.2" max="2.0" step="0.05" value="0.8">
+    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#64748b;">
+      <span>0.2 (靠近頂點)</span>
+      <span>2.0 (推向外緣)</span>
+    </div>
+  </div>
+
+  <!-- 數據面板 -->
+  <div class="info-box" id="metricsBox">
+    計算中...
+  </div>
+</div>
+
+<script>
+  // ==================== 1. Three.js 場景初始化 ====================
+  const container3d = document.getElementById('container3d');
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0f172a);
+
+  const camera = new THREE.PerspectiveCamera(45, container3d.clientWidth / container3d.clientHeight, 0.1, 100);
+  camera.position.set(8.5, 4.5, 9.5);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(container3d.clientWidth, container3d.clientHeight);
+  container3d.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+
+  // 建立標準沙漏雙圓錐 (原點相接，半頂角 45°)
+  const R_MAX = 4.5;
+  const H_CONE = 4.5;
+  const wireMat = new THREE.MeshBasicMaterial({ color: 0x334155, wireframe: true, transparent: true, opacity: 0.35 });
+
+  const geoTop = new THREE.CylinderGeometry(R_MAX, 0, H_CONE, 36, 8, true);
+  geoTop.translate(0, H_CONE / 2, 0);
+  scene.add(new THREE.Mesh(geoTop, wireMat));
+
+  const geoBot = new THREE.CylinderGeometry(0, R_MAX, H_CONE, 36, 8, true);
+  geoBot.translate(0, -H_CONE / 2, 0);
+  scene.add(new THREE.Mesh(geoBot, wireMat));
+
+  // 頂點紅球標記
+  const vertexMarker = new THREE.Mesh(
+    new THREE.SphereGeometry(0.09, 16, 16),
+    new THREE.MeshBasicMaterial({ color: 0xef4444 })
+  );
+  scene.add(vertexMarker);
+
+  const dynamicGroup = new THREE.Group();
+  scene.add(dynamicGroup);
+
+  // ==================== 2. 二維 Canvas 與視圖切換 ====================
+  const canvas2d = document.getElementById('canvas2d');
+  const ctx2d = canvas2d.getContext('2d');
+
+  const sliderTheta = document.getElementById('sliderTheta');
+  const sliderDist = document.getElementById('sliderDist');
+  const valTheta = document.getElementById('valTheta');
+  const valDist = document.getElementById('valDist');
+  const curveTypeBadge = document.getElementById('curveTypeBadge');
+  const metricsBox = document.getElementById('metricsBox');
+  const btnToggleView = document.getElementById('btnToggleView');
+  const viewModeTitle = document.getElementById('viewModeTitle');
+
+  let isProjectionMode = true;
+
+  btnToggleView.addEventListener('click', () => {
+    isProjectionMode = !isProjectionMode;
+    if (isProjectionMode) {
+      viewModeTitle.innerText = "2D 視圖：空間剛體垂直投影 (漸近線真實對偶)";
+      btnToggleView.innerText = "切換為：曲線中心對稱視圖";
+    } else {
+      viewModeTitle.innerText = "2D 視圖：曲線中心固有對稱視圖";
+      btnToggleView.innerText = "切換為：空間剛體垂直投影";
+    }
+    update();
+  });
+
+  function update() {
+    const thetaDeg = parseFloat(sliderTheta.value);
+    const theta = thetaDeg * Math.PI / 180;
+    const d = parseFloat(sliderDist.value);
+
+    valTheta.innerText = thetaDeg.toFixed(1) + "°";
+    valDist.innerText = d.toFixed(2);
+
+    let type = "HYPERBOLA";
+    if (Math.abs(thetaDeg - 45.0) < 0.3) {
+      type = "PARABOLA";
+      curveTypeBadge.innerText = "拋物線 (臨界)";
+      curveTypeBadge.className = "badge badge-parabola";
+    } else if (thetaDeg < 45.0) {
+      type = "HYPERBOLA";
+      curveTypeBadge.innerText = "雙曲線";
+      curveTypeBadge.className = "badge badge-hyperbola";
+    } else if (Math.abs(thetaDeg - 90.0) < 0.3) {
+      type = "CIRCLE";
+      curveTypeBadge.innerText = "正圓 (水平)";
+      curveTypeBadge.className = "badge badge-circle";
+    } else {
+      type = "ELLIPSE";
+      curveTypeBadge.innerText = "橢圓";
+      curveTypeBadge.className = "badge badge-ellipse";
+    }
+
+    update3D(theta, d, type);
+    draw2D(theta, d, type);
+  }
+
+  // ==================== 3D 更新函式 (嚴密封閉解) ====================
+  function update3D(theta, d, type) {
+    while(dynamicGroup.children.length > 0) {
+      dynamicGroup.remove(dynamicGroup.children[0]);
+    }
+
+    const cosT = Math.cos(theta);
+    const sinT = Math.sin(theta);
+
+    // 建立 3D 平面
+    const planeGeo = new THREE.PlaneGeometry(8, 8);
+
+    // 1. 黃色過頂點基準面 π₀
+    const matPi0 = new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.15, side: THREE.DoubleSide });
+    const meshPi0 = new THREE.Mesh(planeGeo, matPi0);
+    meshPi0.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, -sinT, cosT));
+    dynamicGroup.add(meshPi0);
+
+    // 2. 青色平移截面 π_d
+    const matPid = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.22, side: THREE.DoubleSide });
+    const meshPid = new THREE.Mesh(planeGeo, matPid);
+    meshPid.quaternion.copy(meshPi0.quaternion);
+    meshPid.position.set(0, -d * sinT, d * cosT); // 法向平移 d
+    dynamicGroup.add(meshPid);
+
+    // 3. 漸近線母線 (位於 π₀ 上)
+    if (theta <= Math.PI / 4) {
+      const diff = cosT * cosT - sinT * sinT;
+      const tanPsi = Math.sqrt(Math.max(0, diff)) / cosT;
+      const vMax = 4.0;
+      const uMax = tanPsi * vMax;
+
+      const asympMat = new THREE.LineDashedMaterial({ color: 0xfacc15, dashSize: 0.25, gapSize: 0.15, linewidth: 2 });
+      
+      const p1_top = new THREE.Vector3(uMax, vMax * cosT, vMax * sinT);
+      const p1_bot = new THREE.Vector3(-uMax, -vMax * cosT, -vMax * sinT);
+      const l1 = new THREE.Line(new THREE.BufferGeometry().setFromPoints([p1_bot, p1_top]), asympMat);
+      l1.computeLineDistances();
+      dynamicGroup.add(l1);
+
+      const p2_top = new THREE.Vector3(-uMax, vMax * cosT, vMax * sinT);
+      const p2_bot = new THREE.Vector3(uMax, -vMax * cosT, -vMax * sinT);
+      const l2 = new THREE.Line(new THREE.BufferGeometry().setFromPoints([p2_bot, p2_top]), asympMat);
+      l2.computeLineDistances();
+      dynamicGroup.add(l2);
+    }
+
+    // 4. 截面上的交線 (meshPid 子物件，Z=0.01 避免 Z-fighting，絕對共面)
+    const curveMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 3 });
+    const diff = cosT * cosT - sinT * sinT; // cos(2*theta)
+
+    if (type === "HYPERBOLA") {
+      function createBranch(vStart, vEnd, step) {
+        const ptsL = [], ptsR = [];
+        for (let v = vStart; (step > 0 ? v <= vEnd : v >= vEnd); v += step) {
+          const uSq = diff * v * v - 2 * d * Math.sin(2 * theta) * v - d * d * diff;
+          if (uSq >= 0) {
+            const u = Math.sqrt(uSq);
+            const worldY = v * cosT - d * sinT;
+            if (Math.abs(worldY) <= H_CONE) {
+              ptsR.push(new THREE.Vector3(u, v, 0.01));
+              ptsL.push(new THREE.Vector3(-u, v, 0.01));
+            }
+          }
+        }
+        if (ptsR.length === 0) return null;
+        return ptsL.reverse().concat(ptsR);
+      }
+
+      const ptsTop = createBranch(0, 8.0, 0.05);
+      if (ptsTop) meshPid.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(ptsTop), curveMat));
+
+      const ptsBot = createBranch(0, -8.0, -0.05);
+      if (ptsBot) meshPid.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(ptsBot), curveMat));
+
+    } else if (type === "PARABOLA") {
+      const pts = [];
+      for (let u = -3.5; u <= 3.5; u += 0.08) {
+        const v = - (u * u) / (2 * d);
+        const worldY = v * cosT - d * sinT;
+        if (Math.abs(worldY) <= H_CONE) {
+          pts.push(new THREE.Vector3(u, v, 0.01));
+        }
+      }
+      if (pts.length > 0) meshPid.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), curveMat));
+
+    } else {
+      // 橢圓與正圓 (嚴格無近似解析封閉解)
+      const K = sinT * sinT - cosT * cosT; // -cos(2*theta) > 0
+      const v0 = - (2 * d * sinT * cosT) / K;
+      const aSemi = d / Math.sqrt(K); // 水平半短軸
+      const bSemi = d / K;           // 傾斜半長軸
+
+      const pts = [];
+      const steps = 72;
+      for (let i = 0; i <= steps; i++) {
+        const phi = (i / steps) * Math.PI * 2;
+        const u = aSemi * Math.cos(phi);
+        const v = v0 + bSemi * Math.sin(phi);
+        pts.push(new THREE.Vector3(u, v, 0.01));
+      }
+      meshPid.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), curveMat));
+    }
+  }
+
+  // ==================== 2D 畫布繪製 (支援雙重視角) ====================
+  function draw2D(theta, d, type) {
+    const w = canvas2d.width;
+    const h = canvas2d.height;
+    ctx2d.clearRect(0, 0, w, h);
+
+    const cx = w / 2;
+    const cy = h / 2;
+    const scale = Math.min(w, h) / 8.5;
+
+    // 網格坐標軸
+    ctx2d.strokeStyle = "#1e293b";
+    ctx2d.lineWidth = 1;
+    ctx2d.beginPath();
+    ctx2d.moveTo(0, cy); ctx2d.lineTo(w, cy);
+    ctx2d.moveTo(cx, 0); ctx2d.lineTo(cx, h);
+    ctx2d.stroke();
+
+    const cosT = Math.cos(theta);
+    const sinT = Math.sin(theta);
+    const diff = cosT * cosT - sinT * sinT;
+
+    if (type === "HYPERBOLA") {
+      const tanPsi = Math.sqrt(Math.max(0, diff)) / cosT;
+      const angleDeg = (2 * Math.atan(tanPsi) * 180 / Math.PI);
+
+      metricsBox.innerHTML = `
+        <div><strong>截面形態：</strong><span style="color:#38bdf8; font-weight:bold;">雙曲線</span></div>
+        <div><strong>漸近線夾角 (2ψ)：</strong><span style="color:#facc15; font-weight:bold;">${angleDeg.toFixed(1)}°</span></div>
+        <div style="color:#94a3b8; font-size:0.75rem; margin-top:2px;">
+          ${isProjectionMode ? '【剛體垂直投影】黃線為過頂點母線，雙曲線展現平移後漸近貼合' : '【固有對稱視角】雙曲線置中，展示標準漸近線包夾'}
+        </div>
+      `;
+
+      // 漸近線 (黃虛線)
+      ctx2d.strokeStyle = "#facc15";
+      ctx2d.lineWidth = 2;
+      ctx2d.setLineDash([5, 4]);
+      ctx2d.beginPath();
+      const vMax = 4.0;
+      const uMax = tanPsi * vMax;
+      ctx2d.moveTo(cx - uMax * scale, cy + vMax * scale);
+      ctx2d.lineTo(cx + uMax * scale, cy - vMax * scale);
+      ctx2d.moveTo(cx + uMax * scale, cy + vMax * scale);
+      ctx2d.lineTo(cx - uMax * scale, cy - vMax * scale);
+      ctx2d.stroke();
+      ctx2d.setLineDash([]);
+
+      // 繪製雙曲線
+      ctx2d.strokeStyle = "#38bdf8";
+      ctx2d.lineWidth = 2.5;
+
+      if (isProjectionMode) {
+        function drawProjectedBranch(vStart, vEnd, step) {
+          ctx2d.beginPath();
+          let started = false;
+          for (let v = vStart; (step > 0 ? v <= vEnd : v >= vEnd); v += step) {
+            const uSq = diff * v * v - 2 * d * Math.sin(2 * theta) * v - d * d * diff;
+            if (uSq >= 0) {
+              const u = Math.sqrt(uSq);
+              const px = cx + u * scale;
+              const py = cy - v * scale;
+              if (!started) { ctx2d.moveTo(px, py); started = true; }
+              else ctx2d.lineTo(px, py);
+            }
+          }
+          for (let v = vEnd; (step > 0 ? v >= vStart : v <= vStart); v -= step) {
+            const uSq = diff * v * v - 2 * d * Math.sin(2 * theta) * v - d * d * diff;
+            if (uSq >= 0) {
+              const u = -Math.sqrt(uSq);
+              const px = cx + u * scale;
+              const py = cy - v * scale;
+              ctx2d.lineTo(px, py);
+            }
+          }
+          ctx2d.stroke();
+        }
+        drawProjectedBranch(0.1, 4.0, 0.05);
+        drawProjectedBranch(-0.1, -4.0, -0.05);
+
+      } else {
+        const b = (d * sinT) / diff;
+        ctx2d.beginPath();
+        let started = false;
+        for (let u = -3.5; u <= 3.5; u += 0.05) {
+          const v = Math.sqrt(b * b + (u * u) / (tanPsi * tanPsi));
+          const px = cx + u * scale;
+          const py = cy - v * scale;
+          if (!started) { ctx2d.moveTo(px, py); started = true; }
+          else ctx2d.lineTo(px, py);
+        }
+        ctx2d.stroke();
+
+        ctx2d.beginPath();
+        started = false;
+        for (let u = -3.5; u <= 3.5; u += 0.05) {
+          const v = -Math.sqrt(b * b + (u * u) / (tanPsi * tanPsi));
+          const px = cx + u * scale;
+          const py = cy - v * scale;
+          if (!started) { ctx2d.moveTo(px, py); started = true; }
+          else ctx2d.lineTo(px, py);
+        }
+        ctx2d.stroke();
+      }
+
+    } else if (type === "PARABOLA") {
+      metricsBox.innerHTML = `
+        <div><strong>截面形態：</strong><span style="color:#f59e0b; font-weight:bold;">拋物線</span></div>
+        <div><strong>漸近線狀態：</strong><span style="color:#facc15;">夾角 0.0° (兩線重合為一)</span></div>
+        <div style="color:#94a3b8; font-size:0.75rem; margin-top:2px;">臨界角平行母線，單側開口延伸</div>
+      `;
+
+      ctx2d.strokeStyle = "#facc15";
+      ctx2d.lineWidth = 2;
+      ctx2d.setLineDash([5, 4]);
+      ctx2d.beginPath();
+      ctx2d.moveTo(cx, 0); ctx2d.lineTo(cx, h);
+      ctx2d.stroke();
+      ctx2d.setLineDash([]);
+
+      ctx2d.strokeStyle = "#38bdf8";
+      ctx2d.lineWidth = 2.5;
+      ctx2d.beginPath();
+      let started = false;
+      const pScale = 0.55 / d;
+      for (let u = -3.5; u <= 3.5; u += 0.05) {
+        const v = -1.2 + pScale * u * u;
+        const px = cx + u * scale;
+        const py = cy - v * scale;
+        if (!started) { ctx2d.moveTo(px, py); started = true; }
+        else ctx2d.lineTo(px, py);
+      }
+      ctx2d.stroke();
+
+    } else {
+      // 橢圓與正圓 (2D 精確無誤差解析解)
+      const K = sinT * sinT - cosT * cosT;
+      const aSemi = d / Math.sqrt(K);
+      const bSemi = d / K;
+      const v0 = - (2 * d * sinT * cosT) / K;
+      const isCircle = type === "CIRCLE";
+
+      metricsBox.innerHTML = `
+        <div><strong>截面形態：</strong><span style="color:${isCircle ? '#a855f7' : '#10b981'}; font-weight:bold;">${isCircle ? '正圓' : '橢圓'}</span></div>
+        <div><strong>長半軸 b / 短半軸 a：</strong>${bSemi.toFixed(2)} / ${aSemi.toFixed(2)}</div>
+        <div style="color:#94a3b8; font-size:0.75rem; margin-top:2px;">
+          ${isProjectionMode ? '【剛體垂直投影】展示橢圓中心相對於頂點 (0,0) 的真實空間下移' : '【固有對稱視角】橢圓居中'}
+        </div>
+      `;
+
+      ctx2d.strokeStyle = isCircle ? "#a855f7" : "#10b981";
+      ctx2d.lineWidth = 2.5;
+
+      ctx2d.beginPath();
+      const rX = aSemi * scale;
+      const rY = bSemi * scale;
+      const yPos = isProjectionMode ? cy - v0 * scale : cy;
+
+      ctx2d.ellipse(cx, yPos, Math.min(w * 0.45, rX), Math.min(h * 0.45, rY), 0, 0, Math.PI * 2);
+      ctx2d.stroke();
+
+      if (!isCircle && rY > rX) {
+        const cF = Math.sqrt(Math.max(0, rY * rY - rX * rX));
+        ctx2d.fillStyle = "#ef4444";
+        ctx2d.beginPath();
+        ctx2d.arc(cx, yPos - cF, 3.5, 0, Math.PI * 2);
+        ctx2d.arc(cx, yPos + cF, 3.5, 0, Math.PI * 2);
+        ctx2d.fill();
+      }
+    }
+
+    ctx2d.font = "12px sans-serif";
+    ctx2d.fillStyle = "#facc15";
+    ctx2d.fillText("-- 基準面 π₀ 漸近線 (過頂點)", 20, h - 35);
+    ctx2d.fillStyle = "#38bdf8";
+    ctx2d.fillText("—— 平移截面 π_d 截痕", 20, h - 15);
+  }
+
+  function onResize() {
+    const w = container3d.clientWidth;
+    const h = container3d.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+
+    canvas2d.width = canvas2d.parentElement.clientWidth;
+    canvas2d.height = canvas2d.parentElement.clientHeight;
+    update();
+  }
+  window.addEventListener('resize', onResize);
+
+  sliderTheta.addEventListener('input', update);
+  sliderDist.addEventListener('input', update);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  onResize();
+  animate();
+</script>
+
+</body>
+</html>
