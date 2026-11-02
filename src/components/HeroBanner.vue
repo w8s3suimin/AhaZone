@@ -21,7 +21,7 @@ const emit = defineEmits<{
     <div class="absolute -top-24 -left-24 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
     <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
-    <div class="relative z-10 max-w-4xl">
+    <div class="relative z-10 w-full">
       
       <!-- Top Tag (Clean, no technical jargon) -->
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 border border-sky-500/20 text-sky-300 mb-3 sm:mb-4">
@@ -37,7 +37,7 @@ const emit = defineEmits<{
         </span>
       </h1>
 
-      <p class="text-xs sm:text-base text-slate-300 max-w-2xl leading-relaxed mb-5 sm:mb-6">
+      <p class="text-xs sm:text-base text-slate-300 max-w-3xl leading-relaxed mb-5 sm:mb-6">
         「悟境（AhaZone）」融合<strong>三維立體動態幾何</strong>與<strong>高品質段考複習試卷</strong>。
         打破抽象公式死背，藉由空間咬合與即時動態模擬，讓抽象定理躍然紙上。
       </p>
@@ -46,7 +46,7 @@ const emit = defineEmits<{
       <div class="flex flex-wrap gap-3 mb-6 sm:mb-8">
         <button
           @click="emit('exploreConic')"
-          class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 transition-all hover:scale-[1.02]"
+          class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 transition-all hover:scale-[1.02]"
         >
           <Compass class="w-4 h-4 text-white" />
           <span>立即體驗：雙圓錐截面 3D 幾何解析</span>
@@ -62,7 +62,7 @@ const emit = defineEmits<{
           
           <button
             @click="emit('update:resourceType', 'all')"
-            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+            class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
             :class="resourceType === 'all' ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/60'"
           >
             全部資源
@@ -70,7 +70,7 @@ const emit = defineEmits<{
 
           <button
             @click="emit('update:resourceType', 'dynamic')"
-            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
+            class="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
             :class="resourceType === 'dynamic' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/60'"
           >
             <Sparkles class="w-3.5 h-3.5 text-sky-400" />
@@ -79,7 +79,7 @@ const emit = defineEmits<{
 
           <button
             @click="emit('update:resourceType', 'pdf-exam')"
-            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
+            class="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
             :class="resourceType === 'pdf-exam' ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/60'"
           >
             <FileText class="w-3.5 h-3.5 text-amber-400" />
@@ -88,7 +88,7 @@ const emit = defineEmits<{
 
           <button
             @click="emit('update:resourceType', 'pdf-lecture')"
-            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
+            class="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
             :class="resourceType === 'pdf-lecture' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/60'"
           >
             <BookOpen class="w-3.5 h-3.5 text-emerald-400" />

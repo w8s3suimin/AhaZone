@@ -18,7 +18,7 @@ const subject = ref<SubjectId>('all');
 const selectedChapter = ref<string | null>(null);
 const searchQuery = ref<string>('');
 
-// Desktop Sidebar State: Default TRUE (展開放在右側)
+// Desktop Sidebar State: Default TRUE (展開放在右側空白處)
 const isDesktopSidebarOpen = ref(true);
 
 // Mobile Drawer State: Default FALSE (從右側滑出)
@@ -95,7 +95,7 @@ const handleExploreConic = () => {
 <template>
   <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-sky-500 selection:text-white">
     
-    <!-- Top Navigation (Mobile button on right, Desktop toggle on right) -->
+    <!-- Top Navigation (Widescreen container) -->
     <Navbar
       :searchQuery="searchQuery"
       @update:searchQuery="(q) => searchQuery = q"
@@ -107,8 +107,8 @@ const handleExploreConic = () => {
       @reset="resetFilters"
     />
 
-    <!-- Main Container -->
-    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+    <!-- Main Container: Spans up to 1680px for wide desktop screens -->
+    <main class="flex-1 max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-10 py-6 w-full">
       
       <!-- Hero Section -->
       <HeroBanner
@@ -122,13 +122,13 @@ const handleExploreConic = () => {
       <!-- Main Layout Grid: Left Content + Right Curriculum Sidebar on Desktop -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- Main Content Area: Takes 8 cols when sidebar open, or full 12 cols when collapsed -->
+        <!-- Main Content Area: Takes 8-9 cols when sidebar open, or full 12 cols when collapsed -->
         <div 
           class="transition-all duration-300"
-          :class="isDesktopSidebarOpen ? 'lg:col-span-8' : 'lg:col-span-12'"
+          :class="isDesktopSidebarOpen ? 'lg:col-span-8 xl:col-span-9' : 'lg:col-span-12'"
         >
           
-          <!-- Condition A: Chapter Concept Detail Mode (Requirement 4) -->
+          <!-- Condition A: Chapter Concept Detail Mode -->
           <ChapterDetail
             v-if="isChapterDetailView && selectedChapter"
             :chapterName="selectedChapter"
@@ -165,11 +165,11 @@ const handleExploreConic = () => {
               </button>
             </div>
 
-            <!-- Cards Grid -->
+            <!-- Cards Grid (Fluid 2/3/4 columns on wider screen) -->
             <div 
               v-if="filteredResources.length > 0" 
               class="grid grid-cols-1 gap-5"
-              :class="isDesktopSidebarOpen ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'"
+              :class="isDesktopSidebarOpen ? 'md:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'"
             >
               <ResourceCard
                 v-for="res in filteredResources"
@@ -199,10 +199,10 @@ const handleExploreConic = () => {
 
         </div>
 
-        <!-- Desktop Right Sidebar: Default EXPANDED on the RIGHT (4 cols on lg) -->
+        <!-- Desktop Right Sidebar: Default EXPANDED on the RIGHT (Utilizes widescreen right space) -->
         <div 
           v-if="isDesktopSidebarOpen"
-          class="hidden lg:block lg:col-span-4 sticky top-20"
+          class="hidden lg:block lg:col-span-4 xl:col-span-3 sticky top-20"
         >
           <CurriculumTree
             mode="embedded"
@@ -232,7 +232,7 @@ const handleExploreConic = () => {
 
     <!-- Footer -->
     <footer class="mt-16 bg-slate-950 border-t border-slate-900 py-10">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-10 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6">
         <div class="space-y-1">
           <div class="flex items-center justify-center sm:justify-start gap-2">
             <span class="font-extrabold text-base tracking-tight text-white">悟境</span>
