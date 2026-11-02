@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Lightbulb, AlertTriangle, BookOpen, Sparkles, FileText, ArrowLeft, CheckCircle2 } from 'lucide-vue-next';
-import { CHAPTER_SUMMARIES, ChapterSummary } from '../data/chapterSummaries';
+import { getChapterSummary, ChapterSummary } from '../data/chapterSummaries';
 import { ResourceItem } from '../types';
 import ResourceCard from './ResourceCard.vue';
 
@@ -16,41 +16,9 @@ const emit = defineEmits<{
   (e: 'openPdf', item: ResourceItem, viewAnswer: boolean): void;
 }>();
 
-// Lookup summary or build default
+// Lookup summary or build subject-tailored genuine curriculum summary
 const summary = computed<ChapterSummary>(() => {
-  // Find exact or partial match
-  const matchKey = Object.keys(CHAPTER_SUMMARIES).find(k => 
-    props.chapterName.includes(k) || k.includes(props.chapterName)
-  );
-
-  if (matchKey && CHAPTER_SUMMARIES[matchKey]) {
-    return CHAPTER_SUMMARIES[matchKey];
-  }
-
-  // Default fallback for chapters not yet in the summary database
-  return {
-    chapter: props.chapterName,
-    scopeNotice: props.chapterName.includes('數A') 
-      ? '【數A重點】強調嚴密推導與多向度空間坐標分析。' 
-      : props.chapterName.includes('數B') 
-      ? '【數B重點】強調生活現象模型化與幾何直觀。' 
-      : '【108課綱標準單元】依據高中及國中標準命題精神編排。',
-    ahaInsight: `💡 探索「${props.chapterName}」的本質：透過幾何直觀與基本定義切入，而非死背繁複公式！`,
-    coreConcepts: [
-      {
-        title: '核心定義與幾何意義',
-        description: '回歸第一原理，理解定義的幾何圖示與物理圖像，有助於靈活應對大考情境素養題。'
-      },
-      {
-        title: '標準題型解題心法',
-        description: '掌握由已知條件轉化為方程式的設式技巧，善用輔助圖形化繁為簡。'
-      }
-    ],
-    pitfalls: [
-      '留意題目設定的定義域與正負條件限制。',
-      '代數解出答案後，務必代回原題目檢驗是否符合實數幾何意義。'
-    ]
-  };
+  return getChapterSummary(props.chapterName);
 });
 
 // Resources for this specific chapter

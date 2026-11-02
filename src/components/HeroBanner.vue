@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Sparkles, Compass, FileText, BookOpen } from 'lucide-vue-next';
+import { FileText, Sparkles, BookOpen } from 'lucide-vue-next';
 import { ResourceType, SubjectId } from '../types';
 
 defineProps<{
@@ -10,51 +10,30 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'update:resourceType', val: ResourceType): void;
   (e: 'update:subject', val: SubjectId): void;
-  (e: 'exploreConic'): void;
 }>();
 </script>
 
 <template>
-  <div class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900/90 via-slate-900/60 to-slate-950/80 border border-slate-800 p-5 sm:p-8 lg:p-10 mb-8 shadow-2xl">
+  <div class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900/90 via-slate-900/60 to-slate-950/80 border border-slate-800 p-5 sm:p-7 lg:p-8 mb-6 shadow-2xl">
     
-    <!-- Background ambient decorative glows -->
+    <!-- Background ambient decorative glow -->
     <div class="absolute -top-24 -left-24 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-    <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
     <div class="relative z-10 w-full">
-      
-      <!-- Top Tag (Clean, no technical jargon) -->
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 border border-sky-500/20 text-sky-300 mb-3 sm:mb-4">
-        <Sparkles class="w-3.5 h-3.5 text-sky-400" />
-        <span>啟發頓悟與空間幾何思維</span>
-      </div>
-
       <!-- Main Title -->
-      <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-3 sm:mb-4 leading-tight">
-        點亮每一次 
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-2 leading-tight">
+        悟境 ｜ 
         <span class="bg-gradient-to-r from-sky-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
-          恍然大悟的頓悟時刻
+          AhaZone 教學資源庫
         </span>
       </h1>
 
-      <p class="text-xs sm:text-base text-slate-300 max-w-3xl leading-relaxed mb-5 sm:mb-6">
-        「悟境（AhaZone）」融合<strong>三維立體動態幾何</strong>與<strong>高品質段考複習試卷</strong>。
-        打破抽象公式死背，藉由空間咬合與即時動態模擬，讓抽象定理躍然紙上。
+      <p class="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed mb-5">
+        涵蓋 108 課綱國中與高中數理體系，提供各單元觀念重點整理、動態 3D 幾何模擬實驗室與精選段考複習試卷。
       </p>
 
-      <!-- Feature quick CTA -->
-      <div class="flex flex-wrap gap-3 mb-6 sm:mb-8">
-        <button
-          @click="emit('exploreConic')"
-          class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 transition-all hover:scale-[1.02]"
-        >
-          <Compass class="w-4 h-4 text-white" />
-          <span>立即體驗：雙圓錐截面 3D 幾何解析</span>
-        </button>
-      </div>
-
       <!-- Resource Type Filters & Subject Filters -->
-      <div class="pt-5 sm:pt-6 border-t border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="pt-4 border-t border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3">
         
         <!-- Resource Types Tabs -->
         <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">

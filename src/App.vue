@@ -110,8 +110,9 @@ const handleExploreConic = () => {
     <!-- Main Container: Spans up to 1680px for wide desktop screens -->
     <main class="flex-1 max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-10 py-6 w-full">
       
-      <!-- Hero Section -->
+      <!-- Hero Section (只在首頁顯示，進入單元專注學習時自動隱藏) -->
       <HeroBanner
+        v-if="!selectedChapter"
         :resourceType="resourceType"
         @update:resourceType="(t) => resourceType = t"
         :subject="subject"
