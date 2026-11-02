@@ -103,7 +103,7 @@ const chapterResources = computed(() => {
     <div class="space-y-4">
       <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
         <Sparkles class="w-4 h-4 text-sky-400" />
-        <span>核心觀念與幾何公式整理</span>
+        <span>核心觀念與公式精要</span>
       </h3>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -117,15 +117,24 @@ const chapterResources = computed(() => {
               <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
               <span>{{ concept.title }}</span>
             </h4>
-            <p class="text-xs text-slate-300 leading-relaxed mb-3">
+            <p class="text-xs text-slate-300 leading-relaxed mb-2">
               {{ concept.description }}
             </p>
           </div>
+
+          <!-- Formulas list: 每條公式獨立一列，清楚好讀 -->
           <div 
-            v-if="concept.formula"
-            class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs text-amber-300/90 overflow-x-auto"
+            v-if="concept.formulas && concept.formulas.length > 0"
+            class="mt-2 space-y-1.5"
           >
-            {{ concept.formula }}
+            <div 
+              v-for="(fItem, fIdx) in concept.formulas"
+              :key="fIdx"
+              class="px-3.5 py-2 rounded-xl bg-slate-950/90 border border-slate-800/90 text-sky-200 text-xs sm:text-sm font-mono tracking-wide flex items-center gap-2 overflow-x-auto shadow-inner"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
+              <span class="select-all">{{ fItem }}</span>
+            </div>
           </div>
         </div>
       </div>

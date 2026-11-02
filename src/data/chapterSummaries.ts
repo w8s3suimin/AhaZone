@@ -1,15 +1,17 @@
 import { CURRICULUM_DATA } from './curriculum';
 
+export interface ChapterConcept {
+  title: string;
+  description: string;
+  formulas?: string[]; // 每條公式獨立一列
+}
+
 export interface ChapterSummary {
   chapter: string;
   mathTrack?: 'mathA' | 'mathB' | 'common' | 'none'; // 數A / 數B / 數A+B共同 / 非高中數學
   scopeNotice?: string; // 課綱進度與考試定位
   ahaInsight: string; // 核心觀念精要
-  coreConcepts: {
-    title: string;
-    description: string;
-    formula?: string;
-  }[];
+  coreConcepts: ChapterConcept[];
   pitfalls: string[]; // 常見迷思與避坑提醒
 }
 
@@ -95,12 +97,15 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     coreConcepts: [
       {
         title: '密度定義公式',
-        description: '密度 D = 質量 M / 體積 V。同種物質在固定溫度壓力下，質量與體積成正比，其比值（密度）為定值。',
-        formula: 'D = \\frac{M}{V}'
+        description: '密度為單位體積內所含的物質質量，同種物質在固定溫度與壓力下密度為定值：',
+        formulas: [
+          '密度 D = 質量 M / 體積 V',
+          '常用單位：g/cm³ 或 kg/m³ （1 g/cm³ = 1000 kg/m³）'
+        ]
       },
       {
         title: '浮沉判斷法則',
-        description: '物體密度小於液體密度則浮於液面；物體密度大於液體密度則沉入底端；物體密度等於液體密度則懸浮於液體中任意位置。'
+        description: '物體密度小於液體密度則浮於液面；物體密度大於液體密度則沉入底端；物體密度等於液體密度則懸浮於液體中任意深度。'
       }
     ],
     pitfalls: [
@@ -137,9 +142,13 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     ahaInsight: '化學反應只是「原子的重新排列組合」，反應前後原子的種類、數目與質量永遠不增不減！質量守恆定律在密閉系統中恆成立。',
     coreConcepts: [
       {
-        title: '莫耳數的三大轉換橋樑',
-        description: '1. 莫耳數 = 質量(g) / 原子量或分子量；2. 莫耳數 = 粒子總數 / (6 × 10²³)；3. 反應式係數比 = 反應消耗或生成的「莫耳數比」=「分子數比」≠「質量比」。',
-        formula: 'n = \\frac{m}{M} = \\frac{N}{6.02 \\times 10^{23}}'
+        title: '莫耳數換算三大途徑',
+        description: '化學計量計算皆以莫耳數作為轉換樞紐：',
+        formulas: [
+          '莫耳數 n = 質量(g) / 分子量或原子量 M',
+          '莫耳數 n = 粒子總數 N / (6.02 × 10²³)',
+          '反應式平衡係數比 = 消耗或生成之莫耳數比 = 分子數比 （≠ 質量比）'
+        ]
       }
     ],
     pitfalls: [
@@ -158,13 +167,21 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     ahaInsight: '減一個數，等於「加上它的相反數」！數線上的距離就是大數減小數，兩點 A(a)、B(b) 的距離永遠等於 |a - b|，絕無負距離。',
     coreConcepts: [
       {
-        title: '正負數運算法則',
-        description: '同號相乘除得正，異號相乘除得負。遇括號先算小括號、中括號，先乘除後加減。',
-        formula: '(-a) \\times (-b) = a \\times b, \\quad (-a) \\times b = -(a \\times b)'
+        title: '正負數四則運算法則',
+        description: '同號相乘除得正，異號相乘除得負。遇括號先算小括號、中括號，先乘除後加減：',
+        formulas: [
+          '同號相乘：(-a) × (-b) = a × b',
+          '異號相乘：(-a) × b = -(a × b)',
+          '負負得正：a - (-b) = a + b'
+        ]
       },
       {
         title: '相反數與絕對值幾何意義',
-        description: '數線上與原點距離相等的相異兩點互為相反數（a + (-a) = 0）。點 x 到原點的距離即為 |x|。'
+        description: '數線上與原點距離相等的相異兩點互為相反數（a + (-a) = 0）：',
+        formulas: [
+          '點 x 到原點的距離 = |x|',
+          '數線上兩點 A(a) 與 B(b) 的距離 = |a - b|'
+        ]
       }
     ],
     pitfalls: [
@@ -180,13 +197,15 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     ahaInsight: '將合數寫成標準分解式就像拆解樂高積木！求最大公因數就找「共同質因數的最低次方」；求最小公倍數就找「所有出現質因數的最高次方」。兩數乘積恆等於其 GCD 與 LCM 之積！',
     coreConcepts: [
       {
-        title: '標準分解式求 GCD 與 LCM',
-        description: '設 A = 2³ × 3² × 5，B = 2² × 3³ × 7。則 GCD(A, B) = 2² × 3² = 36；LCM(A, B) = 2³ × 3³ × 5 × 7 = 7560。',
-        formula: 'A \\times B = \\gcd(A, B) \\times \\text{lcm}(A, B)'
+        title: '最大公因數與最小公倍數核心定理',
+        description: '任兩正整數 A 與 B 的乘積，恆等於其最大公因數與最小公倍數之乘積：',
+        formulas: [
+          'A × B = gcd(A, B) × lcm(A, B)'
+        ]
       },
       {
         title: '質數判別法',
-        description: '檢驗正整數 n 是否為質數，只需檢查小於等於 √n 的所有質數能否整除 n 即可。'
+        description: '檢驗正整數 n 是否為質數，只需檢查小於等於 √n 的所有質數能否整除 n 即可。若皆不能整除，則 n 必為質數。'
       }
     ],
     pitfalls: [
@@ -203,12 +222,19 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     coreConcepts: [
       {
         title: '三大核心乘法公式',
-        description: '和平方：(a+b)² = a² + 2ab + b²；差平方：(a-b)² = a² - 2ab + b²；平方差：(a+b)(a-b) = a² - b²。',
-        formula: '(a \\pm b)^2 = a^2 \\pm 2ab + b^2, \\quad a^2 - b^2 = (a+b)(a-b)'
+        description: '多項式乘法展開與因式分解的核心工具，牢記正負號與中間項：',
+        formulas: [
+          '和平方公式：(a + b)² = a² + 2ab + b²',
+          '差平方公式：(a - b)² = a² - 2ab + b²',
+          '平方差公式：(a + b)(a - b) = a² - b²'
+        ]
       },
       {
         title: '多項式除法原理',
-        description: '被除式 = 除式 × 商式 + 餘式。餘式的次數必嚴格小於除式的次數（若除式為一次式，餘式必為常數）。'
+        description: '被除式 = 除式 × 商式 + 餘式。餘式的次數必嚴格小於除式的次數（若除式為一次式，餘式必為常數）：',
+        formulas: [
+          'A(x) = B(x) · Q(x) + R(x) （其中 deg(R) < deg(B)）'
+        ]
       }
     ],
     pitfalls: [
@@ -228,13 +254,19 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     coreConcepts: [
       {
         title: '絕對值幾何距離法',
-        description: '方程式 |x - a| = d 表示數線上與 a 距離為 d 的兩點 (a ± d)。不等式 |x - a| < d 即區間 (a-d, a+d)。',
-        formula: '|x - c| < r \\iff c - r < x < c + r'
+        description: '利用數線幾何距離快速求解，免去代數分段討論：',
+        formulas: [
+          '等式解：|x - a| = d  ⟹  x = a ± d',
+          '區間解：|x - c| < r  ⟹  c - r < x < c + r',
+          '兩側解：|x - c| > r  ⟹  x > c + r 或 x < c - r'
+        ]
       },
       {
         title: '算幾不等式',
-        description: '若 a, b > 0，則 (a+b)/2 ≥ √(ab)。當且僅當 a = b 時等號成立。常用於「和為定值求積的最大值」或「積為定值求和的最小值」。',
-        formula: '\\frac{a+b}{2} \\ge \\sqrt{ab}'
+        description: '若 a > 0 且 b > 0，則算術平均數恆大於或等於幾何平均數（當且僅當 a = b 時等號成立）：',
+        formulas: [
+          '(a + b) / 2 ≥ √(ab)'
+        ]
       }
     ],
     pitfalls: [
@@ -251,12 +283,20 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     coreConcepts: [
       {
         title: '除法原理與餘式定理',
-        description: '設 f(x) 除以 g(x) 商為 q(x)，餘式為 r(x)，則 f(x) = g(x)q(x) + r(x)，其中 deg(r) < deg(g)。若除式為一次式 (x - c)，則餘式常數 r = f(c)。',
-        formula: 'f(x) = (x - c)q(x) + f(c)'
+        description: '設 f(x) 除以一次式，餘式為常數，可直接以函數值計算：',
+        formulas: [
+          '除法原理：f(x) = (x - c) · q(x) + f(c)',
+          '餘式定理：餘式 r = f(c)',
+          '推廣公式：f(x) 除以 (ax - b) 之餘式為 f(b/a)'
+        ]
       },
       {
-        title: '三次函數對稱中心與圖形局部分析',
-        description: '三次函數 f(x) = ax³ + bx² + cx + d 的圖形必關於反曲點對稱中心 (h, k) 點對稱，其中 h = -b / (3a)。'
+        title: '三次函數對稱中心',
+        description: '三次函數 f(x) = ax³ + bx² + cx + d 的圖形必關於反曲點對稱中心 (h, k) 點對稱：',
+        formulas: [
+          '對稱中心橫坐標：h = -b / (3a)',
+          '對稱中心縱坐標：k = f(h)'
+        ]
       }
     ],
     pitfalls: [
@@ -273,12 +313,16 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     coreConcepts: [
       {
         title: '單位圓上的三角函數定義',
-        description: '以原點為圓心、半徑為 1 的單位圓上，有向角 θ 的終邊交點 P 坐標定義為 (cos θ, sin θ)。斜率即為 tan θ = sin θ / cos θ。',
-        formula: 'x = \\cos\\theta, \\quad y = \\sin\\theta, \\quad \\sin^2\\theta + \\cos^2\\theta = 1'
+        description: '以原點為圓心、半徑為 1 的單位圓上，有向角 θ 的終邊交點 P 坐標定義如下：',
+        formulas: [
+          '坐標定義：x = cos θ,  y = sin θ',
+          '斜率關係：tan θ = y / x = sin θ / cos θ  (cos θ ≠ 0)',
+          '平方關係：sin² θ + cos² θ = 1'
+        ]
       },
       {
-        title: '化任意角為銳角 (奇變偶不變，符號看象限)',
-        description: 'sin(180° - θ) = sin θ, cos(180° - θ) = -cos θ；sin(90° - θ) = cos θ, cos(90° - θ) = sin θ。'
+        title: '化任意角為銳角法則',
+        description: 'sin(180° - θ) = sin θ；cos(180° - θ) = -cos θ；sin(90° - θ) = cos θ；cos(90° - θ) = sin θ。'
       }
     ],
     pitfalls: [
@@ -294,18 +338,29 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     ahaInsight: '何時用正弦？何時用餘弦？「已知對邊對角」或「外接圓直徑」用正弦定理；「已知兩邊夾一角」或「三邊求角」必用餘弦定理！',
     coreConcepts: [
       {
-        title: '正弦定理與外接圓',
-        description: 'a / sin A = b / sin B = c / sin C = 2R，其中 R 為 ΔABC 外接圓半徑。',
-        formula: '\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C} = 2R'
+        title: '正弦定理 (外接圓直徑關係)',
+        description: '三角形各邊與其對角正弦值之比值相等，且等於外接圓直徑：',
+        formulas: [
+          'a / sin A = b / sin B = c / sin C = 2R'
+        ]
       },
       {
-        title: '餘弦定理',
-        description: 'a² = b² + c² - 2bc cos A；變形為 cos A = (b² + c² - a²) / (2bc)。',
-        formula: 'a^2 = b^2 + c^2 - 2bc \\cos A'
+        title: '餘弦定理 (三邊求一角 / 兩邊夾一角求對邊)',
+        description: '任意三角形邊角關係的推廣畢氏定理：',
+        formulas: [
+          '邊長公式：a² = b² + c² - 2bc · cos A',
+          '求角公式：cos A = (b² + c² - a²) / (2bc)'
+        ]
       },
       {
-        title: '三角形面積公式全家桶',
-        description: 'Area = (1/2)ab sin C = abc / (4R) = rs = √[s(s-a)(s-b)(s-c)]，其中 s = (a+b+c)/2。'
+        title: '三角形面積公式',
+        description: '依據給定條件靈活選擇合適的求法：',
+        formulas: [
+          '兩邊一夾角：Area = (1/2)ab · sin C',
+          '外接圓半徑 R：Area = abc / (4R)',
+          '內切圓半徑 r：Area = r · s  （s = (a+b+c)/2）',
+          '海龍公式：Area = √[s(s-a)(s-b)(s-c)]'
+        ]
       }
     ],
     pitfalls: [
@@ -321,13 +376,22 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     coreConcepts: [
       {
         title: '正餘弦和差角公式',
-        description: 'cos(α ∓ β) = cosα cosβ ± sinα sinβ；sin(α ± β) = sinα cosβ ± cosα sinβ。',
-        formula: '\\cos(\\alpha - \\beta) = \\cos\\alpha \\cos\\beta + \\sin\\alpha \\sin\\beta'
+        description: '由單位圓向量內積推導之基本和差角恆等式：',
+        formulas: [
+          'cos(α - β) = cos α · cos β + sin α · sin β',
+          'cos(α + β) = cos α · cos β - sin α · sin β',
+          'sin(α + β) = sin α · cos β + cos α · sin β',
+          'sin(α - β) = sin α · cos β - cos α · sin β'
+        ]
       },
       {
         title: '二倍角公式與降次',
-        description: 'sin 2θ = 2sinθ cosθ；cos 2θ = 2cos²θ - 1 = 1 - 2sin²θ。常用於將平方項降為一次項求積分或疊合。',
-        formula: '\\cos 2\\theta = 2\\cos^2\\theta - 1 = 1 - 2\\sin^2\\theta'
+        description: '常用於角度化簡、疊合與平方項降次：',
+        formulas: [
+          '正弦二倍角：sin 2θ = 2 sin θ · cos θ',
+          '餘弦二倍角：cos 2θ = cos² θ - sin² θ = 2 cos² θ - 1 = 1 - 2 sin² θ',
+          '降次公式：cos² θ = (1 + cos 2θ) / 2,  sin² θ = (1 - cos 2θ) / 2'
+        ]
       }
     ],
     pitfalls: [
@@ -343,19 +407,31 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     ahaInsight: '二次曲線是由雙圓錐在不同截面角度下的連續過渡：正圓(水平) ➜ 橢圓 ➜ 拋物線(平行母線臨界) ➜ 雙曲線(切過兩葉)。',
     coreConcepts: [
       {
-        title: '拋物線定義與標準式',
-        description: '動點到焦點距離等於到準線距離 (PF = d(P, L))。(y-k)² = 4c(x-h)，焦距為 |c|，正焦弦長為 4|c|。',
-        formula: 'PF = d(P, L), \\quad (y-k)^2 = 4c(x-h)'
+        title: '拋物線標準式 (PF = d(P, L))',
+        description: '頂點在 (h, k)，焦距為 |c|，正焦弦長為 4|c|：',
+        formulas: [
+          '左右開口型：(y - k)² = 4c(x - h)',
+          '上下開口型：(x - h)² = 4c(y - k)'
+        ]
       },
       {
-        title: '橢圓定義與標準式',
-        description: '到兩焦點距離和為定值 2a (PF₁ + PF₂ = 2a > 2c)。關係式為 a² = b² + c²。',
-        formula: 'PF_1 + PF_2 = 2a, \\quad a^2 = b^2 + c^2'
+        title: '橢圓標準式 (PF₁ + PF₂ = 2a > 2c)',
+        description: '中心在 (h, k)，長軸長 2a，短軸長 2b，焦距 2c：',
+        formulas: [
+          '水平長軸型：(x - h)² / a² + (y - k)² / b² = 1  (a > b > 0)',
+          '鉛直長軸型：(x - h)² / b² + (y - k)² / a² = 1  (a > b > 0)',
+          '基本關係式：a² = b² + c² （a 最大）'
+        ]
       },
       {
-        title: '雙曲線定義與漸近線',
-        description: '到兩焦點距離差為定值 2a (|PF₁ - PF₂| = 2a < 2c)。關係式為 c² = a² + b²。漸近線為 (x-h)²/a² - (y-k)²/b² = 0。',
-        formula: '|PF_1 - PF_2| = 2a, \\quad c^2 = a^2 + b^2'
+        title: '雙曲線標準式 (|PF₁ - PF₂| = 2a < 2c)',
+        description: '中心在 (h, k)，貫軸長 2a，共軛軸長 2b，焦距 2c：',
+        formulas: [
+          '左右貫軸型：(x - h)² / a² - (y - k)² / b² = 1',
+          '上下貫軸型：(y - k)² / a² - (x - h)² / b² = 1',
+          '基本關係式：c² = a² + b² （c 最大）',
+          '漸近線方程式：(x - h)² / a² - (y - k)² / b² = 0'
+        ]
       }
     ],
     pitfalls: [
@@ -372,7 +448,12 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     coreConcepts: [
       {
         title: '截面傾角 θ 與母線半頂角 α (45°)',
-        description: 'θ > 45° 截斷單葉封閉為橢圓；θ = 45° 平行母線臨界為拋物線；θ < 45° 穿透雙葉開口為雙曲線。'
+        description: '觀察空間平面切過雙葉圓錐時的曲線分類臨界條件：',
+        formulas: [
+          'θ > 45°：截斷單葉封閉成「橢圓」',
+          'θ = 45°：平行母線臨界邊界成「拋物線」',
+          'θ < 45°：穿透雙葉開口成「雙曲線」'
+        ]
       }
     ],
     pitfalls: [
@@ -391,8 +472,13 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     coreConcepts: [
       {
         title: '等加速度運動三大公式',
-        description: '1. v = v₀ + at；2. Δx = v₀t + (1/2)at²；3. v² = v₀² + 2aΔx。平均速度 v_avg = (v₀ + v) / 2。',
-        formula: 'v = v_0 + at, \\quad \\Delta x = v_0 t + \\frac{1}{2}at^2, \\quad v^2 = v_0^2 + 2a\\Delta x'
+        description: '設初速度為 v₀，加速度為 a，歷時 t，位移為 Δx，末速度為 v：',
+        formulas: [
+          '末速度公式：v = v₀ + at',
+          '位移公式：Δx = v₀t + (1/2)at²',
+          '無時間公式：v² = v₀² + 2a · Δx',
+          '平均速度：v_avg = (v₀ + v) / 2 = Δx / t'
+        ]
       },
       {
         title: '自由落體與鉛直上拋',
@@ -413,8 +499,10 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     coreConcepts: [
       {
         title: '牛頓第二運動定律 (F = ma)',
-        description: '物體的加速度與所受合外力大小成正比，與物體質量成反比，方向與合力方向相同。',
-        formula: '\\vec{F}_{\\text{net}} = m\\vec{a}'
+        description: '物體的加速度與所受合外力大小成正比，與物體質量成反比，方向與合力方向相同：',
+        formulas: [
+          '合外力公式：F_net = m · a  （單位：N = kg · m/s²）'
+        ]
       },
       {
         title: '牛頓第三定律（作用力與反作用力）',
