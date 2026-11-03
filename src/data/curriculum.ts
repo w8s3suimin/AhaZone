@@ -222,7 +222,7 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
       },
       {
         gradeId: 's11-math',
-        gradeName: '高中二年級 (高二 數A / 數B 分流)',
+        gradeName: '高中二年級 (高二 "數A/數甲" & "數B/數乙" 兩種分流)',
         semesters: [
           {
             name: '高二上學期 (第 3 冊進度)',

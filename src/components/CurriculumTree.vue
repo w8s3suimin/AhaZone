@@ -198,14 +198,14 @@ const getResourceCountForChapter = (chapterName: string) => {
             class="px-2 py-0.5 rounded text-[11px] font-medium"
             :class="mathTrackFilter === 'mathA' ? 'bg-indigo-600 text-white' : 'text-slate-400'"
           >
-            數A
+            數A/數甲
           </button>
           <button
             @click="mathTrackFilter = 'mathB'"
             class="px-2 py-0.5 rounded text-[11px] font-medium"
             :class="mathTrackFilter === 'mathB' ? 'bg-amber-600 text-white' : 'text-slate-400'"
           >
-            數B
+            數B/數乙
           </button>
           <button
             @click="mathTrackFilter = 'common'"
@@ -364,14 +364,14 @@ const getResourceCountForChapter = (chapterName: string) => {
           class="px-2 py-0.5 rounded text-[11px] font-medium transition-colors"
           :class="mathTrackFilter === 'mathA' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'"
         >
-          數A
+          數A/數甲
         </button>
         <button
           @click="mathTrackFilter = 'mathB'"
           class="px-2 py-0.5 rounded text-[11px] font-medium transition-colors"
           :class="mathTrackFilter === 'mathB' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-slate-200'"
         >
-          數B
+          數B/數乙
         </button>
         <button
           @click="mathTrackFilter = 'common'"
