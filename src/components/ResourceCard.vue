@@ -84,7 +84,7 @@ const handleLaunchLab = () => {
       >
         <Lightbulb class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
         <div>
-          <span class="font-bold text-amber-300 block mb-0.5">悟境點撥：</span>
+          <span class="font-bold text-amber-300 block mb-0.5">訣竅 (Aha! Moment)：</span>
           <span>{{ resource.ahaInsight }}</span>
         </div>
       </div>

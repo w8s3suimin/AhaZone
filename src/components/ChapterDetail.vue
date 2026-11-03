@@ -93,7 +93,7 @@ const chapterResources = computed(() => {
       <div class="p-4 rounded-2xl bg-amber-950/25 border border-amber-500/30 text-amber-200 text-xs sm:text-sm leading-relaxed flex items-start gap-3">
         <Lightbulb class="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
         <div>
-          <span class="font-bold text-amber-300 block mb-1">💡 悟境頓悟點撥 (Aha! Moment)：</span>
+          <span class="font-bold text-amber-300 block mb-1">訣竅 (Aha! Moment)：</span>
           <span class="text-amber-100/90 leading-relaxed">{{ summary.ahaInsight }}</span>
         </div>
       </div>
