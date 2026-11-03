@@ -244,6 +244,53 @@
       display: flex !important;
       flex: 1 1 0% !important;
     }
+    .preset-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 5px;
+      margin-top: 3px;
+    }
+    .preset-btn {
+      flex: 1;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      border-radius: 5px;
+      padding: 3px 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .preset-btn:hover {
+      background: #1e293b;
+      color: #f1f5f9;
+      border-color: #64748b;
+    }
+    .preset-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    .preset-btn.btn-parabola {
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.45);
+      background: rgba(245, 158, 11, 0.1);
+    }
+    .preset-btn.btn-parabola:hover {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: #f59e0b;
+      color: #fef3c7;
+    }
+    .preset-btn.btn-parabola.active {
+      background: #b45309;
+      border-color: #f59e0b;
+      color: #ffffff;
+      box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+    }
     @media (max-width: 768px) {
       .seg-btn.btn-both {
         display: none !important;
@@ -340,10 +387,11 @@
       </span>
     </div>
     <input type="range" id="sliderTheta" min="0" max="90" step="0.5" value="0">
-    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#64748b;">
-      <span>0° (鉛直雙曲)</span>
-      <span>45° (平行母線臨界)</span>
-      <span>90° (水平正圓)</span>
+    <div class="preset-group">
+      <button type="button" class="preset-btn active" data-theta="0" title="垂直雙曲線 (0°)">雙曲 0°</button>
+      <button type="button" class="preset-btn btn-parabola" data-theta="45" title="平行母線臨界拋物線 (45°)">🎯 拋物線 45°</button>
+      <button type="button" class="preset-btn" data-theta="65" title="封閉橢圓 (65°)">橢圓 65°</button>
+      <button type="button" class="preset-btn" data-theta="90" title="水平正圓 (90°)">正圓 90°</button>
     </div>
   </div>
 
@@ -354,9 +402,10 @@
       <span class="val" id="valDist">0.80</span>
     </div>
     <input type="range" id="sliderDist" min="0.2" max="2.0" step="0.05" value="0.8">
-    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#64748b;">
-      <span>0.2 (靠近頂點)</span>
-      <span>2.0 (推向外緣)</span>
+    <div class="preset-group">
+      <button type="button" class="preset-btn" data-dist="0.4" title="靠近頂點 (d=0.4)">近頂點 0.4</button>
+      <button type="button" class="preset-btn active" data-dist="0.8" title="標準距離 (d=0.8)">標準 0.8</button>
+      <button type="button" class="preset-btn" data-dist="1.5" title="推向外緣 (d=1.5)">外緣 1.5</button>
     </div>
   </div>
 
@@ -616,6 +665,16 @@
       curveTypeBadge.innerText = "橢圓";
       curveTypeBadge.className = "badge badge-ellipse";
     }
+
+    // 更新預設按鈕的高亮狀態
+    document.querySelectorAll('.preset-btn[data-theta]').forEach(btn => {
+      const t = parseFloat(btn.dataset.theta);
+      btn.classList.toggle('active', Math.abs(t - thetaDeg) < 0.3);
+    });
+    document.querySelectorAll('.preset-btn[data-dist]').forEach(btn => {
+      const dVal = parseFloat(btn.dataset.dist);
+      btn.classList.toggle('active', Math.abs(dVal - d) < 0.04);
+    });
 
     update3D(theta, d, type);
     draw2D(theta, d, type);
@@ -1009,7 +1068,29 @@
     onResize();
   });
 
-  sliderTheta.addEventListener('input', update);
+  // 快速切換按鈕事件綁定
+  document.querySelectorAll('.preset-btn[data-theta]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sliderTheta.value = btn.dataset.theta;
+      update();
+    });
+  });
+
+  document.querySelectorAll('.preset-btn[data-dist]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sliderDist.value = btn.dataset.dist;
+      update();
+    });
+  });
+
+  // 滑桿拖曳事件 (含 45° 臨界拋物線磁吸輔助)
+  sliderTheta.addEventListener('input', () => {
+    const val = parseFloat(sliderTheta.value);
+    if (Math.abs(val - 45.0) <= 0.8) {
+      sliderTheta.value = 45.0;
+    }
+    update();
+  });
   sliderDist.addEventListener('input', update);
 
   function animate() {
