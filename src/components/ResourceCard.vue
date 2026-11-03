@@ -2,7 +2,7 @@
 import { Sparkles, FileText, Download, Eye, ExternalLink, Lightbulb, CheckCircle, ArrowRight } from 'lucide-vue-next';
 import { ResourceItem } from '../types';
 
-defineProps<{
+const props = defineProps<{
   resource: ResourceItem;
 }>();
 
@@ -10,6 +10,15 @@ const emit = defineEmits<{
   (e: 'openLab', item: ResourceItem): void;
   (e: 'openPdf', item: ResourceItem, viewAnswer: boolean): void;
 }>();
+
+const handleLaunchLab = () => {
+  const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+  if (isMobile && props.resource.filePath) {
+    window.location.href = props.resource.filePath;
+  } else {
+    emit('openLab', props.resource);
+  }
+};
 </script>
 
 <template>
@@ -97,7 +106,7 @@ const emit = defineEmits<{
       <!-- Dynamic Buttons -->
       <div v-if="resource.type === 'dynamic'" class="w-full flex items-center gap-2">
         <button
-          @click="emit('openLab', resource)"
+          @click="handleLaunchLab"
           class="flex-1 py-2 px-4 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-md shadow-sky-600/25 transition-all"
         >
           <Sparkles class="w-3.5 h-3.5" />

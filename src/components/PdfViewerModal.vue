@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onUnmounted } from 'vue';
 import { X, Download, FileText, CheckCircle, ExternalLink, Lightbulb } from 'lucide-vue-next';
 import { ResourceItem } from '../types';
 
@@ -14,9 +14,22 @@ const emit = defineEmits<{
 
 const activeTab = ref<'question' | 'answer'>('question');
 
-watch(() => props.resource, () => {
+watch(() => props.resource, (val) => {
   activeTab.value = props.initialShowAnswer && props.resource?.answerPath ? 'answer' : 'question';
+  if (typeof document !== 'undefined') {
+    if (val) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
 }, { immediate: true });
+
+onUnmounted(() => {
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = '';
+  }
+});
 
 const currentPdfUrl = computed(() => {
   if (!props.resource) return '';
@@ -27,10 +40,11 @@ const currentPdfUrl = computed(() => {
 </script>
 
 <template>
-  <div 
-    v-if="resource"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-200"
-  >
+  <Teleport to="body">
+    <div 
+      v-if="resource"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-200"
+    >
     <div class="w-full h-full max-w-6xl bg-slate-900 border border-slate-700/80 rounded-2xl overflow-hidden flex flex-col shadow-2xl">
       
       <!-- Top Header -->
@@ -124,5 +138,6 @@ const currentPdfUrl = computed(() => {
       </div>
 
     </div>
-  </div>
+    </div>
+  </Teleport>
 </template>

@@ -84,10 +84,22 @@ const resetFilters = () => {
   searchQuery.value = '';
 };
 
+const isMobileDevice = () => {
+  return typeof window !== 'undefined' && (window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+};
+
+const handleOpenLab = (item: ResourceItem) => {
+  if (isMobileDevice() && item.filePath) {
+    window.location.href = item.filePath;
+  } else {
+    activeLab.value = item;
+  }
+};
+
 const handleExploreConic = () => {
   const conicLab = resources.value.find(r => r.id === 'res-dynamic-conic-sections');
   if (conicLab) {
-    activeLab.value = conicLab;
+    handleOpenLab(conicLab);
   }
 };
 </script>
@@ -135,7 +147,7 @@ const handleExploreConic = () => {
             :chapterName="selectedChapter"
             :resources="resources"
             @back="selectedChapter = null"
-            @openLab="(item) => activeLab = item"
+            @openLab="handleOpenLab"
             @openPdf="(item, ans) => activePdf = { resource: item, showAnswer: ans }"
           />
 
@@ -176,7 +188,7 @@ const handleExploreConic = () => {
                 v-for="res in filteredResources"
                 :key="res.id"
                 :resource="res"
-                @openLab="(item) => activeLab = item"
+                @openLab="handleOpenLab"
                 @openPdf="(item, viewAns) => activePdf = { resource: item, showAnswer: viewAns }"
               />
             </div>
