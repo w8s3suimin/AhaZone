@@ -529,7 +529,8 @@
   const camera = new THREE.PerspectiveCamera(45, container3d.clientWidth / container3d.clientHeight, 0.1, 100);
   camera.position.set(8.5, 4.5, 9.5);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
   renderer.setSize(container3d.clientWidth, container3d.clientHeight);
   container3d.appendChild(renderer.domElement);
 
@@ -643,8 +644,8 @@
     const zoomFactor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
     const newZoom = Math.max(0.15, Math.min(25, zoom * zoomFactor));
     if (newZoom !== zoom) {
-      const w = canvas2d.width;
-      const h = canvas2d.height;
+      const w = canvas2d.parentElement.clientWidth;
+      const h = canvas2d.parentElement.clientHeight;
       panX = mouseX - w / 2 - (mouseX - w / 2 - panX) * (newZoom / zoom);
       panY = mouseY - h / 2 - (mouseY - h / 2 - panY) * (newZoom / zoom);
       zoom = newZoom;
@@ -692,8 +693,8 @@
 
       const newZoom = Math.max(0.2, Math.min(15, touchStartZoom * (currentDist / touchStartDist)));
       if (newZoom !== zoom) {
-        const w = canvas2d.width;
-        const h = canvas2d.height;
+        const w = canvas2d.parentElement.clientWidth;
+        const h = canvas2d.parentElement.clientHeight;
         panX = canvasMidX - w / 2 - (canvasMidX - w / 2 - panX) * (newZoom / zoom);
         panY = canvasMidY - h / 2 - (canvasMidY - h / 2 - panY) * (newZoom / zoom);
         zoom = newZoom;
@@ -859,8 +860,12 @@
 
   // ==================== 2D 畫布繪製 (支援雙重視角與平移縮放) ====================
   function draw2D(theta, d, type) {
-    const w = canvas2d.width;
-    const h = canvas2d.height;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const w = canvas2d.parentElement.clientWidth;
+    const h = canvas2d.parentElement.clientHeight;
+    if (w <= 0 || h <= 0) return;
+
+    ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx2d.clearRect(0, 0, w, h);
 
     const baseScale = Math.min(w, h) / 8.5;
@@ -1106,12 +1111,15 @@
   }
 
   function onResize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+
     if (!mainContainer.classList.contains('mode-2d')) {
       const w = container3d.clientWidth;
       const h = container3d.clientHeight;
       if (w > 0 && h > 0) {
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
+        renderer.setPixelRatio(dpr);
         renderer.setSize(w, h);
       }
     }
@@ -1120,8 +1128,10 @@
       const w2d = canvas2d.parentElement.clientWidth;
       const h2d = canvas2d.parentElement.clientHeight;
       if (w2d > 0 && h2d > 0) {
-        canvas2d.width = w2d;
-        canvas2d.height = h2d;
+        canvas2d.width = Math.round(w2d * dpr);
+        canvas2d.height = Math.round(h2d * dpr);
+        canvas2d.style.width = w2d + 'px';
+        canvas2d.style.height = h2d + 'px';
       }
     }
     update();
@@ -1172,6 +1182,7 @@
   }
 
   setLayoutMode(currentLayoutMode);
+  onResize();
   animate();
 </script>
 
