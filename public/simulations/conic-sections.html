@@ -139,40 +139,59 @@
     .control-group {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 4px;
     }
     .label-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.82rem;
+      align-items: center;
+      font-size: 0.88rem;
       color: #94a3b8;
     }
     .label-row span.val {
       color: #38bdf8;
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 0.95rem;
     }
     input[type=range] {
       -webkit-appearance: none;
       width: 100%;
       background: #334155;
-      height: 6px;
-      border-radius: 3px;
+      height: 8px;
+      border-radius: 4px;
       outline: none;
-      margin: 3px 0;
+      margin: 6px 0;
+      cursor: pointer;
     }
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       background: #38bdf8;
       cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      border: 2px solid #ffffff;
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:active {
+      transform: scale(1.15);
+      background: #0284c7;
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      border: 2px solid #ffffff;
     }
     .badge {
       display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 0.78rem;
       font-weight: 700;
       margin-left: 6px;
     }
@@ -289,10 +308,15 @@
         display: none !important;
       }
       header {
-        padding: 6px 12px;
+        padding: 8px 12px;
       }
       header h1 {
-        font-size: 0.92rem;
+        font-size: 0.95rem;
+      }
+      .seg-btn {
+        padding: 6px 14px;
+        font-size: 0.85rem;
+        min-height: 34px;
       }
       .panel-header {
         top: 8px;
@@ -300,23 +324,64 @@
         right: 8px;
       }
       .panel-title {
-        font-size: 0.75rem;
-        padding: 4px 8px;
+        font-size: 0.8rem;
+        padding: 5px 10px;
       }
       .toggle-btn {
-        font-size: 0.75rem;
-        padding: 4px 8px;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        min-height: 32px;
       }
+      /* 手機版：拉桿區改成上下垂直排列，元件放大好按 */
       .controls {
-        padding: 6px 12px 8px 12px;
-        grid-template-columns: 1fr 1fr;
-        gap: 6px 10px;
+        display: flex;
+        flex-direction: column;
+        padding: 12px 16px 14px 16px;
+        gap: 12px;
+        max-height: 48%;
+        overflow-y: auto;
+      }
+      .control-group {
+        width: 100%;
+        gap: 6px;
+      }
+      .label-row {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #e2e8f0;
+      }
+      .label-row span.val {
+        font-size: 1.05rem;
+      }
+      .cycle-btn {
+        font-size: 0.82rem;
+        padding: 4px 12px;
+        min-height: 30px;
+      }
+      input[type=range] {
+        height: 10px;
+        margin: 8px 0;
+      }
+      input[type=range]::-webkit-slider-thumb {
+        width: 28px;
+        height: 28px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      }
+      input[type=range]::-moz-range-thumb {
+        width: 28px;
+        height: 28px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      }
+      .badge {
+        font-size: 0.82rem;
+        padding: 3px 8px;
       }
       .controls .info-box {
-        grid-column: 1 / -1;
+        width: 100%;
         min-height: unset;
-        padding: 5px 8px;
-        font-size: 0.72rem;
+        padding: 8px 12px;
+        font-size: 0.82rem;
+        line-height: 1.45;
       }
     }
     @media (max-height: 620px) {
@@ -327,17 +392,12 @@
         padding: 4px 12px;
       }
       .controls {
-        padding: 4px 10px 6px 10px;
-        gap: 4px 8px;
-      }
-      .preset-btn {
-        padding: 2px 3px;
-        font-size: 0.68rem;
+        padding: 8px 12px;
+        gap: 8px;
       }
       .controls .info-box {
-        padding: 4px 8px;
-        font-size: 0.68rem;
-        min-height: unset;
+        padding: 6px 10px;
+        font-size: 0.75rem;
       }
     }
   </style>
