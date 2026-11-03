@@ -248,13 +248,11 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
               { name: '空間向量與三維平面方程式', semester: '11下', mathTrack: 'mathA', tagLabel: '[數A專屬]' },
               { name: '空間向量外積與三階行列式體積', semester: '11下', mathTrack: 'mathA', tagLabel: '[數A專屬]' },
               { name: '平面線性變換與旋轉矩陣', semester: '11下', mathTrack: 'mathA', tagLabel: '[數A專屬]' },
-              { name: '圓錐截面與二次曲線 (拋物線、橢圓、雙曲線)', semester: '11下', mathTrack: 'mathA', tagLabel: '[數A專屬]' },
-              { name: '雙圓錐截面立體幾何與漸近線對偶', semester: '11下', mathTrack: 'mathA', tagLabel: '[數A專屬]' },
 
               // 數B 專屬
               { name: '單點透視圖與立體視圖繪製', semester: '11下', mathTrack: 'mathB', tagLabel: '[數B專屬]' },
               { name: '球面經緯度坐標與大圓航線', semester: '11下', mathTrack: 'mathB', tagLabel: '[數B專屬]' },
-              { name: '圓錐截面幾何特性與日晷模型', semester: '11下', mathTrack: 'mathB', tagLabel: '[數B專屬]' }
+              { name: '圓錐截面', semester: '11下', mathTrack: 'mathB', tagLabel: '[數B專屬]' }
             ]
           }
         ]
@@ -279,6 +277,7 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
             chapters: [
               { name: '空間直線方程式與對稱比例式', semester: '12下', mathTrack: 'mathA', tagLabel: '[數甲專屬]' },
               { name: '空間歪斜線距離與法向量應用', semester: '12下', mathTrack: 'mathA', tagLabel: '[數甲專屬]' },
+              { name: '二次曲線 (拋物線、橢圓、雙曲線)', semester: '12下', mathTrack: 'mathA', tagLabel: '[數甲專屬]' },
               { name: '學測與分科測驗跨冊整合總複習', semester: '12下', mathTrack: 'common', tagLabel: '[數A+B]' }
             ]
           }
