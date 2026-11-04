@@ -81,8 +81,31 @@ const updatePosFromPointer = (event: PointerEvent) => {
   let newDo = X_CENTER - pointerX;
   // 限制範圍 25px ~ 285px
   newDo = Math.max(25, Math.min(285, Math.round(newDo)));
+
+  // 焦點 F (80px) 與 2倍焦距 2F (160px) 磁吸功能 (感應範圍 ±6px)
+  const SNAP_THRESHOLD = 6;
+  if (Math.abs(newDo - F_PX) <= SNAP_THRESHOLD) {
+    newDo = F_PX; // 磁吸至 1.00 F
+  } else if (Math.abs(newDo - 2 * F_PX) <= SNAP_THRESHOLD) {
+    newDo = 2 * F_PX; // 磁吸至 2.00 F
+  }
+
   doVal.value = newDo;
 };
+
+// 磁吸狀態與標籤計算
+const isSnapped = computed(() => {
+  return doVal.value === F_PX || doVal.value === 2 * F_PX;
+});
+
+const snapLabel = computed(() => {
+  if (doVal.value === F_PX) {
+    return '物距 do = 1.00 F (焦點)';
+  } else if (doVal.value === 2 * F_PX) {
+    return '物距 do = 2.00 F (2F)';
+  }
+  return `物距 do = ${(doVal.value / F_PX).toFixed(2)} F`;
+});
 
 // 將射線端點裁剪於畫布範圍內
 function clipRayToCanvas(x1: number, y1: number, dx: number, dy: number) {
@@ -449,8 +472,8 @@ const showFullTable = ref(false);
           <line :x1="X_CENTER + F_PX" :y1="Y_AXIS - 5" :x2="X_CENTER + F_PX" :y2="Y_AXIS + 5" />
           <line :x1="X_CENTER + 2 * F_PX" :y1="Y_AXIS - 5" :x2="X_CENTER + 2 * F_PX" :y2="Y_AXIS + 5" />
         </g>
-        <circle :cx="X_CENTER - 2 * F_PX" :cy="Y_AXIS" r="2.5" fill="#94a3b8" />
-        <circle :cx="X_CENTER - F_PX" :cy="Y_AXIS" r="2.5" fill="#94a3b8" />
+        <circle :cx="X_CENTER - 2 * F_PX" :cy="Y_AXIS" :r="doVal === 2 * F_PX ? 4.5 : 2.5" :fill="doVal === 2 * F_PX ? '#38bdf8' : '#94a3b8'" />
+        <circle :cx="X_CENTER - F_PX" :cy="Y_AXIS" :r="doVal === F_PX ? 4.5 : 2.5" :fill="doVal === F_PX ? '#38bdf8' : '#94a3b8'" />
         <circle :cx="X_CENTER + F_PX" :cy="Y_AXIS" r="2.5" fill="#94a3b8" />
         <circle :cx="X_CENTER + 2 * F_PX" :cy="Y_AXIS" r="2.5" fill="#94a3b8" />
 
@@ -707,29 +730,29 @@ const showFullTable = ref(false);
           </template>
         </g>
 
-        <!-- ======================= 實際物距標註於圖面右下角 (放大字體) ======================= -->
+        <!-- ======================= 實際物距標註於圖面右下角 (放大字體，支援磁吸回饋) ======================= -->
         <g>
           <rect
-            :x="SVG_WIDTH - 156"
+            :x="SVG_WIDTH - (isSnapped ? 186 : 156)"
             :y="SVG_HEIGHT - 35"
-            width="144"
+            :width="isSnapped ? 174 : 144"
             height="26"
             rx="6"
             fill="#090e1a"
             fill-opacity="0.94"
-            stroke="#334155"
+            :stroke="isSnapped ? '#38bdf8' : '#334155'"
             stroke-width="1.2"
           />
           <text
-            :x="SVG_WIDTH - 84"
+            :x="SVG_WIDTH - (isSnapped ? 99 : 84)"
             :y="SVG_HEIGHT - 18"
             text-anchor="middle"
-            fill="#fbbf24"
+            :fill="isSnapped ? '#38bdf8' : '#fbbf24'"
             font-size="13"
             font-weight="bold"
             font-family="monospace"
           >
-            物距 do = {{ (doVal / F_PX).toFixed(2) }} F
+            {{ snapLabel }}
           </text>
         </g>
       </svg>
