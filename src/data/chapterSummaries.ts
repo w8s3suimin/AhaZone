@@ -1669,10 +1669,10 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '等加速度直線運動四大公式',
         description: '初速 v₀、末速 v、加速度 a、歷時 t、位移 Δx：',
         formulas: [
-          '末速度：v = v₀ + at',
-          '位移公式：Δx = v₀t + (1/2)at²',
-          '無時間公式：v² = v₀² + 2a · Δx',
-          '平均速度：v_avg = (v₀ + v)/2 = Δx / t'
+          '末速度：v = v_0 + at',
+          '位移公式：\\Delta x = v_0 t + \\frac{1}{2}at^2',
+          '無時間公式：v^2 = v_0^2 + 2a \\cdot \\Delta x',
+          '平均速度：v_{\\text{avg}} = \\frac{v_0 + v}{2} = \\frac{\\Delta x}{t}'
         ]
       },
       {
@@ -1700,9 +1700,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '斜向拋射公式彙整 (初速 v₀，仰角 θ)',
         description: '分解初速：v_0x = v₀ cosθ, v_0y = v₀ sinθ：',
         formulas: [
-          '飛行總時間：T = (2v₀ sinθ) / g',
-          '最大飛行高度：H = (v₀ sinθ)² / (2g)',
-          '水平射程：R = (v₀² sin 2θ) / g  (當 θ = 45° 時射程最大；互餘角 θ 與 90°-θ 射程相等)'
+          '飛行總時間：T = \\frac{2v_0 \\sin\\theta}{g}',
+          '最大飛行高度：H = \\frac{(v_0 \\sin\\theta)^2}{2g}',
+          '水平射程：R = \\frac{v_0^2 \\sin 2\\theta}{g}  (當 \\theta = 45^\\circ 時射程最大；互餘角 \\theta 與 90^\\circ-\\theta 射程相等)'
         ]
       }
     ],
@@ -1726,17 +1726,17 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '等速圓周運動核心公式',
         description: '向心加速度恆指向圓心：',
         formulas: [
-          '向心加速度：a_c = v² / R = ω²R = (4π² / T²) R',
-          '向心力：F_c = m a_c = m v² / R'
+          '向心加速度：a_c = \\frac{v^2}{R} = \\omega^2 R = \\frac{4\\pi^2}{T^2} R',
+          '向心力：F_c = m a_c = \\frac{m v^2}{R}'
         ]
       },
       {
         title: '簡諧運動 (SHM) 特徵與週期公式',
         description: '恢復力 F = -kx，物體作正弦形式的週期震盪：',
         formulas: [
-          '水平彈簧振子週期：T = 2π √(m / k)  (與振幅 A 無關，具等時性)',
-          '單擺小角度週期：T = 2π √(L / g)  (擺角 θ < 5°)',
-          '端點處：位移最大、加速度最大、速度為 0；平衡點處：位移為 0、加速度為 0、速率達最大值 v_max = ωA'
+          '水平彈簧振子週期：T = 2\\pi \\sqrt{\\frac{m}{k}}  (與振幅 A 無關，具等時性)',
+          '單擺小角度週期：T = 2\\pi \\sqrt{\\frac{L}{g}}  (擺角 \\theta < 5^\\circ)',
+          '端點處：位移最大、加速度最大、速度為 0；平衡點處：位移為 0、加速度為 0、速率達最大值 v_{\\text{max}} = \\omega A'
         ]
       }
     ],
@@ -1760,10 +1760,10 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '衛星軌道運算核心方程',
         description: '引力等於向心力：G Mm / r² = m v² / r = m (4π²/T²) r：',
         formulas: [
-          '軌道速率：v = √(GM / r)',
-          '萬有引力位能：U = -GMm / r  (取無窮遠處 U=0)',
-          '總力學能：E = K + U = (1/2)mv² - GMm/r = -GMm / (2r) = (1/2)U = -K',
-          '脫離速率 (自地表發射飛至無窮遠)：v_esc = √(2GM / R_E) = √2 · v_orbit'
+          '軌道速率：v = \\sqrt{\\frac{GM}{r}}',
+          '萬有引力位能：U = -\\frac{GMm}{r}  (取無窮遠處 U=0)',
+          '總力學能：E = K + U = \\frac{1}{2}mv^2 - \\frac{GMm}{r} = -\\frac{GMm}{2r} = \\frac{1}{2}U = -K',
+          '脫離速率 (自地表發射飛至無窮遠)：v_{\\text{esc}} = \\sqrt{\\frac{2GM}{R_E}} = \\sqrt{2} v_{\\text{orbit}}'
         ]
       }
     ],
@@ -1783,9 +1783,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '一維彈性碰撞末速度公式 (初速 v₁, v₂)',
         description: '質量分別為 m₁ 與 m₂：',
         formulas: [
-          'm₁ 末速：v₁\' = [(m₁ - m₂) / (m₁ + m₂)] v₁ + [2m₂ / (m₁ + m₂)] v₂',
-          'm₂ 末速：v₂\' = [2m₁ / (m₁ + m₂)] v₁ + [(m₂ - m₁) / (m₁ + m₂)] v₂',
-          '接近速率等於分離速率：v₁ - v₂ = -(v₁\' - v₂\')  => 恢復係數 e = 1'
+          'm_1 末速：v_1\' = \\frac{m_1 - m_2}{m_1 + m_2} v_1 + \\frac{2m_2}{m_1 + m_2} v_2',
+          'm_2 末速：v_2\' = \\frac{2m_1}{m_1 + m_2} v_1 + \\frac{m_2 - m_1}{m_1 + m_2} v_2',
+          '接近速率等於分離速率：v_1 - v_2 = -(v_1\' - v_2\')  \\implies e = 1'
         ]
       },
       {

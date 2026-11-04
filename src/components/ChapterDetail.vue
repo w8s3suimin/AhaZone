@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue';
 import { Lightbulb, AlertTriangle, BookOpen, Sparkles, FileText, ArrowLeft, CheckCircle2, Layers } from 'lucide-vue-next';
 import { getChapterSummary, ChapterSummary } from '../data/chapterSummaries';
+import { renderFormulaItem } from '../utils/mathRenderer';
 import { ResourceItem } from '../types';
 import ResourceCard from './ResourceCard.vue';
 
@@ -270,18 +271,36 @@ const chapterResources = computed(() => {
             </p>
           </div>
 
-          <!-- Formulas list: 每條公式獨立一列，清楚好讀 -->
+          <!-- Formulas list: 以 KaTeX 數學排版引擎渲染真實分數、上下標與希臘字母 -->
           <div 
             v-if="concept.formulas && concept.formulas.length > 0"
-            class="mt-2 space-y-1.5"
+            class="mt-2 space-y-2"
           >
             <div 
               v-for="(fItem, fIdx) in concept.formulas"
               :key="fIdx"
-              class="px-3.5 py-2 rounded-xl bg-slate-950/90 border border-slate-800/90 text-sky-200 text-xs sm:text-sm font-mono tracking-wide flex items-center gap-2 overflow-x-auto shadow-inner"
+              class="px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-slate-800/90 text-slate-100 text-sm tracking-wide flex flex-wrap items-center gap-2 overflow-x-auto shadow-inner"
             >
               <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
-              <span class="select-all">{{ fItem }}</span>
+              <!-- 前置中文名稱標籤 -->
+              <span 
+                v-if="renderFormulaItem(fItem).label" 
+                class="font-bold text-sky-400 shrink-0"
+              >
+                {{ renderFormulaItem(fItem).label }}
+              </span>
+              <!-- KaTeX 渲染之高畫質數學公式（含真實垂直分數線、精緻下標） -->
+              <span 
+                class="text-sky-100 select-all font-sans text-sm sm:text-base leading-none py-0.5"
+                v-html="renderFormulaItem(fItem).mathHtml"
+              />
+              <!-- 後置補充備註說明 -->
+              <span 
+                v-if="renderFormulaItem(fItem).note" 
+                class="text-xs text-slate-400 font-sans ml-1"
+              >
+                {{ renderFormulaItem(fItem).note }}
+              </span>
             </div>
           </div>
         </div>
