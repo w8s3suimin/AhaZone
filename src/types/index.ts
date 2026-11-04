@@ -28,7 +28,7 @@ export interface ResourceItem {
   tags: string[];
   filePath: string;
   answerPath?: string;
-  ahaInsight: string; // 悟境亮點 / 思考點撥
+  ahaInsight?: string; // 悟境亮點 / 思考點撥 (選填，無填寫時不顯示)
   learningGoals?: string[];
   featured?: boolean;
   date: string;

@@ -58,7 +58,7 @@ const filteredResources = computed(() => {
       const inDesc = item.description.toLowerCase().includes(q);
       const inChapter = item.chapter.toLowerCase().includes(q);
       const inTags = item.tags.some(t => t.toLowerCase().includes(q));
-      const inAha = item.ahaInsight.toLowerCase().includes(q);
+      const inAha = item.ahaInsight ? item.ahaInsight.toLowerCase().includes(q) : false;
 
       if (!inTitle && !inSubtitle && !inDesc && !inChapter && !inTags && !inAha) {
         return false;

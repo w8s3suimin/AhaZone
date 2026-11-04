@@ -32,8 +32,8 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
   {
     "id": "res-drive-1a1a74cb443",
     "title": "高一下三角函數重點整理",
-    "subtitle": "高一數學 三角比 精選練習",
-    "description": "精選 三角比 練習卷，透過 Google 雲端即時載入，題目與解析齊備。",
+    "subtitle": "三角比性質、公式推導與實戰試卷",
+    "description": "精選高一數學三角比單元重點練習卷，內含核心公式解析與常考題型，隨附完整詳解卷，可線上預覽或下載列印。",
     "type": "pdf-exam",
     "stage": "senior",
     "grade": "s10-math",
@@ -47,11 +47,6 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
       "含題目與詳解"
     ],
     "filePath": "https://drive.google.com/file/d/1-DsoKOxKeVXdJdupGGRWJT93aBtN4qy_/preview",
-    "ahaInsight": "掌握核心觀念與幾何幾何意涵，快速突破常見盲點。",
-    "learningGoals": [
-      "掌握考題題型與解法思維",
-      "建立關鍵公式與定理直覺"
-    ],
     "featured": false,
     "date": "2026-11-05",
     "downloads": 0,

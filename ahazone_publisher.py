@@ -20,6 +20,7 @@ import urllib.request
 import urllib.parse
 from datetime import datetime
 import concurrent.futures
+import subprocess
 
 # Windows 終端機 UTF-8 編碼相容處理
 if sys.platform == 'win32':
@@ -257,27 +258,36 @@ def write_to_resources_ts(selected_items):
     new_entries = []
     for item in selected_items:
         is_pair = item['type'] == 'pair'
+        is_combined = item['type'] == 'combined'
         q_file = item['q'] if item.get('q') else (item.get('c') or item.get('a'))
         q_url = q_file['previewUrl'] if q_file else ""
         a_url = item['a']['previewUrl'] if (is_pair and item.get('a')) else None
         ch = item['matched_chapter']
 
+        if is_pair:
+            desc = f"精選 {ch['gradeLabel']} {ch['chapter']} 單元重點練習卷，含完整題目卷與詳解卷，可線上預覽或下載列印。"
+            sub = f"{ch['gradeLabel']} · {ch['chapter']} 題目與詳解"
+        elif is_combined:
+            desc = f"精選 {ch['gradeLabel']} {ch['chapter']} 單元精選練習（題解合一版），附詳細解答步驟。"
+            sub = f"{ch['gradeLabel']} · {ch['chapter']} 題解合一卷"
+        else:
+            desc = f"精選 {ch['gradeLabel']} {ch['chapter']} 單元實戰練習試卷，可線上預覽或下載列印。"
+            sub = f"{ch['gradeLabel']} · {ch['chapter']} 精選試卷"
+
         entry = {
             "id": f"res-drive-{hex(int(datetime.now().timestamp() * 1000))[2:]}",
             "title": item['clean_title'],
-            "subtitle": f"{ch['gradeLabel']} {ch['chapter']} 精選練習",
-            "description": f"精選 {ch['chapter']} 練習卷，透過 Google 雲端即時載入，題目與解析齊備。",
-            "type": "pdf-exam" if is_pair else "pdf-paper",
+            "subtitle": sub,
+            "description": desc,
+            "type": "pdf-exam" if is_pair else "pdf-lecture",
             "stage": ch['stage'],
             "grade": ch['grade'],
             "gradeLabel": ch['gradeLabel'],
             "subject": ch['subject'],
             "subjectLabel": ch['subjectLabel'],
             "chapter": ch['chapter'],
-            "tags": [ch['gradeLabel'], ch['chapter'], "含題目與詳解" if is_pair else ("題解合一" if item['type'] == 'combined' else "精選試卷")],
+            "tags": [ch['gradeLabel'], ch['chapter'], "含題目與詳解" if is_pair else ("題解合一" if is_combined else "精選試卷")],
             "filePath": q_url,
-            "ahaInsight": "掌握核心觀念與幾何幾何意涵，快速突破常見盲點。",
-            "learningGoals": ["掌握考題題型與解法思維", "建立關鍵公式與定理直覺"],
             "featured": False,
             "date": datetime.now().strftime('%Y-%m-%d'),
             "downloads": 0,
@@ -718,6 +728,27 @@ def launch_gui():
                 tree.set(item_id, "status", "[   ]")
         update_summary_status(bool(search_var.get()), search_var.get(), len(currently_shown_indices))
 
+    # Git 自動提交與推送
+    def sync_to_git(count):
+        """執行 git add, commit, push 自動推送至 GitHub"""
+        cmd_add = ['git', 'add', 'src/data/resources.ts']
+        commit_msg = f"feat(resources): 發布雲端教材 (共 {count} 份)"
+        cmd_commit = ['git', 'commit', '-m', commit_msg]
+        cmd_push = ['git', 'push']
+
+        p_add = subprocess.run(cmd_add, cwd=BASE_DIR, capture_output=True, text=True, encoding='utf-8', errors='replace')
+        if p_add.returncode != 0:
+            raise RuntimeError(f"git add 失敗：\n{p_add.stderr or p_add.stdout}")
+
+        p_commit = subprocess.run(cmd_commit, cwd=BASE_DIR, capture_output=True, text=True, encoding='utf-8', errors='replace')
+        out_commit = (p_commit.stdout + p_commit.stderr).lower()
+        if p_commit.returncode != 0 and 'nothing to commit' not in out_commit and 'working tree clean' not in out_commit:
+            raise RuntimeError(f"git commit 失敗：\n{p_commit.stderr or p_commit.stdout}")
+
+        p_push = subprocess.run(cmd_push, cwd=BASE_DIR, capture_output=True, text=True, encoding='utf-8', errors='replace')
+        if p_push.returncode != 0:
+            raise RuntimeError(f"git push 失敗：\n{p_push.stderr or p_push.stdout}")
+
     # 執行一鍵發布
     def do_publish():
         save_current_edit()
@@ -726,19 +757,50 @@ def launch_gui():
             return
 
         to_publish = [candidates_data[i] for i in sorted(selected_indices)]
+        will_git = auto_git_var.get()
+
         msg = f"即將把以下 {len(to_publish)} 份教材寫入 AhaZone：\n\n"
         for item in to_publish[:10]:
             msg += f"• 【{item['matched_chapter']['chapter']}】{item['clean_title']}\n"
         if len(to_publish) > 10:
             msg += f"...以及另外 {len(to_publish) - 10} 份教材\n"
-        msg += "\n請問是否確定發布？"
+        
+        if will_git:
+            msg += "\n※ 已勾選「同步推送至 GitHub (自動 Git Push)」，寫入完成後將自動推送並觸發雲端上線！"
+        else:
+            msg += "\n※ 未勾選自動 Git Push，寫入後僅在本地生效，需手動執行 git push 才能上線。"
+
+        msg += "\n\n請問是否確定發布？"
 
         if messagebox.askyesno("確認發布", msg):
-            try:
-                count = write_to_resources_ts(to_publish)
-                messagebox.showinfo("發布成功", f"成功寫入 {count} 筆資源至 resources.ts！\n學生端點擊即可透過 Google Drive 串流即時預覽。")
-            except Exception as e:
-                messagebox.showerror("寫入失敗", str(e))
+            btn_publish.config(state="disabled", text="正在發布中...")
+            status_var.set("正在寫入教材至 resources.ts...")
+
+            def publish_worker():
+                try:
+                    count = write_to_resources_ts(to_publish)
+                    if will_git:
+                        root.after(0, lambda: status_var.set("正在執行 Git Commit & Push 至 GitHub..."))
+                        sync_to_git(count)
+                        root.after(0, lambda: (
+                            btn_publish.config(state="normal", text="一鍵寫入 AhaZone 教材庫"),
+                            status_var.set(f"✔ 成功發布並 Push {count} 筆資源至 GitHub！"),
+                            messagebox.showinfo("發布成功", f"成功寫入 {count} 筆資源至 resources.ts，並已同步 Push 至 GitHub！\n\n線上網站將在數分鐘內自動完成雲端部署。")
+                        ))
+                    else:
+                        root.after(0, lambda: (
+                            btn_publish.config(state="normal", text="一鍵寫入 AhaZone 教材庫"),
+                            status_var.set(f"✔ 成功寫入 {count} 筆資源至 resources.ts！"),
+                            messagebox.showinfo("寫入成功", f"成功寫入 {count} 筆資源至 resources.ts！\n\n(提示：未勾選自動 Push，請記得在終端機執行 git push 以部署到線上網站)")
+                        ))
+                except Exception as e:
+                    root.after(0, lambda err=e: (
+                        btn_publish.config(state="normal", text="一鍵寫入 AhaZone 教材庫"),
+                        status_var.set(f"❌ 發布失敗：{err}"),
+                        messagebox.showerror("發布過程發生錯誤", str(err))
+                    ))
+
+            threading.Thread(target=publish_worker, daemon=True).start()
 
     # ------------------------------------------
     # 下方按鈕控制列
@@ -760,6 +822,22 @@ def launch_gui():
 
     btn_publish = tk.Button(bottom_frame, text="一鍵寫入 AhaZone 教材庫", command=do_publish, font=('Microsoft JhengHei', 10, 'bold'), bg="#0284c7", fg="#ffffff", padx=18, pady=6, relief=tk.FLAT)
     btn_publish.pack(side=tk.RIGHT)
+
+    # 默認勾選自動 Git Push
+    auto_git_var = tk.BooleanVar(value=True)
+    chk_git = tk.Checkbutton(
+        bottom_frame,
+        text="同步推送至 GitHub (自動 Git Push)",
+        variable=auto_git_var,
+        font=('Microsoft JhengHei', 9),
+        bg="#0f172a",
+        fg="#38bdf8",
+        activebackground="#0f172a",
+        activeforeground="#38bdf8",
+        selectcolor="#1e293b",
+        cursor="hand2"
+    )
+    chk_git.pack(side=tk.RIGHT, padx=12)
 
     # 啟動時自動掃描一次
     root.after(300, run_scan)
