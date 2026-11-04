@@ -13,10 +13,10 @@ export interface FormattedFormula {
 export function formulaToLatex(raw: string): string {
   let s = raw.trim();
 
-  // 若字串已顯式宣告為 LaTeX（含 \frac, \sqrt, \int 等），直接使用
-  if (s.includes('\\frac') || s.includes('\\sqrt') || s.includes('\\sum') || s.includes('\\int')) {
-    return s;
-  }
+  // 0. 括號指數與下標替換：a^(-n) -> a^{-n}, a^-n -> a^{-n}, r^(n-1) -> r^{n-1}, a_(n+1) -> a_{n+1}
+  s = s.replace(/\^\(([^()]+)\)/g, '^{$1}');
+  s = s.replace(/\^-([a-zA-Z0-9]+)/g, '^{-$1}');
+  s = s.replace(/_\(([^()]+)\)/g, '_{$1}');
 
   // 1. 上標符號替換
   s = s.replace(/²/g, '^2')
@@ -68,20 +68,25 @@ export function formulaToLatex(raw: string): string {
   s = s.replace(/√\(([^()]+)\)/g, '\\sqrt{$1}');
   s = s.replace(/√([a-zA-Z0-9]+)/g, '\\sqrt{$1}');
 
-  // 6. 分數轉換（垂直分數 \frac{分子}{分母}）
-  // 處理括號包覆的除法，例如 (4\pi^2 / T^2) -> \frac{4\pi^2}{T^2}
-  s = s.replace(/\(([^()]+)\)\s*\/\s*\(([^()]+)\)/g, '\\frac{$1}{$2}');
-  s = s.replace(/\(([^()]+)\)\s*\/\s*([a-zA-Z0-9_^{}]+)/g, '\\frac{$1}{$2}');
-  s = s.replace(/([a-zA-Z0-9_^{}]+)\s*\/\s*\(([^()]+)\)/g, '\\frac{$1}{$2}');
+  // 若字串已顯式包含 \frac 或其他進階 LaTeX，跳過後續自動斜線除法換算
+  const hasExplicitFrac = s.includes('\\frac');
 
-  // 處理簡單單項分數，例如 v^2 / R 或 GMm / r 或 m / k 或 L / g 等（排除純單位）
-  if (!s.includes('g/cm') && !s.includes('kg/m') && !s.includes('m/s')) {
-    s = s.replace(/([a-zA-Z0-9_^{}]+)\s*\/\s*([a-zA-Z0-9_^{}]+)/g, '\\frac{$1}{$2}');
+  // 6. 分數轉換（垂直分數 \frac{分子}{分母}）
+  if (!hasExplicitFrac) {
+    // 處理括號包覆的除法，例如 (4\pi^2 / T^2) -> \frac{4\pi^2}{T^2}
+    s = s.replace(/\(([^()]+)\)\s*\/\s*\(([^()]+)\)/g, '\\frac{$1}{$2}');
+    s = s.replace(/\(([^()]+)\)\s*\/\s*([a-zA-Z0-9_^{}]+)/g, '\\frac{$1}{$2}');
+    s = s.replace(/([a-zA-Z0-9_^{}]+)\s*\/\s*\(([^()]+)\)/g, '\\frac{$1}{$2}');
+
+    // 處理簡單單項分數，例如 v^2 / R 或 GMm / r 或 m / k 或 L / g 等（排除純單位）
+    if (!s.includes('g/cm') && !s.includes('kg/m') && !s.includes('m/s')) {
+      s = s.replace(/([a-zA-Z0-9_^{}]+)\s*\/\s*([a-zA-Z0-9_^{}]+)/g, '\\frac{$1}{$2}');
+    }
   }
 
-  // 7. 下標轉換：a_c, F_c, v_0, a_avg 等
+  // 7. 下標轉換：a_c, F_c, v_0, a_avg 等 (避免影響已有的 LaTeX 指令如 \text{})
   s = s.replace(/([a-zA-Z])_([a-zA-Z0-9]+)/g, (match, p1, p2) => {
-    if (p2.length > 1 && !/^\d+$/.test(p2)) {
+    if (p2.length > 1 && !/^\d+$/.test(p2) && !match.startsWith('\\')) {
       return `${p1}_{\\text{${p2}}}`;
     }
     return `${p1}_{${p2}}`;

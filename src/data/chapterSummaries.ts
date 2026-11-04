@@ -226,8 +226,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '分數四則運算與指數律',
         description: '異分母分數加減必先通分找分母的 LCM；乘法直接分子乘分子、分母乘分母（先約分再乘除）：',
         formulas: [
-          '負指數律：a^(-n) = 1 / (a^n) （a ≠ 0）',
-          '零次指數：a^0 = 1 （a ≠ 0）'
+          '負指數律：a^{-n} = \\frac{1}{a^n}  (a \\ne 0)',
+          '零次指數：a^0 = 1  (a \\ne 0)'
         ]
       }
     ],
@@ -841,17 +841,17 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '等比數列一般項與求和公式',
         description: '首項為 a₁，公比為 r (r ≠ 1)：',
         formulas: [
-          '一般項：an = a₁ · r^(n - 1)',
-          '求和公式：Sn = a₁(1 - r^n) / (1 - r) = a₁(r^n - 1) / (r - 1)'
+          '一般項：a_n = a_1 \\cdot r^{n - 1}',
+          '求和公式：S_n = \\frac{a_1(1 - r^n)}{1 - r} = \\frac{a_1(r^n - 1)}{r - 1}  (r \\ne 1)'
         ]
       },
       {
         title: 'Sigma 運算核心公式',
         description: '自然數列前 n 項次方和：',
         formulas: [
-          '一次方和：∑k = n(n + 1) / 2',
-          '二次方和：∑k² = n(n + 1)(2n + 1) / 6',
-          '三次方和：∑k³ = [n(n + 1) / 2]²'
+          '一次方和：\\sum_{k=1}^n k = \\frac{n(n + 1)}{2}',
+          '二次方和：\\sum_{k=1}^n k^2 = \\frac{n(n + 1)(2n + 1)}{6}',
+          '三次方和：\\sum_{k=1}^n k^3 = [\\frac{n(n + 1)}{2}]^2'
         ]
       }
     ],
@@ -911,8 +911,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '二項式定理與排容原理',
         description: '多項展開通式與機率計算：',
         formulas: [
-          '二項式定理：(x + y)^n = ∑ C(n, k) · x^(n-k) · y^k',
-          '排容原理：P(A ∪ B) = P(A) + P(B) - P(A ∩ B)'
+          '二項式定理：(x + y)^n = \\sum_{k=0}^n \\binom{n}{k} x^{n-k} y^k',
+          '排容原理：P(A \\cup B) = P(A) + P(B) - P(A \\cap B)'
         ]
       }
     ],
