@@ -242,6 +242,7 @@ const chapterResources = computed(() => {
           v-for="(concept, idx) in displayedConcepts" 
           :key="idx"
           class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700/80 transition-colors flex flex-col justify-between"
+          :class="concept.diagramType === 'lens-optics' ? 'md:col-span-2' : ''"
         >
           <div>
             <div class="flex items-center justify-between gap-2 mb-1.5">
@@ -276,7 +277,7 @@ const chapterResources = computed(() => {
           <!-- Visual Illustration Diagram (若單元具幾何圖解則動態呈現) -->
           <div 
             v-if="concept.diagramType"
-            class="my-2.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner flex flex-col items-center"
+            class="my-2.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner flex flex-col items-center w-full"
           >
             <div class="w-full flex items-center justify-between px-2 py-1 text-[10px] text-sky-400/90 border-b border-slate-900 mb-1.5">
               <span class="flex items-center gap-1 font-semibold">
