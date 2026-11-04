@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Eye, Sparkles, HelpCircle, CheckCircle2, Sliders, MousePointer2 } from 'lucide-vue-next';
+import { Eye, HelpCircle, MousePointer2 } from 'lucide-vue-next';
 
 // 4 種光學儀器模式
-type OpticalDevice = 'convex-lens' | 'concave-lens' | 'concave-mirror' | 'convex-mirror';
+type OpticalDevice = 'convex-lens' | 'concave-lens' | 'convex-mirror' | 'concave-mirror';
 
 const currentDevice = ref<OpticalDevice>('convex-lens');
 
@@ -112,7 +112,7 @@ function clipRayToCanvas(x1: number, y1: number, dx: number, dy: number) {
 const opticsState = computed(() => {
   const d = doVal.value;
   const xo = X_CENTER - d;
-  const yoTip = Y_AXIS - HO;
+  const yoTip = Y_AXIS - HO; // 物體箭頭尖端 Y 座標
 
   let di = 0;
   let hi = 0;
@@ -210,7 +210,7 @@ const opticsState = computed(() => {
 
   // 計算像的座標位置 (SVG 畫布)
   let xi = 0;
-  let yiTip = Y_AXIS;
+  let yiTip = Y_AXIS; // 像箭頭尖端 Y 座標
   let isImageVisible = false;
 
   if (isFormed) {
@@ -249,16 +249,16 @@ const opticsState = computed(() => {
   };
 });
 
-// 光路計算 (嚴格通過物體頂點、光心/頂點與焦點)
+// 光路計算 (嚴格自物體箭頭尖端出發，且精確交會於像箭頭尖端)
 const rays = computed(() => {
   const d = doVal.value;
   const { xo, yoTip, xi, yiTip, isFormed, isReal } = opticsState.value;
   const dev = currentDevice.value;
 
-  // 1. 平行主軸光線 (Ray 1: 始終從物體頂點 (xo, yoTip) 平行射向鏡面 (X_CENTER, yoTip))
+  // 1. 平行主軸光線 (Ray 1: 起點嚴格位於物體箭頭尖端 (xo, yoTip))
   const r1Incident = { x1: xo, y1: yoTip, x2: X_CENTER, y2: yoTip };
   
-  // 2. 光心/頂點光線 (Ray 2: 始終從物體頂點 (xo, yoTip) 射向光心/頂點 (X_CENTER, Y_AXIS))
+  // 2. 光心/頂點光線 (Ray 2: 起點嚴格位於物體箭頭尖端 (xo, yoTip)，過光心/頂點 (X_CENTER, Y_AXIS))
   const r2Incident = { x1: xo, y1: yoTip, x2: X_CENTER, y2: Y_AXIS };
 
   let r1Solid = { x1: 0, y1: 0, x2: 0, y2: 0 };
@@ -276,7 +276,7 @@ const rays = computed(() => {
     r2Solid = { x1: X_CENTER, y1: Y_AXIS, x2: r2Clipped.x2, y2: r2Clipped.y2 };
 
     if (!isReal && isFormed) {
-      // 虛像 (do < F)：折射光線反向虛線延長至鏡前虛像 (xi, yiTip)
+      // 虛像 (do < F)：折射光線反向虛線延長至鏡前虛像尖端 (xi, yiTip)
       r1Dashed = { x1: X_CENTER, y1: yoTip, x2: xi, y2: yiTip, show: true };
       r2Dashed = { x1: X_CENTER, y1: Y_AXIS, x2: xi, y2: yiTip, show: true };
     }
@@ -285,7 +285,7 @@ const rays = computed(() => {
     const r1Clipped = clipRayToCanvas(X_CENTER, yoTip, F_PX, -HO);
     r1Solid = { x1: X_CENTER, y1: yoTip, x2: r1Clipped.x2, y2: r1Clipped.y2 };
 
-    // 鏡前虛線反向延長至左焦點 F1
+    // 鏡前虛線反向延長至左焦點 F1 (精確穿過虛像尖端 (xi, yiTip))
     r1Dashed = { x1: X_CENTER, y1: yoTip, x2: X_CENTER - F_PX, y2: Y_AXIS, show: true };
 
     // 光心光線：直通穿過鏡心至鏡後
@@ -301,7 +301,7 @@ const rays = computed(() => {
     r2Solid = { x1: X_CENTER, y1: Y_AXIS, x2: r2Clipped.x2, y2: r2Clipped.y2 };
 
     if (!isReal && isFormed) {
-      // 虛像 (do < F)：反射光線在鏡前發散，反向虛線延長至鏡後 (xi, yiTip)
+      // 虛像 (do < F)：反射光線在鏡前發散，反向虛線延長至鏡後虛像尖端 (xi, yiTip)
       r1Dashed = { x1: X_CENTER, y1: yoTip, x2: xi, y2: yiTip, show: true };
       r2Dashed = { x1: X_CENTER, y1: Y_AXIS, x2: xi, y2: yiTip, show: true };
     }
@@ -311,7 +311,7 @@ const rays = computed(() => {
     r1Solid = { x1: X_CENTER, y1: yoTip, x2: r1Clipped.x2, y2: r1Clipped.y2 };
     r1Dashed = { x1: X_CENTER, y1: yoTip, x2: X_CENTER + F_PX, y2: Y_AXIS, show: true };
 
-    // 頂點反射光線：在鏡前對稱向下反射，反向延長線穿過 (xi, yiTip)
+    // 頂點反射光線：在鏡前對稱向下反射，反向延長線穿過虛像尖端 (xi, yiTip)
     const r2Clipped = clipRayToCanvas(X_CENTER, Y_AXIS, -d, HO);
     r2Solid = { x1: X_CENTER, y1: Y_AXIS, x2: r2Clipped.x2, y2: r2Clipped.y2 };
     r2Dashed = { x1: X_CENTER, y1: Y_AXIS, x2: xi, y2: yiTip, show: true };
@@ -325,119 +325,96 @@ const showFullTable = ref(false);
 </script>
 
 <template>
-  <div class="w-full bg-slate-900/90 rounded-2xl border border-slate-800 p-4 sm:p-5 shadow-2xl flex flex-col gap-4 text-slate-100 select-none">
+  <div class="w-full bg-slate-900/95 rounded-2xl border border-slate-800 p-4 sm:p-5 shadow-2xl flex flex-col gap-4 text-slate-100 select-none">
     
-    <!-- 頂部控制列：標題、儀器切換標籤與常考分區速選 (佔滿雙卡片寬度，空間寬敞不擠壓) -->
-    <div class="flex flex-col gap-3 border-b border-slate-800/80 pb-3">
-      
-      <!-- 第一行：標題 + 4 大儀器切換按鈕 -->
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-2">
-          <span class="p-1.5 rounded-lg bg-sky-500/20 text-sky-400">
-            <Eye class="w-4 h-4" />
-          </span>
-          <span class="font-bold text-sm tracking-wide text-white">光學成像實驗室 (幾何光線作圖)</span>
-          <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-sky-400 border border-sky-500/30">
-            動態即時計算
-          </span>
-        </div>
-
-        <!-- 面鏡 / 透鏡 4 大儀器切換 -->
-        <div class="flex items-center p-1 rounded-xl bg-slate-950 border border-slate-800 text-xs shadow-inner">
-          <button
-            @click="setDevice('convex-lens')"
-            class="px-3 py-1.5 rounded-lg transition-all font-medium"
-            :class="currentDevice === 'convex-lens' ? 'bg-sky-500 text-white shadow-md shadow-sky-500/30' : 'text-slate-400 hover:text-slate-200'"
-          >
-            凸透鏡
-          </button>
-          <button
-            @click="setDevice('concave-lens')"
-            class="px-3 py-1.5 rounded-lg transition-all font-medium"
-            :class="currentDevice === 'concave-lens' ? 'bg-sky-500 text-white shadow-md shadow-sky-500/30' : 'text-slate-400 hover:text-slate-200'"
-          >
-            凹透鏡
-          </button>
-          <button
-            @click="setDevice('concave-mirror')"
-            class="px-3 py-1.5 rounded-lg transition-all font-medium"
-            :class="currentDevice === 'concave-mirror' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30' : 'text-slate-400 hover:text-slate-200'"
-          >
-            凹面鏡
-          </button>
-          <button
-            @click="setDevice('convex-mirror')"
-            class="px-3 py-1.5 rounded-lg transition-all font-medium"
-            :class="currentDevice === 'convex-mirror' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30' : 'text-slate-400 hover:text-slate-200'"
-          >
-            凸面鏡
-          </button>
-        </div>
+    <!-- 頂部控制列：物距速選按鈕與操作提示 (儀器切換按鈕已依需求移入畫布右上角) -->
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
+      <!-- 5 大物距速選按鈕 -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold text-white mr-0.5">物距速選：</span>
+        <button 
+          @click="setPreset('2F_out')"
+          class="px-3 py-1.5 rounded-lg border text-xs transition-colors font-medium"
+          :class="opticsState.zoneTag === '物距 do > 2F' ? 'bg-sky-500/20 border-sky-400 text-sky-300' : 'bg-slate-950/70 border-slate-800 text-slate-300 hover:border-slate-700'"
+        >
+          1. do &gt; 2F
+        </button>
+        <button 
+          @click="setPreset('2F')"
+          class="px-3 py-1.5 rounded-lg border text-xs transition-colors font-medium"
+          :class="opticsState.zoneTag === '物距 do = 2F' ? 'bg-sky-500/20 border-sky-400 text-sky-300' : 'bg-slate-950/70 border-slate-800 text-slate-300 hover:border-slate-700'"
+        >
+          2. do = 2F
+        </button>
+        <button 
+          @click="setPreset('F_2F')"
+          class="px-3 py-1.5 rounded-lg border text-xs transition-colors font-medium"
+          :class="opticsState.zoneTag === '物距 F < do < 2F' ? 'bg-sky-500/20 border-sky-400 text-sky-300' : 'bg-slate-950/70 border-slate-800 text-slate-300 hover:border-slate-700'"
+        >
+          3. F &lt; do &lt; 2F
+        </button>
+        <button 
+          @click="setPreset('F')"
+          class="px-3 py-1.5 rounded-lg border text-xs transition-colors font-medium"
+          :class="opticsState.zoneTag === '物距 do = F' ? 'bg-sky-500/20 border-sky-400 text-sky-300' : 'bg-slate-950/70 border-slate-800 text-slate-300 hover:border-slate-700'"
+        >
+          4. do = F
+        </button>
+        <button 
+          @click="setPreset('F_in')"
+          class="px-3 py-1.5 rounded-lg border text-xs transition-colors font-medium"
+          :class="opticsState.zoneTag === '物距 do < F' ? 'bg-sky-500/20 border-sky-400 text-sky-300' : 'bg-slate-950/70 border-slate-800 text-slate-300 hover:border-slate-700'"
+        >
+          5. do &lt; F
+        </button>
       </div>
 
-      <!-- 第二行：5 大物距速選按鈕 + 操作提示 (獨立於圖面之外，絕不遮擋圖面) -->
-      <div class="flex flex-wrap items-center justify-between gap-2.5 text-xs">
-        <div class="flex flex-wrap items-center gap-1.5">
-          <span class="text-slate-400 flex items-center gap-1 mr-1">
-            <Sliders class="w-3.5 h-3.5 text-sky-400" />
-            <span>題型速選：</span>
-          </span>
-          <button 
-            @click="setPreset('2F_out')"
-            class="px-2.5 py-1 rounded-lg border text-[11px] transition-colors"
-            :class="opticsState.zoneTag === '物距 do > 2F' ? 'bg-sky-500/20 border-sky-400 text-sky-300 font-semibold' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'"
-          >
-            1. do &gt; 2F
-          </button>
-          <button 
-            @click="setPreset('2F')"
-            class="px-2.5 py-1 rounded-lg border text-[11px] transition-colors"
-            :class="opticsState.zoneTag === '物距 do = 2F' ? 'bg-sky-500/20 border-sky-400 text-sky-300 font-semibold' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'"
-          >
-            2. do = 2F
-          </button>
-          <button 
-            @click="setPreset('F_2F')"
-            class="px-2.5 py-1 rounded-lg border text-[11px] transition-colors"
-            :class="opticsState.zoneTag === '物距 F < do < 2F' ? 'bg-sky-500/20 border-sky-400 text-sky-300 font-semibold' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'"
-          >
-            3. F &lt; do &lt; 2F
-          </button>
-          <button 
-            @click="setPreset('F')"
-            class="px-2.5 py-1 rounded-lg border text-[11px] transition-colors"
-            :class="opticsState.zoneTag === '物距 do = F' ? 'bg-sky-500/20 border-sky-400 text-sky-300 font-semibold' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'"
-          >
-            4. do = F
-          </button>
-          <button 
-            @click="setPreset('F_in')"
-            class="px-2.5 py-1 rounded-lg border text-[11px] transition-colors"
-            :class="opticsState.zoneTag === '物距 do < F' ? 'bg-sky-500/20 border-sky-400 text-sky-300 font-semibold' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'"
-          >
-            5. do &lt; F
-          </button>
-        </div>
-
-        <!-- 提示學生可拖曳物體 -->
-        <div class="flex items-center gap-3 text-xs">
-          <span class="inline-flex items-center gap-1.5 text-amber-400 font-medium bg-amber-950/50 px-2.5 py-1 rounded-lg border border-amber-800/60">
-            <MousePointer2 class="w-3.5 h-3.5 animate-bounce" />
-            可直接在圖中左右拖曳橘色實物
-          </span>
-          <div class="hidden sm:flex items-center gap-2.5 text-[11px] text-slate-400">
-            <span class="flex items-center gap-1"><span class="w-2.5 h-0.5 bg-sky-400 inline-block"></span>光線① 平行主軸</span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-0.5 bg-emerald-400 inline-block"></span>光線② 過鏡心/頂點</span>
-          </div>
-        </div>
+      <!-- 操作提示 -->
+      <div class="flex items-center gap-3 text-xs">
+        <span class="inline-flex items-center gap-1.5 text-amber-400 font-medium bg-amber-950/50 px-2.5 py-1 rounded-lg border border-amber-800/60">
+          <MousePointer2 class="w-3.5 h-3.5 animate-bounce" />
+          可直接在圖中左右拖曳橘色實物
+        </span>
       </div>
     </div>
 
-    <!-- 動態 SVG 畫布區域 (無遮蔽、無跳動圓圈、支援流暢滑鼠/觸控拖曳) -->
+    <!-- 動態 SVG 畫布區域 (切換按鈕整合於畫布右上角) -->
     <div 
       class="relative w-full overflow-hidden rounded-xl bg-[#070b14] border border-slate-800 shadow-inner group"
       :class="isDragging ? 'cursor-grabbing' : 'cursor-grab'"
     >
+      <!-- 儀器切換按鈕：浮動於圖紙右上角處 (有格線區塊的右上角) -->
+      <div class="absolute top-3 right-3 z-20 flex items-center p-1 rounded-xl bg-slate-950/90 backdrop-blur border border-slate-700/80 shadow-xl text-xs">
+        <button
+          @click="setDevice('convex-lens')"
+          class="px-3 py-1.5 rounded-lg transition-all font-medium"
+          :class="currentDevice === 'convex-lens' ? 'bg-sky-500 text-white shadow' : 'text-slate-300 hover:text-white'"
+        >
+          凸透鏡
+        </button>
+        <button
+          @click="setDevice('concave-lens')"
+          class="px-3 py-1.5 rounded-lg transition-all font-medium"
+          :class="currentDevice === 'concave-lens' ? 'bg-sky-500 text-white shadow' : 'text-slate-300 hover:text-white'"
+        >
+          凹透鏡
+        </button>
+        <button
+          @click="setDevice('convex-mirror')"
+          class="px-3 py-1.5 rounded-lg transition-all font-medium"
+          :class="currentDevice === 'convex-mirror' ? 'bg-amber-500 text-white shadow' : 'text-slate-300 hover:text-white'"
+        >
+          凸面鏡
+        </button>
+        <button
+          @click="setDevice('concave-mirror')"
+          class="px-3 py-1.5 rounded-lg transition-all font-medium"
+          :class="currentDevice === 'concave-mirror' ? 'bg-amber-500 text-white shadow' : 'text-slate-300 hover:text-white'"
+        >
+          凹面鏡
+        </button>
+      </div>
+
       <svg
         ref="svgRef"
         :viewBox="`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`"
@@ -463,7 +440,7 @@ const showFullTable = ref(false);
 
         <!-- 主光軸 (Principal Axis) -->
         <line :x1="X_MIN" :y1="Y_AXIS" :x2="X_MAX" :y2="Y_AXIS" stroke="#475569" stroke-width="1.5" />
-        <text :x="X_MAX - 30" :y="Y_AXIS + 16" fill="#64748b" font-size="10" font-family="sans-serif">主光軸</text>
+        <text :x="X_MAX - 38" :y="Y_AXIS + 17" fill="#64748b" font-size="12" font-family="sans-serif">主光軸</text>
 
         <!-- 焦點與 2 倍焦距標記 -->
         <g stroke="#64748b" stroke-width="1.5">
@@ -477,12 +454,12 @@ const showFullTable = ref(false);
         <circle :cx="X_CENTER + F_PX" :cy="Y_AXIS" r="2.5" fill="#94a3b8" />
         <circle :cx="X_CENTER + 2 * F_PX" :cy="Y_AXIS" r="2.5" fill="#94a3b8" />
 
-        <!-- 刻度標籤文字 -->
-        <text :x="X_CENTER - 2 * F_PX - 8" :y="Y_AXIS + 16" fill="#94a3b8" font-size="11" font-weight="bold">2F</text>
-        <text :x="X_CENTER - F_PX - 4" :y="Y_AXIS + 16" fill="#94a3b8" font-size="11" font-weight="bold">F</text>
-        <text :x="X_CENTER + F_PX - 4" :y="Y_AXIS + 16" fill="#94a3b8" font-size="11" font-weight="bold">F</text>
-        <text :x="X_CENTER + 2 * F_PX - 8" :y="Y_AXIS + 16" fill="#94a3b8" font-size="11" font-weight="bold">2F</text>
-        <text :x="X_CENTER - 5" :y="Y_AXIS + 16" fill="#38bdf8" font-size="11" font-weight="bold">
+        <!-- 刻度標籤文字 (稍微放大更易辨認) -->
+        <text :x="X_CENTER - 2 * F_PX - 8" :y="Y_AXIS + 18" fill="#cbd5e1" font-size="12" font-weight="bold">2F</text>
+        <text :x="X_CENTER - F_PX - 4" :y="Y_AXIS + 18" fill="#cbd5e1" font-size="12" font-weight="bold">F</text>
+        <text :x="X_CENTER + F_PX - 4" :y="Y_AXIS + 18" fill="#cbd5e1" font-size="12" font-weight="bold">F</text>
+        <text :x="X_CENTER + 2 * F_PX - 8" :y="Y_AXIS + 18" fill="#cbd5e1" font-size="12" font-weight="bold">2F</text>
+        <text :x="X_CENTER - 5" :y="Y_AXIS + 18" fill="#38bdf8" font-size="12" font-weight="bold">
           {{ currentDevice.includes('lens') ? 'O' : 'V' }}
         </text>
 
@@ -545,7 +522,7 @@ const showFullTable = ref(false);
           <line :x1="X_CENTER" :y1="Y_AXIS - 105" :x2="X_CENTER" :y2="Y_AXIS + 105" stroke="#64748b" stroke-width="1" stroke-dasharray="3,3" opacity="0.4" />
         </g>
 
-        <!-- ======================= 光路繪製 (嚴格精準) ======================= -->
+        <!-- ======================= 光路繪製 (起點為物體尖端，交點為像尖端) ======================= -->
         <!-- 光線① 平行入射線 (藍色) -->
         <line
           :x1="rays.r1Incident.x1"
@@ -555,7 +532,7 @@ const showFullTable = ref(false);
           stroke="#38bdf8"
           stroke-width="1.8"
         />
-        <!-- 光線① 箭頭標記 -->
+        <!-- 光線① 前進箭頭標記 -->
         <polygon
           :points="`${(rays.r1Incident.x1 + rays.r1Incident.x2)/2 - 3},${rays.r1Incident.y1 - 4} ${(rays.r1Incident.x1 + rays.r1Incident.x2)/2 + 5},${rays.r1Incident.y1} ${(rays.r1Incident.x1 + rays.r1Incident.x2)/2 - 3},${rays.r1Incident.y1 + 4}`"
           fill="#38bdf8"
@@ -616,29 +593,30 @@ const showFullTable = ref(false);
         />
 
         <!-- ======================= 實物 (Object) ======================= -->
-        <!-- 已移除先前產生跳動之圓圈，僅保留銳利、清晰的橘色物體箭頭 -->
+        <!-- 光源自箭頭尖端 (xo, yoTip) 發出，箭頭尖頂正好落在該點 -->
         <g>
-          <!-- 實物箭頭桿身 (橘黃色) -->
+          <!-- 實物箭頭桿身 -->
           <line
             :x1="opticsState.xo"
             :y1="Y_AXIS"
             :x2="opticsState.xo"
-            :y2="opticsState.yoTip"
+            :y2="opticsState.yoTip + 7"
             stroke="#f59e0b"
             stroke-width="3.5"
             stroke-linecap="round"
           />
-          <!-- 實物箭頭尖頂 -->
+          <!-- 實物箭頭尖端：尖頂 (第一個點) 嚴格位於 (xo, yoTip) -->
           <polygon
-            :points="`${opticsState.xo},${opticsState.yoTip - 8} ${opticsState.xo - 6},${opticsState.yoTip + 2} ${opticsState.xo + 6},${opticsState.yoTip + 2}`"
+            :points="`${opticsState.xo},${opticsState.yoTip} ${opticsState.xo - 5},${opticsState.yoTip + 8} ${opticsState.xo + 5},${opticsState.yoTip + 8}`"
             fill="#f59e0b"
           />
-          <!-- 物體文字標示 -->
+          <!-- 物體文字標示 (放大字體) -->
           <text
-            :x="opticsState.xo - 12"
-            :y="opticsState.yoTip - 12"
+            :x="opticsState.xo"
+            :y="opticsState.yoTip - 10"
+            text-anchor="middle"
             fill="#fbbf24"
-            font-size="11"
+            font-size="13"
             font-weight="bold"
             font-family="sans-serif"
           >
@@ -661,65 +639,67 @@ const showFullTable = ref(false);
             stroke-width="1"
             stroke-dasharray="3,3"
           />
-          <text :x="X_CENTER + 52" :y="Y_AXIS - 6" fill="#f87171" font-size="12" font-weight="bold">
+          <text :x="X_CENTER + 52" :y="Y_AXIS - 6" fill="#f87171" font-size="13" font-weight="bold">
             光線平行，無交點
           </text>
-          <text :x="X_CENTER + 52" :y="Y_AXIS + 16" fill="#94a3b8" font-size="10">
+          <text :x="X_CENTER + 52" :y="Y_AXIS + 16" fill="#94a3b8" font-size="12">
             不成立像（像在無窮遠）
           </text>
         </g>
 
         <!-- 2. 有成立像 (實像或虛像) -->
         <g v-else-if="opticsState.isImageVisible">
-          <!-- 實像 (紅色實線箭頭) -->
+          <!-- 實像 (紅色實線箭頭，倒立指向下方，尖頂嚴格落在 (xi, yiTip)) -->
           <template v-if="opticsState.isReal">
             <line
               :x1="opticsState.xi"
               :y1="Y_AXIS"
               :x2="opticsState.xi"
-              :y2="opticsState.yiTip"
+              :y2="opticsState.yiTip - 7"
               stroke="#f43f5e"
               stroke-width="3"
               stroke-linecap="round"
             />
-            <!-- 實像箭頭 (倒立指向下方) -->
+            <!-- 實像箭頭：尖頂朝下，嚴格落在 (xi, yiTip) -->
             <polygon
-              :points="`${opticsState.xi},${opticsState.yiTip + 8} ${opticsState.xi - 5},${opticsState.yiTip - 2} ${opticsState.xi + 5},${opticsState.yiTip - 2}`"
+              :points="`${opticsState.xi},${opticsState.yiTip} ${opticsState.xi - 5},${opticsState.yiTip - 8} ${opticsState.xi + 5},${opticsState.yiTip - 8}`"
               fill="#f43f5e"
             />
             <text
-              :x="opticsState.xi - 18"
-              :y="opticsState.yiTip + 22"
+              :x="opticsState.xi"
+              :y="opticsState.yiTip + 18"
+              text-anchor="middle"
               fill="#f43f5e"
-              font-size="11"
+              font-size="13"
               font-weight="bold"
             >
               實像
             </text>
           </template>
 
-          <!-- 虛像 (紫色虛線箭頭) -->
+          <!-- 虛像 (紫色虛線箭頭，正立指向上方，尖頂嚴格落在 (xi, yiTip)) -->
           <template v-else>
             <line
               :x1="opticsState.xi"
               :y1="Y_AXIS"
               :x2="opticsState.xi"
-              :y2="opticsState.yiTip"
+              :y2="opticsState.yiTip + 7"
               stroke="#c084fc"
               stroke-width="2.8"
               stroke-dasharray="4,3"
               stroke-linecap="round"
             />
-            <!-- 虛像箭頭 (正立指向上方) -->
+            <!-- 虛像箭頭：尖頂朝上，嚴格落在 (xi, yiTip) -->
             <polygon
-              :points="`${opticsState.xi},${opticsState.yiTip - 8} ${opticsState.xi - 5},${opticsState.yiTip + 2} ${opticsState.xi + 5},${opticsState.yiTip + 2}`"
+              :points="`${opticsState.xi},${opticsState.yiTip} ${opticsState.xi - 5},${opticsState.yiTip + 8} ${opticsState.xi + 5},${opticsState.yiTip + 8}`"
               fill="#c084fc"
             />
             <text
-              :x="opticsState.xi - 16"
-              :y="opticsState.yiTip - 12"
+              :x="opticsState.xi"
+              :y="opticsState.yiTip - 10"
+              text-anchor="middle"
               fill="#c084fc"
-              font-size="11"
+              font-size="13"
               font-weight="bold"
             >
               虛像
@@ -727,25 +707,25 @@ const showFullTable = ref(false);
           </template>
         </g>
 
-        <!-- ======================= 實際物距標註於圖面右下角 ======================= -->
+        <!-- ======================= 實際物距標註於圖面右下角 (放大字體) ======================= -->
         <g>
           <rect
-            :x="SVG_WIDTH - 150"
-            :y="SVG_HEIGHT - 32"
-            width="136"
-            height="22"
+            :x="SVG_WIDTH - 156"
+            :y="SVG_HEIGHT - 35"
+            width="144"
+            height="26"
             rx="6"
             fill="#090e1a"
-            fill-opacity="0.92"
+            fill-opacity="0.94"
             stroke="#334155"
-            stroke-width="1"
+            stroke-width="1.2"
           />
           <text
-            :x="SVG_WIDTH - 82"
-            :y="SVG_HEIGHT - 17"
+            :x="SVG_WIDTH - 84"
+            :y="SVG_HEIGHT - 18"
             text-anchor="middle"
             fill="#fbbf24"
-            font-size="11"
+            font-size="13"
             font-weight="bold"
             font-family="monospace"
           >
@@ -755,61 +735,65 @@ const showFullTable = ref(false);
       </svg>
     </div>
 
-    <!-- 即時解題回饋看板：改為單一卡片呈現，成像位置與成像特性左右並排（不分上下） -->
-    <div class="p-4 rounded-xl bg-slate-950/90 border border-slate-800/90 shadow-md">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 divide-y md:divide-y-0 md:divide-x divide-slate-800/80">
+    <!-- 即時解題回饋看板：單一卡片，成像位置與成像特性左右並排 -->
+    <div class="p-4 sm:p-5 rounded-xl bg-slate-950/90 border border-slate-800 shadow-md">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 divide-y md:divide-y-0 md:divide-x divide-slate-800">
         
-        <!-- 左半部：1. 成像位置 -->
-        <div class="flex flex-col gap-2 md:pr-4">
+        <!-- 左半部：成像位置 -->
+        <div class="flex flex-col gap-2 md:pr-5">
           <div class="flex items-center justify-between">
-            <span class="font-bold flex items-center gap-1.5 text-sky-400 text-xs">
-              <CheckCircle2 class="w-4 h-4" />
+            <!-- 標題用純白字 -->
+            <span class="font-bold text-white text-sm tracking-wide">
               1. 成像位置
             </span>
-            <span class="text-[10px] text-slate-400 font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+            <span class="text-xs text-slate-300 font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
               {{ opticsState.zoneTag }}
             </span>
           </div>
-          <div class="text-base sm:text-lg font-bold text-white tracking-wide">
+          <!-- 成像位置結論：使用藍色作為醒目提示 -->
+          <div class="text-lg sm:text-xl font-bold text-sky-400 tracking-wide">
             {{ opticsState.posText }}
           </div>
-          <div class="text-[11px] text-slate-400">
+          <!-- 像距細節：文字放大至 13-14px -->
+          <div class="text-sm text-slate-300">
             <span v-if="opticsState.isFormed">
-              像距 di ≈ <span class="text-sky-300 font-mono font-semibold">{{ Math.abs(opticsState.di / F_PX).toFixed(2) }} F</span>
-              （{{ opticsState.di > 0 ? (currentDevice.includes('lens') ? '鏡後' : '鏡前') : (currentDevice.includes('lens') ? '同側鏡前' : '鏡後') }}）
+              像距 di ≈ <span class="text-white font-mono font-bold">{{ Math.abs(opticsState.di / F_PX).toFixed(2) }} F</span>
+              <span class="text-slate-400 ml-1">（{{ opticsState.di > 0 ? (currentDevice.includes('lens') ? '鏡後' : '鏡前') : (currentDevice.includes('lens') ? '同側鏡前' : '鏡後') }}）</span>
             </span>
-            <span v-else class="text-rose-400">
+            <span v-else class="text-rose-400 font-medium">
               折射/反射光線平行，在無窮遠處不相交
             </span>
           </div>
         </div>
 
-        <!-- 右半部：2. 成像特性 -->
-        <div class="flex flex-col gap-2 pt-3 md:pt-0 md:pl-4">
+        <!-- 右半部：成像特性 -->
+        <div class="flex flex-col gap-2 pt-4 md:pt-0 md:pl-5">
           <div class="flex items-center justify-between">
-            <span class="font-bold flex items-center gap-1.5 text-emerald-400 text-xs">
-              <Sparkles class="w-4 h-4" />
+            <!-- 標題用純白字 -->
+            <span class="font-bold text-white text-sm tracking-wide">
               2. 成像特性
             </span>
             <span 
-              class="text-[10px] px-2 py-0.5 rounded font-medium" 
-              :class="opticsState.isReal ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : (!opticsState.isFormed ? 'bg-slate-800 text-slate-400' : 'bg-purple-500/20 text-purple-300 border border-purple-500/30')"
+              class="text-xs px-2.5 py-0.5 rounded font-semibold border" 
+              :class="opticsState.isReal ? 'bg-rose-500/15 text-rose-300 border-rose-500/30' : (!opticsState.isFormed ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-purple-500/15 text-purple-300 border-purple-500/30')"
             >
               {{ !opticsState.isFormed ? '不成像' : (opticsState.isReal ? '實像' : '虛像') }}
             </span>
           </div>
+          <!-- 成像特性結論：實像玫瑰紅、虛像紫色、不成像灰白 -->
           <div 
-            class="text-base sm:text-lg font-bold tracking-wide" 
-            :class="opticsState.isFormed ? (opticsState.isReal ? 'text-rose-400' : 'text-purple-300') : 'text-slate-400'"
+            class="text-lg sm:text-xl font-bold tracking-wide" 
+            :class="opticsState.isFormed ? (opticsState.isReal ? 'text-rose-400' : 'text-purple-300') : 'text-slate-300'"
           >
             {{ opticsState.propText }}
           </div>
-          <div class="text-[11px] text-slate-400">
+          <!-- 放大率細節：文字放大至 13-14px -->
+          <div class="text-sm text-slate-300">
             <span v-if="opticsState.isFormed">
-              放大率 |m| ≈ <span class="text-emerald-300 font-mono font-semibold">{{ Math.abs(opticsState.m).toFixed(2) }}×</span>
-              （{{ Math.abs(opticsState.m) > 1.05 ? '放大' : (Math.abs(opticsState.m) < 0.95 ? '縮小' : '等大') }}）
+              放大率 |m| ≈ <span class="text-white font-mono font-bold">{{ Math.abs(opticsState.m).toFixed(2) }}×</span>
+              <span class="text-slate-400 ml-1">（{{ Math.abs(opticsState.m) > 1.05 ? '放大' : (Math.abs(opticsState.m) < 0.95 ? '縮小' : '等大') }}）</span>
             </span>
-            <span v-else class="text-slate-500">
+            <span v-else class="text-slate-400">
               無法測量放大率
             </span>
           </div>
@@ -819,59 +803,59 @@ const showFullTable = ref(false);
     </div>
 
     <!-- 解答卷對照表收合摺疊區 (點擊可展開檢視 20 種全部情境) -->
-    <div class="border-t border-slate-800/80 pt-2">
+    <div class="border-t border-slate-800 pt-2">
       <button
         @click="showFullTable = !showFullTable"
-        class="w-full py-2 px-3 rounded-lg bg-slate-950/50 hover:bg-slate-800/60 border border-slate-800/80 text-[11px] text-slate-400 hover:text-slate-200 transition-colors flex items-center justify-between"
+        class="w-full py-2 px-3 rounded-lg bg-slate-950/60 hover:bg-slate-800/60 border border-slate-800 text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between"
       >
-        <span class="flex items-center gap-1.5">
-          <HelpCircle class="w-3.5 h-3.5 text-sky-400" />
+        <span class="flex items-center gap-1.5 font-medium">
+          <HelpCircle class="w-4 h-4 text-slate-400" />
           <span>查看完整 20 種面鏡與透鏡成像對照表（符合幾何光學練習單解答卷）</span>
         </span>
-        <span class="text-sky-400 font-medium">{{ showFullTable ? '收合 ▲' : '展開 ▼' }}</span>
+        <span class="text-sky-400 font-semibold">{{ showFullTable ? '收合 ▲' : '展開 ▼' }}</span>
       </button>
 
-      <div v-if="showFullTable" class="mt-2.5 p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] space-y-3 overflow-x-auto">
+      <div v-if="showFullTable" class="mt-2.5 p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-4 overflow-x-auto">
         <!-- 透鏡篇表 -->
         <div>
-          <div class="font-bold text-sky-400 mb-1">【透鏡篇】凸透鏡 vs 凹透鏡</div>
+          <div class="font-bold text-sky-400 mb-1.5 text-sm">【透鏡篇】凸透鏡 vs 凹透鏡</div>
           <table class="w-full text-left border-collapse border border-slate-800 text-slate-300">
             <thead>
-              <tr class="bg-slate-900 text-slate-400 border-b border-slate-800">
-                <th class="p-1.5 border border-slate-800">物距條件</th>
-                <th class="p-1.5 border border-slate-800">凸透鏡 成像位置</th>
-                <th class="p-1.5 border border-slate-800">凸透鏡 成像特性</th>
-                <th class="p-1.5 border border-slate-800">凹透鏡 成像位置與特性</th>
+              <tr class="bg-slate-900 text-slate-300 border-b border-slate-800">
+                <th class="p-2 border border-slate-800">物距條件</th>
+                <th class="p-2 border border-slate-800">凸透鏡 成像位置</th>
+                <th class="p-2 border border-slate-800">凸透鏡 成像特性</th>
+                <th class="p-2 border border-slate-800">凹透鏡 成像位置與特性</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="p-1.5 border border-slate-800 font-mono">do &gt; 2F</td>
-                <td class="p-1.5 border border-slate-800 text-white">F 與 2F 之間（鏡後）</td>
-                <td class="p-1.5 border border-slate-800 text-rose-300">倒立、縮小、實像</td>
-                <td class="p-1.5 border border-slate-800 text-purple-300" rowspan="5">
+                <td class="p-2 border border-slate-800 font-mono font-semibold">do &gt; 2F</td>
+                <td class="p-2 border border-slate-800 text-white font-medium">F 與 2F 之間（鏡後）</td>
+                <td class="p-2 border border-slate-800 text-rose-300">倒立、縮小、實像</td>
+                <td class="p-2 border border-slate-800 text-purple-300" rowspan="5">
                   恆在「同側焦點內（鏡前 F 內）」<br>成「正立、縮小、虛像」
                 </td>
               </tr>
               <tr>
-                <td class="p-1.5 border border-slate-800 font-mono">do = 2F</td>
-                <td class="p-1.5 border border-slate-800 text-white">2F 上（鏡後）</td>
-                <td class="p-1.5 border border-slate-800 text-rose-300">倒立、等大、實像</td>
+                <td class="p-2 border border-slate-800 font-mono font-semibold">do = 2F</td>
+                <td class="p-2 border border-slate-800 text-white font-medium">2F 上（鏡後）</td>
+                <td class="p-2 border border-slate-800 text-rose-300">倒立、等大、實像</td>
               </tr>
               <tr>
-                <td class="p-1.5 border border-slate-800 font-mono">F &lt; do &lt; 2F</td>
-                <td class="p-1.5 border border-slate-800 text-white">2F 外（鏡後）</td>
-                <td class="p-1.5 border border-slate-800 text-rose-300">倒立、放大、實像</td>
+                <td class="p-2 border border-slate-800 font-mono font-semibold">F &lt; do &lt; 2F</td>
+                <td class="p-2 border border-slate-800 text-white font-medium">2F 外（鏡後）</td>
+                <td class="p-2 border border-slate-800 text-rose-300">倒立、放大、實像</td>
               </tr>
               <tr>
-                <td class="p-1.5 border border-slate-800 font-mono">do = F</td>
-                <td class="p-1.5 border border-slate-800 text-amber-300">不成立像（無窮遠處）</td>
-                <td class="p-1.5 border border-slate-800 text-slate-400">不成像（折射光線互相平行）</td>
+                <td class="p-2 border border-slate-800 font-mono font-semibold">do = F</td>
+                <td class="p-2 border border-slate-800 text-slate-200">不成立像（無窮遠處）</td>
+                <td class="p-2 border border-slate-800 text-slate-400">不成像（折射光線互相平行）</td>
               </tr>
               <tr>
-                <td class="p-1.5 border border-slate-800 font-mono">do &lt; F</td>
-                <td class="p-1.5 border border-slate-800 text-white">物體後方（鏡前/同側）</td>
-                <td class="p-1.5 border border-slate-800 text-purple-300">正立、放大、虛像</td>
+                <td class="p-2 border border-slate-800 font-mono font-semibold">do &lt; F</td>
+                <td class="p-2 border border-slate-800 text-white font-medium">物體後方（鏡前/同側）</td>
+                <td class="p-2 border border-slate-800 text-purple-300">正立、放大、虛像</td>
               </tr>
             </tbody>
           </table>
@@ -879,44 +863,44 @@ const showFullTable = ref(false);
 
         <!-- 面鏡篇表 -->
         <div>
-          <div class="font-bold text-amber-400 mb-1">【面鏡篇】凹面鏡 vs 凸面鏡</div>
+          <div class="font-bold text-amber-400 mb-1.5 text-sm">【面鏡篇】凹面鏡 vs 凸面鏡</div>
           <table class="w-full text-left border-collapse border border-slate-800 text-slate-300">
             <thead>
-              <tr class="bg-slate-900 text-slate-400 border-b border-slate-800">
-                <th class="p-1.5 border border-slate-800">物距條件</th>
-                <th class="p-1.5 border border-slate-800">凹面鏡 成像位置</th>
-                <th class="p-1.5 border border-slate-800">凹面鏡 成像特性</th>
-                <th class="p-1.5 border border-slate-800">凸面鏡 成像位置與特性</th>
+              <tr class="bg-slate-900 text-slate-300 border-b border-slate-800">
+                <th class="p-2 border border-slate-800">物距條件</th>
+                <th class="p-2 border border-slate-800">凹面鏡 成像位置</th>
+                <th class="p-2 border border-slate-800">凹面鏡 成像特性</th>
+                <th class="p-2 border border-slate-800">凸面鏡 成像位置與特性</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="p-1.5 border border-slate-800 font-mono">do &gt; 2F</td>
-                <td class="p-1.5 border border-slate-800 text-white">F 與 2F 之間（鏡前）</td>
-                <td class="p-1.5 border border-slate-800 text-rose-300">倒立、縮小、實像</td>
-                <td class="p-1.5 border border-slate-800 text-purple-300" rowspan="5">
+                <td class="p-2 border border-slate-800 font-mono font-semibold">do &gt; 2F</td>
+                <td class="p-2 border border-slate-800 text-white font-medium">F 與 2F 之間（鏡前）</td>
+                <td class="p-2 border border-slate-800 text-rose-300">倒立、縮小、實像</td>
+                <td class="p-2 border border-slate-800 text-purple-300" rowspan="5">
                   恆在「焦點內（鏡後 F 內）」<br>成「正立、縮小、虛像」
                 </td>
               </tr>
               <tr>
-                <td class="p-1.5 border border-slate-800 font-mono">do = 2F</td>
-                <td class="p-1.5 border border-slate-800 text-white">2F 上（鏡前）</td>
-                <td class="p-1.5 border border-slate-800 text-rose-300">倒立、等大、實像</td>
+                <td class="p-2 border border-slate-800 font-mono font-semibold">do = 2F</td>
+                <td class="p-2 border border-slate-800 text-white font-medium">2F 上（鏡前）</td>
+                <td class="p-2 border border-slate-800 text-rose-300">倒立、等大、實像</td>
               </tr>
               <tr>
-                <td class="p-1.5 border border-slate-800 font-mono">F &lt; do &lt; 2F</td>
-                <td class="p-1.5 border border-slate-800 text-white">2F 外（鏡前）</td>
-                <td class="p-1.5 border border-slate-800 text-rose-300">倒立、放大、實像</td>
+                <td class="p-2 border border-slate-800 font-mono font-semibold">F &lt; do &lt; 2F</td>
+                <td class="p-2 border border-slate-800 text-white font-medium">2F 外（鏡前）</td>
+                <td class="p-2 border border-slate-800 text-rose-300">倒立、放大、實像</td>
               </tr>
               <tr>
-                <td class="p-1.5 border border-slate-800 font-mono">do = F</td>
-                <td class="p-1.5 border border-slate-800 text-amber-300">不成立像（無窮遠處）</td>
-                <td class="p-1.5 border border-slate-800 text-slate-400">不成像（反射光線互相平行）</td>
+                <td class="p-2 border border-slate-800 font-mono font-semibold">do = F</td>
+                <td class="p-2 border border-slate-800 text-slate-200">不成立像（無窮遠處）</td>
+                <td class="p-2 border border-slate-800 text-slate-400">不成像（反射光線互相平行）</td>
               </tr>
               <tr>
-                <td class="p-1.5 border border-slate-800 font-mono">do &lt; F</td>
-                <td class="p-1.5 border border-slate-800 text-white">鏡後</td>
-                <td class="p-1.5 border border-slate-800 text-purple-300">正立、放大、虛像</td>
+                <td class="p-2 border border-slate-800 font-mono font-semibold">do &lt; F</td>
+                <td class="p-2 border border-slate-800 text-white font-medium">鏡後</td>
+                <td class="p-2 border border-slate-800 text-purple-300">正立、放大、虛像</td>
               </tr>
             </tbody>
           </table>

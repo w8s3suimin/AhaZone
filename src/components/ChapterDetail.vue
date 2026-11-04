@@ -279,13 +279,6 @@ const chapterResources = computed(() => {
             v-if="concept.diagramType"
             class="my-2.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner flex flex-col items-center w-full"
           >
-            <div class="w-full flex items-center justify-between px-2 py-1 text-[10px] text-sky-400/90 border-b border-slate-900 mb-1.5">
-              <span class="flex items-center gap-1 font-semibold">
-                <Sparkles class="w-3 h-3 text-sky-400" />
-                幾何視覺化圖解
-              </span>
-              <span class="text-[9px] text-slate-500">直觀心像模型</span>
-            </div>
             <ConceptDiagram :type="concept.diagramType" />
           </div>
 
