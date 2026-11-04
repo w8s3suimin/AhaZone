@@ -5,6 +5,7 @@ import { getChapterSummary, ChapterSummary } from '../data/chapterSummaries';
 import { renderFormulaItem } from '../utils/mathRenderer';
 import { ResourceItem } from '../types';
 import ResourceCard from './ResourceCard.vue';
+import ConceptDiagram from './ConceptDiagram.vue';
 
 const props = defineProps<{
   chapterName: string;
@@ -269,6 +270,21 @@ const chapterResources = computed(() => {
             <p class="text-xs text-slate-300 leading-relaxed mb-2">
               {{ concept.description }}
             </p>
+          </div>
+
+          <!-- Visual Illustration Diagram (若單元具幾何圖解則動態呈現) -->
+          <div 
+            v-if="concept.diagramType"
+            class="my-2.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner flex flex-col items-center"
+          >
+            <div class="w-full flex items-center justify-between px-2 py-1 text-[10px] text-sky-400/90 border-b border-slate-900 mb-1.5">
+              <span class="flex items-center gap-1 font-semibold">
+                <Sparkles class="w-3 h-3 text-sky-400" />
+                幾何視覺化圖解
+              </span>
+              <span class="text-[9px] text-slate-500">直觀心像模型</span>
+            </div>
+            <ConceptDiagram :type="concept.diagramType" />
           </div>
 
           <!-- Formulas list: 以 KaTeX 數學排版引擎渲染真實分數、上下標與希臘字母 -->

@@ -4,6 +4,7 @@ export interface ChapterConcept {
   title: string;
   description: string;
   formulas?: string[]; // 每條公式獨立一列
+  diagramType?: string; // 幾何圖像視覺化
   track?: 'common' | 'mathA' | 'mathB'; // 標註為共同、數A專屬或數B專屬
 }
 
@@ -40,7 +41,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     coreConcepts: [
       {
         title: '動植物細胞構造對照',
-        description: '植物細胞特有「細胞壁（維持細胞形狀、保護）」與「葉綠體（光合作用）」；植物成熟細胞具有大型中央「液胞（儲存水分與廢物）」，動物細胞液胞則小而多。細胞核含有遺傳物質 DNA，為生命中樞。'
+        description: '植物細胞特有「細胞壁（維持細胞形狀、保護）」與「葉綠體（光合作用）」；植物成熟細胞具有大型中央「液胞（儲存水分與廢物）」，動物細胞液胞則小而多。細胞核含有遺傳物質 DNA，為生命中樞。',
+        diagramType: 'cell-structure'
       },
       {
         title: '顯微鏡操作關鍵法則',
@@ -978,6 +980,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
           '週期：Period T = 2π / |B|  (正弦/餘弦)；T = π / |B|  (正切)',
           '水平平移：向左或向右平移 |C/B| 單位'
         ],
+        diagramType: 'unit-circle',
         track: 'common'
       },
       {
@@ -1151,6 +1154,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
           '正射影向量：proj_v u = [ (u · v) / |v|² ] · v',
           '正射影長度：|proj_v u| = |u · v| / |v|'
         ],
+        diagramType: 'vector-projection',
         track: 'mathA'
       },
       {
@@ -1272,6 +1276,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         formulas: [
           'θ = 90°：正圓；θ > 45°：橢圓；θ = 45°：拋物線；θ < 45°：雙曲線'
         ],
+        diagramType: 'conic-sections',
         track: 'mathB'
       }
     ],
@@ -1673,7 +1678,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
           '位移公式：\\Delta x = v_0 t + \\frac{1}{2}at^2',
           '無時間公式：v^2 = v_0^2 + 2a \\cdot \\Delta x',
           '平均速度：v_{\\text{avg}} = \\frac{v_0 + v}{2} = \\frac{\\Delta x}{t}'
-        ]
+        ],
+        diagramType: 'vt-graph'
       },
       {
         title: '鉛直上拋運動特徵',
@@ -1703,7 +1709,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
           '飛行總時間：T = \\frac{2v_0 \\sin\\theta}{g}',
           '最大飛行高度：H = \\frac{(v_0 \\sin\\theta)^2}{2g}',
           '水平射程：R = \\frac{v_0^2 \\sin 2\\theta}{g}  (當 \\theta = 45^\\circ 時射程最大；互餘角 \\theta 與 90^\\circ-\\theta 射程相等)'
-        ]
+        ],
+        diagramType: 'projectile-motion'
       }
     ],
     pitfalls: [
@@ -1728,7 +1735,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         formulas: [
           '向心加速度：a_c = \\frac{v^2}{R} = \\omega^2 R = \\frac{4\\pi^2}{T^2} R',
           '向心力：F_c = m a_c = \\frac{m v^2}{R}'
-        ]
+        ],
+        diagramType: 'circular-motion'
       },
       {
         title: '簡諧運動 (SHM) 特徵與週期公式',
@@ -1737,7 +1745,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
           '水平彈簧振子週期：T = 2\\pi \\sqrt{\\frac{m}{k}}  (與振幅 A 無關，具等時性)',
           '單擺小角度週期：T = 2\\pi \\sqrt{\\frac{L}{g}}  (擺角 \\theta < 5^\\circ)',
           '端點處：位移最大、加速度最大、速度為 0；平衡點處：位移為 0、加速度為 0、速率達最大值 v_{\\text{max}} = \\omega A'
-        ]
+        ],
+        diagramType: 'shm-projection'
       }
     ],
     pitfalls: [
@@ -1937,10 +1946,11 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '司乃耳定律與全反射條件',
         description: '介質 1 進入介質 2：n₁ sinθ₁ = n₂ sinθ₂。',
         formulas: [
-          '全反射臨界角：sinθ_c = n₂ / n₁  (必先滿足光密進光疏 n₁ > n₂)',
-          '薄透鏡成像公式：1/p + 1/q = 1/f  (凸透鏡 f > 0，凹透鏡 f < 0；實物 p > 0，實像 q > 0，虛像 q < 0)',
-          '橫向放大率：m = -q / p  (|m| > 1 放大，m < 0 倒立實像，m > 0 正立虛像)'
-        ]
+          '全反射臨界角：\\sin\\theta_c = \\frac{n_2}{n_1}  (n_1 > n_2)',
+          '薄透鏡成像公式：\\frac{1}{p} + \\frac{1}{q} = \\frac{1}{f}  (凸透鏡 f > 0，凹透鏡 f < 0；實物 p > 0，實像 q > 0，虛像 q < 0)',
+          '橫向放大率：m = -\\frac{q}{p}  (|m| > 1 放大，m < 0 倒立實像，m > 0 正立虛像)'
+        ],
+        diagramType: 'lens-optics'
       },
       {
         title: '凹透鏡與凸面鏡成像特性',
@@ -1963,10 +1973,11 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '楊氏雙狹縫干涉公式',
         description: '狹縫間距 d，狹縫到光屏距離 L，光波長 λ：',
         formulas: [
-          '亮紋條件 (波程差為整數波長)：d sinθ = mλ  (m = 0, ±1, ±2...)',
-          '暗紋條件 (波程差為半整數波長)：d sinθ = (m - 1/2)λ',
-          '相鄰亮紋間距：Δy = (L / d) λ'
-        ]
+          '亮紋條件 (波程差為整數波長)：d \\sin\\theta = m\\lambda  (m = 0, \\pm 1, \\pm 2...)',
+          '暗紋條件 (波程差為半整數波長)：d \\sin\\theta = (m - \\frac{1}{2})\\lambda',
+          '相鄰亮紋間距：\\Delta y = \\frac{L}{d} \\lambda'
+        ],
+        diagramType: 'double-slit'
       },
       {
         title: '單狹縫繞射公式 (縫寬 b)',
@@ -2071,9 +2082,10 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '法拉第電磁感應定律',
         description: '磁通量 Φ_B = B · A = BA cosθ (單位韋伯 Wb)：',
         formulas: [
-          '感應電動勢：ε = -N (dΦ_B / dt)  (負號為冷次定律反抗意涵)',
-          '金屬棒切割磁力線動生電動勢：ε = B L v  (右手開掌定則求電位高低端)'
-        ]
+          '感應電動勢：\\varepsilon = -N \\frac{d\\Phi_B}{dt}  (負號為冷次定律反抗意涵)',
+          '金屬棒切割磁力線動生電動勢：\\varepsilon = B L v  (右手開掌定則求電位高低端)'
+        ],
+        diagramType: 'lenz-law'
       },
       {
         title: '互感與理想變壓器',
@@ -2128,7 +2140,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       },
       {
         title: '氫原子光譜線系列',
-        description: '躍遷至 n = 1：萊曼系 (Lyman series，紫外線區)；躍遷至 n = 2：巴耳末系 (Balmer series，可見光與近紫外)；躍遷至 n = 3：帕申系 (Paschen series，紅外線區)。'
+        description: '躍遷至 n = 1：萊曼系 (Lyman series，紫外線區)；躍遷至 n = 2：巴耳末系 (Balmer series，可見光與近紫外)；躍遷至 n = 3：帕申系 (Paschen series，紅外線區)。',
+        diagramType: 'bohr-atom'
       },
       {
         title: '核物理與質能互換',
