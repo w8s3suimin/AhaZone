@@ -392,12 +392,24 @@ const showFullTable = ref(false);
         </button>
       </div>
 
-      <!-- 操作提示 -->
-      <div class="flex items-center gap-3 text-xs">
-        <span class="inline-flex items-center gap-1.5 text-amber-400 font-medium bg-amber-950/50 px-2.5 py-1 rounded-lg border border-amber-800/60">
+      <!-- 操作提示與光路註解 -->
+      <div class="flex flex-wrap items-center gap-3 text-xs">
+        <span class="inline-flex items-center gap-1.5 text-amber-400 font-medium bg-amber-950/40 px-2.5 py-1 rounded-lg border border-amber-800/50">
           <MousePointer2 class="w-3.5 h-3.5 animate-bounce" />
           可直接在圖中左右拖曳橘色實物
         </span>
+
+        <!-- 光路圖例註解 (光線① 與 光線②) -->
+        <div class="flex items-center gap-2.5 text-xs">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-200 shadow-sm">
+            <span class="w-3 h-0.5 bg-sky-400 inline-block rounded"></span>
+            <span class="font-medium">光線① 平行主軸</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-200 shadow-sm">
+            <span class="w-3 h-0.5 bg-emerald-400 inline-block rounded"></span>
+            <span class="font-medium">光線② 過鏡心/頂點</span>
+          </span>
+        </div>
       </div>
     </div>
 
