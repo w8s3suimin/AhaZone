@@ -277,7 +277,8 @@ const chapterResources = computed(() => {
           <!-- Visual Illustration Diagram (若單元具幾何圖解則動態呈現) -->
           <div 
             v-if="concept.diagramType"
-            class="my-2.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner flex flex-col items-center w-full"
+            class="my-2.5 w-full flex flex-col items-center"
+            :class="concept.diagramType === 'lens-optics' ? '' : 'rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner'"
           >
             <ConceptDiagram :type="concept.diagramType" />
           </div>
