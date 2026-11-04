@@ -374,8 +374,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         description: '反射定律：入射角 = 反射角。平面鏡生成「正立等大虛像」，物距 = 像距，左右相反。'
       },
       {
-        title: '面鏡與透鏡成像規律（動態光學實驗室）',
-        description: '可拖曳實物位置，動態觀察凸透鏡、凹透鏡、凹面鏡、凸面鏡的光路折射/反射與成像特性。包含 5 大物距分區之成像位置、正倒立、縮小放大與虛實特性。',
+        title: '面鏡與透鏡成像',
+        description: '拖曳實物位置，動態觀察凸透鏡、凹透鏡、凹面鏡、凸面鏡的光路折射/反射與成像特性。',
         diagramType: 'lens-optics'
       },
       {

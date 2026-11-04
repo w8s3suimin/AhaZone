@@ -845,7 +845,7 @@ const showFullTable = ref(false);
       >
         <span class="flex items-center gap-1.5 font-medium">
           <HelpCircle class="w-4 h-4 text-slate-400" />
-          <span>查看完整 20 種面鏡與透鏡成像對照表（符合幾何光學練習單解答卷）</span>
+          <span>查看完整面鏡與透鏡成像結論</span>
         </span>
         <span class="text-sky-400 font-semibold">{{ showFullTable ? '收合 ▲' : '展開 ▼' }}</span>
       </button>
