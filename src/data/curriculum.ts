@@ -119,18 +119,20 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
           {
             name: '七年級上學期 (生物篇上)',
             chapters: [
-              { name: '生命現象與細胞構造', semester: '7上', mathTrack: 'none' },
-              { name: '生物體的組成層次與養分', semester: '7上', mathTrack: 'none' },
-              { name: '生物體內部的運輸與消化循環', semester: '7上', mathTrack: 'none' },
-              { name: '生物體的協調與恆定性 (排泄與調節)', semester: '7上', mathTrack: 'none' }
+              { name: '生物體的組成與科學方法', semester: '7上', mathTrack: 'none' },
+              { name: '養分', semester: '7上', mathTrack: 'none' },
+              { name: '運輸與防禦', semester: '7上', mathTrack: 'none' },
+              { name: '協調作用', semester: '7上', mathTrack: 'none' },
+              { name: '恆定', semester: '7上', mathTrack: 'none' }
             ]
           },
           {
             name: '七年級下學期 (生物篇下)',
             chapters: [
-              { name: '生殖作用與遺傳法則', semester: '7下', mathTrack: 'none' },
-              { name: '演化學說與生物多樣性', semester: '7下', mathTrack: 'none' },
-              { name: '生態系平衡與環境保護', semester: '7下', mathTrack: 'none' }
+              { name: '生殖', semester: '7下', mathTrack: 'none' },
+              { name: '遺傳', semester: '7下', mathTrack: 'none' },
+              { name: '演化與分類', semester: '7下', mathTrack: 'none' },
+              { name: '生態系與環境保護', semester: '7下', mathTrack: 'none' }
             ]
           }
         ]
@@ -142,21 +144,23 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
           {
             name: '八年級上學期 (理化篇上)',
             chapters: [
-              { name: '基本測量與密度', semester: '8上', mathTrack: 'none' },
-              { name: '物質的世界 (純物質與混合物)', semester: '8上', mathTrack: 'none' },
-              { name: '波動與聲音的傳播', semester: '8上', mathTrack: 'none' },
-              { name: '光學 (光的反射、折射與面鏡透鏡成像)', semester: '8上', mathTrack: 'none' },
-              { name: '溫度與熱量 (比熱與熱傳播)', semester: '8上', mathTrack: 'none' }
+              { name: '基本測量', semester: '8上', mathTrack: 'none' },
+              { name: '物質的世界', semester: '8上', mathTrack: 'none' },
+              { name: '波動與聲音', semester: '8上', mathTrack: 'none' },
+              { name: '光、影像與顏色', semester: '8上', mathTrack: 'none' },
+              { name: '溫度與熱', semester: '8上', mathTrack: 'none' },
+              { name: '物質的基本結構', semester: '8上', mathTrack: 'none' }
             ]
           },
           {
             name: '八年級下學期 (理化篇下)',
             chapters: [
-              { name: '化學反應與質量守恆定律', semester: '8下', mathTrack: 'none' },
-              { name: '反應速率與化學平衡', semester: '8下', mathTrack: 'none' },
-              { name: '酸鹼鹽溶液與氧化還原', semester: '8下', mathTrack: 'none' },
-              { name: '有機化合物與生活化學', semester: '8下', mathTrack: 'none' },
-              { name: '常見的力與壓力、浮力', semester: '8下', mathTrack: 'none' }
+              { name: '化學反應', semester: '8下', mathTrack: 'none' },
+              { name: '氧化還原反應', semester: '8下', mathTrack: 'none' },
+              { name: '電解質與酸鹼鹽', semester: '8下', mathTrack: 'none' },
+              { name: '反應速率與平衡', semester: '8下', mathTrack: 'none' },
+              { name: '有機化合物', semester: '8下', mathTrack: 'none' },
+              { name: '力與壓力', semester: '8下', mathTrack: 'none' }
             ]
           }
         ]
@@ -168,20 +172,22 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
           {
             name: '九年級上學期 (力學與地科上)',
             chapters: [
-              { name: '直線運動 (速度、加速度與 v-t 圖)', semester: '9上', mathTrack: 'none' },
-              { name: '牛頓運動定律與萬有引力', semester: '9上', mathTrack: 'none' },
-              { name: '功與力學能守恆', semester: '9上', mathTrack: 'none' },
-              { name: '靜電與歐姆定律 (基本電路)', semester: '9上', mathTrack: 'none' },
-              { name: '地球構造與板塊構造學說', semester: '9上', mathTrack: 'none' }
+              { name: '直線運動', semester: '9上', mathTrack: 'none' },
+              { name: '力與運動', semester: '9上', mathTrack: 'none' },
+              { name: '功與能', semester: '9上', mathTrack: 'none' },
+              { name: '電流電壓與歐姆定律', semester: '9上', mathTrack: 'none' },
+              { name: '地球的環境', semester: '9上', mathTrack: 'none' },
+              { name: '板塊運動與岩層的秘密', semester: '9上', mathTrack: 'none' },
+              { name: '浩瀚的宇宙', semester: '9上', mathTrack: 'none' }
             ]
           },
           {
             name: '九年級下學期 (電磁與地科下)',
             chapters: [
-              { name: '電流的熱效應與化學效應', semester: '9下', mathTrack: 'none' },
-              { name: '電流的磁效應與電磁感應', semester: '9下', mathTrack: 'none' },
-              { name: '天氣變化、大氣與海洋', semester: '9下', mathTrack: 'none' },
-              { name: '天文宇宙與地球環境變遷', semester: '9下', mathTrack: 'none' }
+              { name: '電與生活', semester: '9下', mathTrack: 'none' },
+              { name: '電與磁', semester: '9下', mathTrack: 'none' },
+              { name: '變化莫測的天氣', semester: '9下', mathTrack: 'none' },
+              { name: '永續的地球', semester: '9下', mathTrack: 'none' }
             ]
           }
         ]

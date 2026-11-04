@@ -145,6 +145,7 @@ const handleExploreConic = () => {
           <ChapterDetail
             v-if="isChapterDetailView && selectedChapter"
             :chapterName="selectedChapter"
+            :stage="stage"
             :resources="resources"
             @back="selectedChapter = null"
             @openLab="handleOpenLab"

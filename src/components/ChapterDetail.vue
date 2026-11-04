@@ -9,6 +9,7 @@ import ConceptDiagram from './ConceptDiagram.vue';
 
 const props = defineProps<{
   chapterName: string;
+  stage?: string;
   resources: ResourceItem[];
 }>();
 
@@ -20,7 +21,7 @@ const emit = defineEmits<{
 
 // Lookup summary or build subject-tailored genuine curriculum summary
 const summary = computed<ChapterSummary>(() => {
-  return getChapterSummary(props.chapterName);
+  return getChapterSummary(props.chapterName, props.stage);
 });
 
 // Active track tab: 'all' | 'mathA' | 'mathB'
