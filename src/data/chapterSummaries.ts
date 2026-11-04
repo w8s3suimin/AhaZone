@@ -226,8 +226,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '分數四則運算與指數律',
         description: '異分母分數加減必先通分找分母的 LCM；乘法直接分子乘分子、分母乘分母（先約分再乘除）：',
         formulas: [
-          '負指數律：a^{-n} = \\frac{1}{a^n}  (a \\ne 0)',
-          '零次指數：a^0 = 1  (a \\ne 0)'
+          '負指數律：a^{-n} = \\frac{1}{a^n} \\quad (a \\ne 0)',
+          '零次指數：a^0 = 1 \\quad (a \\ne 0)'
         ]
       }
     ],

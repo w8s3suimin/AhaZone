@@ -92,6 +92,11 @@ export function formulaToLatex(raw: string): string {
     return `${p1}_{${p2}}`;
   });
 
+  // 8. 數學限制條件前置間隔（如 a^0 = 1 (a \ne 0) -> a^0 = 1 \quad (a \ne 0)）
+  s = s.replace(/([^\s\\])\s+([(（](?:[a-zA-Z]|\\theta|\\pi|\\omega|[0-9])+\s*(?:\\ne|≠|=|\\le|≤|\\ge|≥|<|>|\\approx)[^()（）]*[)）])$/, (match, p1, p2) => {
+    return `${p1} \\quad ${p2}`;
+  });
+
   return s;
 }
 
@@ -110,11 +115,21 @@ export function renderFormulaItem(raw: string): FormattedFormula {
     text = colonMatch[2].trim();
   }
 
-  // 2. 提取後置括號備註（如「（與振幅 A 無關，具等時性）」或「（取無窮遠處 U=0）」）
-  const noteMatch = text.match(/^(.*?)(\s*[（(][^()（）]{3,}[)）]\s*)$/);
-  if (noteMatch && !noteMatch[1].includes('/') && !noteMatch[1].includes('\\frac')) {
-    text = noteMatch[1].trim();
-    note = noteMatch[2].trim();
+  // 2. 提取後置括號備註（僅針對以中文為主的補充說明，例如「（與振幅 A 無關，具等時性）」或「（取無窮遠處 U=0）」）
+  // 注意：純數學限制條件（如 (a ≠ 0)、(a \ne 0)、(r \ne 1)、(cos θ ≠ 0)）絕不能抽離為純文字備註，必須保留在公式內由 KaTeX 渲染
+  const noteMatch = text.match(/^(.*?)(\s*[（(]([^()（）]{2,})[)）]\s*)$/);
+  if (noteMatch) {
+    const mainPart = noteMatch[1].trim();
+    const innerNote = noteMatch[3].trim();
+    const hasChinese = /[\u4e00-\u9fa5]/.test(innerNote);
+    const isMathCondition = /(?:^|\s)(?:[a-zA-Z]|\\theta|\\pi|\\omega|det|[0-9])+\s*(?:\\ne|≠|=|\\le|≤|\\ge|≥|<|>|\\approx)\s*/.test(innerNote) 
+      || /^[a-zA-Z0-9_\^\{\}\s\\ne=<>±+-\\*\/]+$/.test(innerNote);
+
+    // 只有確實含有中文字，且不是 (a ≠ 0) 等純數學條件時，才視為說明備註抽離
+    if (hasChinese && !isMathCondition && !mainPart.includes('/') && !mainPart.includes('\\frac')) {
+      text = mainPart;
+      note = noteMatch[2].trim();
+    }
   }
 
   // 3. 轉為 LaTeX
