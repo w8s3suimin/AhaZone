@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import Navbar from './components/Navbar.vue';
 import CurriculumTree from './components/CurriculumTree.vue';
 import HeroBanner from './components/HeroBanner.vue';
@@ -8,6 +8,7 @@ import ChapterDetail from './components/ChapterDetail.vue';
 import DynamicLabModal from './components/DynamicLabModal.vue';
 import PdfViewerModal from './components/PdfViewerModal.vue';
 import { INITIAL_RESOURCES } from './data/resources';
+import { CURRICULUM_DATA } from './data/curriculum';
 import { EducationStage, ResourceType, SubjectId, ResourceItem } from './types';
 import { Search, Filter, CheckCircle2 } from 'lucide-vue-next';
 
@@ -102,6 +103,70 @@ const handleExploreConic = () => {
     handleOpenLab(conicLab);
   }
 };
+
+// 根據章節名稱反查所屬學段 (國中/高中) 與學科
+const findChapterContext = (chapterName: string) => {
+  const cleanName = chapterName.toLowerCase().replace(/\[.*?\]/g, '').trim();
+  for (const sub of CURRICULUM_DATA) {
+    for (const g of sub.grades) {
+      for (const sem of g.semesters) {
+        for (const ch of sem.chapters) {
+          const chClean = ch.name.toLowerCase().replace(/\[.*?\]/g, '').trim();
+          if (chClean === cleanName || chClean.includes(cleanName) || cleanName.includes(chClean)) {
+            return {
+              stage: sub.stage as EducationStage,
+              subject: sub.id as SubjectId,
+              chapter: ch.name
+            };
+          }
+        }
+      }
+    }
+  }
+  return null;
+};
+
+// 1. 初始化讀取瀏覽器網址參數：?chapter=xxx
+onMounted(() => {
+  if (typeof window === 'undefined') return;
+  const params = new URLSearchParams(window.location.search);
+  const chapterParam = params.get('chapter');
+  if (chapterParam) {
+    const ctx = findChapterContext(chapterParam);
+    if (ctx) {
+      stage.value = ctx.stage;
+      selectedChapter.value = ctx.chapter;
+    } else {
+      selectedChapter.value = chapterParam;
+    }
+    // 確保回到全部資源、清除搜尋，直接呈現章節筆記
+    resourceType.value = 'all';
+    searchQuery.value = '';
+  }
+
+  // 監聽瀏覽器上一頁/下一頁 (popstate)
+  window.addEventListener('popstate', () => {
+    const p = new URLSearchParams(window.location.search);
+    const ch = p.get('chapter');
+    selectedChapter.value = ch || null;
+  });
+});
+
+// 2. 當 selectedChapter 改變時，自動同步更新瀏覽器網址 (無需重新載入頁面，支援一鍵分享)
+watch(selectedChapter, (newCh) => {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+  if (newCh) {
+    url.searchParams.set('chapter', newCh);
+    const ctx = findChapterContext(newCh);
+    if (ctx) {
+      stage.value = ctx.stage;
+    }
+  } else {
+    url.searchParams.delete('chapter');
+  }
+  window.history.replaceState({}, '', url.toString());
+});
 </script>
 
 <template>

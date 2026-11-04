@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { Lightbulb, AlertTriangle, BookOpen, Sparkles, FileText, ArrowLeft, CheckCircle2, Layers } from 'lucide-vue-next';
+import { Lightbulb, AlertTriangle, BookOpen, Sparkles, FileText, ArrowLeft, CheckCircle2, Layers, Share2, Check } from 'lucide-vue-next';
 import { getChapterSummary, ChapterSummary } from '../data/chapterSummaries';
 import { renderFormulaItem } from '../utils/mathRenderer';
 import { ResourceItem } from '../types';
@@ -18,6 +18,30 @@ const emit = defineEmits<{
   (e: 'openLab', item: ResourceItem): void;
   (e: 'openPdf', item: ResourceItem, viewAnswer: boolean): void;
 }>();
+
+// 一鍵複製此章節的專屬分享網址
+const isCopied = ref(false);
+const copyShareLink = async () => {
+  if (typeof window === 'undefined') return;
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    isCopied.value = true;
+    setTimeout(() => {
+      isCopied.value = false;
+    }, 2500);
+  } catch (err) {
+    const dummy = document.createElement('input');
+    document.body.appendChild(dummy);
+    dummy.value = window.location.href;
+    dummy.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummy);
+    isCopied.value = true;
+    setTimeout(() => {
+      isCopied.value = false;
+    }, 2500);
+  }
+};
 
 // Lookup summary or build subject-tailored genuine curriculum summary
 const summary = computed<ChapterSummary>(() => {
@@ -120,14 +144,27 @@ const chapterResources = computed(() => {
   <div class="space-y-6 animate-in fade-in duration-200">
     
     <!-- Top Action Bar -->
-    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-      <button
-        @click="emit('back')"
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-semibold transition-colors"
-      >
-        <ArrowLeft class="w-3.5 h-3.5" />
-        <span>返回全部資源清單</span>
-      </button>
+    <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+      <div class="flex items-center gap-2">
+        <button
+          @click="emit('back')"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-semibold transition-colors"
+        >
+          <ArrowLeft class="w-3.5 h-3.5" />
+          <span>返回全部資源清單</span>
+        </button>
+
+        <!-- 一鍵複製章節專屬分享連結 -->
+        <button
+          @click="copyShareLink"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all shadow-sm"
+          :class="isCopied ? 'bg-emerald-950/80 border-emerald-500/80 text-emerald-300' : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'"
+          title="複製此章節的專屬分享網址，可直接傳送給學生開啟"
+        >
+          <component :is="isCopied ? Check : Share2" class="w-3.5 h-3.5" :class="isCopied ? 'text-emerald-400' : 'text-sky-400'" />
+          <span>{{ isCopied ? '已複製章節分享網址！' : '複製章節分享網址' }}</span>
+        </button>
+      </div>
 
       <!-- Scope Badge -->
       <div class="flex items-center gap-2">

@@ -60,6 +60,29 @@ const toggleSemester = (key: string) => {
   expandedSemesters.value[key] = !expandedSemesters.value[key];
 };
 
+// 當外部傳入或網址載入 selectedChapter 時，自動切換該章節的學科並展開對應學期
+watch(() => props.selectedChapter, (chName) => {
+  if (!chName) return;
+  const cleanName = chName.toLowerCase().replace(/\[.*?\]/g, '').trim();
+  for (const sub of CURRICULUM_DATA) {
+    for (const g of sub.grades) {
+      for (let sIdx = 0; sIdx < g.semesters.length; sIdx++) {
+        const sem = g.semesters[sIdx];
+        const hasChapter = sem.chapters.some(c => {
+          const cClean = c.name.toLowerCase().replace(/\[.*?\]/g, '').trim();
+          return cClean === cleanName || cClean.includes(cleanName) || cleanName.includes(cClean);
+        });
+        if (hasChapter) {
+          activeSubject.value = sub.id;
+          const semKey = `${g.gradeId}-${sIdx}`;
+          expandedSemesters.value[semKey] = true;
+          return;
+        }
+      }
+    }
+  }
+}, { immediate: true });
+
 // Available subjects for current stage
 const availableSubjects = computed(() => {
   if (currentStage.value === 'junior') {
