@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import OpticsSimulator from './OpticsSimulator.vue';
 
 const props = defineProps<{
   type: string;
@@ -340,53 +341,9 @@ const props = defineProps<{
     </svg>
 
     <!-- ========================================================================= -->
-    <!-- 7. 幾何光學薄透鏡成像 (lens-optics) -->
+    <!-- 7. 幾何光學透鏡與面鏡動態成像實驗室 (lens-optics) -->
     <!-- ========================================================================= -->
-    <svg 
-      v-else-if="type === 'lens-optics'" 
-      viewBox="0 0 380 180" 
-      class="w-full max-w-md h-auto drop-shadow-md"
-    >
-      <rect width="380" height="180" rx="16" fill="#090d16" />
-
-      <!-- Principal Optical Axis -->
-      <line x1="20" y1="90" x2="360" y2="90" stroke="#334155" stroke-width="1.5" />
-
-      <!-- Convex Lens at x=190 -->
-      <ellipse cx="190" cy="90" rx="6" ry="70" fill="#38bdf8" fill-opacity="0.25" stroke="#38bdf8" stroke-width="2" />
-
-      <!-- Focal points: F1=130, 2F1=70; F2=250, 2F2=310 -->
-      <circle cx="130" cy="90" r="3" fill="#94a3b8" />
-      <text x="126" y="105" fill="#94a3b8" font-size="10" font-family="sans-serif">F</text>
-      <circle cx="70" cy="90" r="3" fill="#94a3b8" />
-      <text x="64" y="105" fill="#94a3b8" font-size="10" font-family="sans-serif">2F</text>
-
-      <circle cx="250" cy="90" r="3" fill="#94a3b8" />
-      <text x="246" y="105" fill="#94a3b8" font-size="10" font-family="sans-serif">F'</text>
-      <circle cx="310" cy="90" r="3" fill="#94a3b8" />
-      <text x="304" y="105" fill="#94a3b8" font-size="10" font-family="sans-serif">2F'</text>
-
-      <!-- Object at x=45 (outside 2F) -->
-      <line x1="45" y1="90" x2="45" y2="40" stroke="#f59e0b" stroke-width="3" />
-      <polygon points="45,35 41,43 49,43" fill="#f59e0b" />
-      <text x="35" y="30" fill="#f59e0b" font-weight="bold" font-size="11" font-family="sans-serif">實物</text>
-
-      <!-- Ray 1: Parallel to axis, refracts through F' (250, 90) -->
-      <line x1="45" y1="40" x2="190" y2="40" stroke="#38bdf8" stroke-width="1.5" />
-      <line x1="190" y1="40" x2="310" y2="120" stroke="#38bdf8" stroke-width="1.5" />
-
-      <!-- Ray 2: Passes straight through center of lens (190, 90) -->
-      <line x1="45" y1="40" x2="310" y2="120" stroke="#34d399" stroke-width="1.5" />
-
-      <!-- Inverted Real Image at x=280 (between F' and 2F') -->
-      <line x1="280" y1="90" x2="280" y2="110" stroke="#f43f5e" stroke-width="2.5" />
-      <polygon points="280,114 276,106 284,106" fill="#f43f5e" />
-      <text x="260" y="132" fill="#f43f5e" font-weight="bold" font-size="11" font-family="sans-serif">倒立縮小實像</text>
-
-      <text x="130" y="165" fill="#94a3b8" font-size="10" font-family="sans-serif">
-        薄透鏡造鏡公式：1/p + 1/q = 1/f（物在 2F 外，成倒立縮小實像於 F~2F 間）
-      </text>
-    </svg>
+    <OpticsSimulator v-else-if="type === 'lens-optics'" />
 
     <!-- ========================================================================= -->
     <!-- 8. 楊氏雙狹縫干涉 (double-slit) -->
