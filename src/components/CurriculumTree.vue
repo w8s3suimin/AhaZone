@@ -80,13 +80,17 @@ const currentSubjectCurriculum = computed(() => {
   return CURRICULUM_DATA.find(s => s.stage === currentStage.value && s.id === activeSubject.value) || CURRICULUM_DATA[0];
 });
 
-// Filter chapters by math track
+// Filter chapters by math track (僅在高三選修數甲/數乙處進行分流篩選，高一與高二共同課程完整保留)
 const filterChapters = (chapters: ChapterItem[]) => {
   if (currentStage.value !== 'senior' || activeSubject.value !== 'math' || mathTrackFilter.value === 'all') {
     return chapters;
   }
 
   return chapters.filter(c => {
+    // 高一、高二等無分流標記之單元恆常顯示
+    if (!c.mathTrack || c.mathTrack === 'none') {
+      return true;
+    }
     if (mathTrackFilter.value === 'mathA') {
       return c.mathTrack === 'mathA' || c.mathTrack === 'common';
     }
@@ -198,14 +202,14 @@ const getResourceCountForChapter = (chapterName: string) => {
             class="px-2 py-0.5 rounded text-[11px] font-medium"
             :class="mathTrackFilter === 'mathA' ? 'bg-indigo-600 text-white' : 'text-slate-400'"
           >
-            數A/數甲
+            數甲
           </button>
           <button
             @click="mathTrackFilter = 'mathB'"
             class="px-2 py-0.5 rounded text-[11px] font-medium"
             :class="mathTrackFilter === 'mathB' ? 'bg-amber-600 text-white' : 'text-slate-400'"
           >
-            數B/數乙
+            數乙
           </button>
           <button
             @click="mathTrackFilter = 'common'"
@@ -364,14 +368,14 @@ const getResourceCountForChapter = (chapterName: string) => {
           class="px-2 py-0.5 rounded text-[11px] font-medium transition-colors"
           :class="mathTrackFilter === 'mathA' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'"
         >
-          數A/數甲
+          數甲
         </button>
         <button
           @click="mathTrackFilter = 'mathB'"
           class="px-2 py-0.5 rounded text-[11px] font-medium transition-colors"
           :class="mathTrackFilter === 'mathB' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-slate-200'"
         >
-          數B/數乙
+          數乙
         </button>
         <button
           @click="mathTrackFilter = 'common'"

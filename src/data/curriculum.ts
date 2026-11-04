@@ -222,22 +222,22 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
       },
       {
         gradeId: 's11-math',
-        gradeName: '高中二年級 (高二 "數A" & "數B" 兩種分流)',
+        gradeName: '高中二年級 (高二)',
         semesters: [
           {
             name: '高二上學期 (第 3 冊進度)',
             chapters: [
-              { name: '三角函數', semester: '11上', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '指數函數與對數函數', semester: '11上', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '平面向量', semester: '11上', mathTrack: 'common', tagLabel: '[數A+B]' }
+              { name: '三角函數', semester: '11上', mathTrack: 'none' },
+              { name: '指數函數與對數函數', semester: '11上', mathTrack: 'none' },
+              { name: '平面向量', semester: '11上', mathTrack: 'none' }
             ]
           },
           {
             name: '高二下學期 (第 4 冊進度)',
             chapters: [
-              { name: '空間概念與空間坐標', semester: '11下', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '條件機率', semester: '11下', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '矩陣運算及其應用', semester: '11下', mathTrack: 'common', tagLabel: '[數A+B]' }
+              { name: '空間概念與空間坐標', semester: '11下', mathTrack: 'none' },
+              { name: '條件機率', semester: '11下', mathTrack: 'none' },
+              { name: '矩陣運算及其應用', semester: '11下', mathTrack: 'none' }
             ]
           }
         ]

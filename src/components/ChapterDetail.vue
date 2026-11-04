@@ -21,60 +21,86 @@ const summary = computed<ChapterSummary>(() => {
   return getChapterSummary(props.chapterName);
 });
 
-// Active track tab for chapters with Math A / B differences
-const activeTrackTab = ref<'all' | 'common' | 'mathA' | 'mathB'>('all');
+// Active track tab: 'all' | 'mathA' | 'mathB'
+const activeTrackTab = ref<'all' | 'mathA' | 'mathB'>('all');
 
 watch(() => props.chapterName, () => {
   activeTrackTab.value = 'all';
 });
 
-// Check if current chapter has Math A / B variants
+// Check if current chapter has Math A / B differences
 const hasTrackVariants = computed(() => {
-  return !!(summary.value.trackVariants && (
-    summary.value.trackVariants.mathA || 
-    summary.value.trackVariants.mathB || 
-    summary.value.trackVariants.common
-  ));
+  return summary.value.coreConcepts?.some(c => c.track === 'mathA' || c.track === 'mathB') ||
+    !!(summary.value.trackVariants && (summary.value.trackVariants.mathA || summary.value.trackVariants.mathB));
 });
 
 // Dynamically displayed scope notice
 const displayedScopeNotice = computed(() => {
-  if (hasTrackVariants.value && activeTrackTab.value !== 'all') {
-    const variant = summary.value.trackVariants?.[activeTrackTab.value];
-    if (variant?.scopeNotice) return variant.scopeNotice;
+  if (hasTrackVariants.value) {
+    if (activeTrackTab.value === 'mathA') {
+      return summary.value.trackVariants?.mathA?.scopeNotice || '【數A 完整內容】包含數A+B共同核心概念與數A專屬深化單元。';
+    }
+    if (activeTrackTab.value === 'mathB') {
+      return summary.value.trackVariants?.mathB?.scopeNotice || '【數B 完整內容】包含數A+B共同核心概念與數B專屬幾何/生活應用單元。';
+    }
   }
   return summary.value.scopeNotice;
 });
 
 // Dynamically displayed aha insight
 const displayedAhaInsight = computed(() => {
-  if (hasTrackVariants.value && activeTrackTab.value !== 'all') {
-    const variant = summary.value.trackVariants?.[activeTrackTab.value];
-    if (variant?.ahaInsight) return variant.ahaInsight;
+  if (hasTrackVariants.value) {
+    if (activeTrackTab.value === 'mathA') {
+      return summary.value.trackVariants?.mathA?.ahaInsight || summary.value.ahaInsight;
+    }
+    if (activeTrackTab.value === 'mathB') {
+      return summary.value.trackVariants?.mathB?.ahaInsight || summary.value.ahaInsight;
+    }
   }
   return summary.value.ahaInsight;
 });
 
-// Dynamically displayed concepts
+// Dynamically displayed concepts:
+// 數A: 顯示 共同 + 數A專屬內容
+// 數B: 顯示 共同 + 數B專屬內容
+// 全部: 顯示全部
 const displayedConcepts = computed(() => {
-  if (hasTrackVariants.value && activeTrackTab.value !== 'all') {
-    const variant = summary.value.trackVariants?.[activeTrackTab.value];
-    if (variant?.coreConcepts && variant.coreConcepts.length > 0) {
-      return variant.coreConcepts;
-    }
+  const allConcepts = summary.value.coreConcepts || [];
+  if (!hasTrackVariants.value || activeTrackTab.value === 'all') {
+    return allConcepts;
   }
-  return summary.value.coreConcepts;
+  if (activeTrackTab.value === 'mathA') {
+    return allConcepts.filter(c => !c.track || c.track === 'common' || c.track === 'mathA');
+  }
+  if (activeTrackTab.value === 'mathB') {
+    return allConcepts.filter(c => !c.track || c.track === 'common' || c.track === 'mathB');
+  }
+  return allConcepts;
 });
 
 // Dynamically displayed pitfalls
 const displayedPitfalls = computed(() => {
-  if (hasTrackVariants.value && activeTrackTab.value !== 'all') {
-    const variant = summary.value.trackVariants?.[activeTrackTab.value];
-    if (variant?.pitfalls && variant.pitfalls.length > 0) {
-      return variant.pitfalls;
-    }
+  const allPitfalls = summary.value.pitfalls || [];
+  if (!hasTrackVariants.value || activeTrackTab.value === 'all') {
+    return allPitfalls;
   }
-  return summary.value.pitfalls;
+  if (activeTrackTab.value === 'mathA') {
+    const commonP = summary.value.trackVariants?.common?.pitfalls || [];
+    const aP = summary.value.trackVariants?.mathA?.pitfalls || [];
+    if (commonP.length > 0 || aP.length > 0) {
+      return [...commonP, ...aP];
+    }
+    return allPitfalls.filter(p => !p.includes('數B專屬'));
+  }
+  if (activeTrackTab.value === 'mathB') {
+    const commonP = summary.value.trackVariants?.common?.pitfalls || [];
+    const bP = summary.value.trackVariants?.mathB?.pitfalls || [];
+    if (commonP.length > 0 || bP.length > 0) {
+      return [...commonP, ...bP];
+    }
+    return allPitfalls.filter(p => !p.includes('數A專屬') && !p.includes('數A深化'));
+  }
+  return allPitfalls;
 });
 
 // Resources for this specific chapter
@@ -139,12 +165,12 @@ const chapterResources = computed(() => {
         {{ chapterName }}
       </h2>
 
-      <!-- Math A / Math B Track Switcher (Only appears for chapters with Math A / B differences) -->
+      <!-- Math A / Math B Track Switcher (模式切換: 全部 / 數A / 數B) -->
       <div v-if="hasTrackVariants" class="mb-4 pt-3 border-t border-slate-800/80">
         <div class="flex flex-wrap items-center gap-2">
           <span class="text-xs text-slate-400 font-semibold flex items-center gap-1.5 mr-1">
             <Layers class="w-3.5 h-3.5 text-sky-400" />
-            <span>數A/數B分流版本切換：</span>
+            <span>模式切換：</span>
           </span>
           <div class="flex flex-wrap bg-slate-950 p-1 rounded-xl border border-slate-800/90 gap-1">
             <button
@@ -152,34 +178,23 @@ const chapterResources = computed(() => {
               class="px-3 py-1 rounded-lg text-xs font-semibold transition-all"
               :class="activeTrackTab === 'all' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
             >
-              全部精要
+              全部
             </button>
             <button
-              v-if="summary.trackVariants?.common"
-              @click="activeTrackTab = 'common'"
-              class="px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1"
-              :class="activeTrackTab === 'common' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              <span>數A+B 共同核心</span>
-            </button>
-            <button
-              v-if="summary.trackVariants?.mathA"
               @click="activeTrackTab = 'mathA'"
-              class="px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1"
+              class="px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
               :class="activeTrackTab === 'mathA' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
             >
               <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-              <span>數A 專屬深化</span>
+              <span>數A (共同 + 專屬)</span>
             </button>
             <button
-              v-if="summary.trackVariants?.mathB"
               @click="activeTrackTab = 'mathB'"
-              class="px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1"
+              class="px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
               :class="activeTrackTab === 'mathB' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
             >
               <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-              <span>數B 專屬特色</span>
+              <span>數B (共同 + 專屬)</span>
             </button>
           </div>
         </div>
@@ -215,7 +230,7 @@ const chapterResources = computed(() => {
           <span>核心觀念與公式精要</span>
         </h3>
         <span v-if="hasTrackVariants" class="text-[11px] text-slate-400">
-          目前顯示：<strong class="text-sky-300 font-semibold">{{ activeTrackTab === 'all' ? '全部觀念' : activeTrackTab === 'common' ? '數A+B 共同核心' : activeTrackTab === 'mathA' ? '數A 專屬' : '數B 專屬' }}</strong>
+          目前顯示：<strong class="text-sky-300 font-semibold">{{ activeTrackTab === 'all' ? '全部 (共同 + 數A + 數B)' : activeTrackTab === 'mathA' ? '數A (共同 + 數A專屬)' : '數B (共同 + 數B專屬)' }}</strong>
         </span>
       </div>
 
