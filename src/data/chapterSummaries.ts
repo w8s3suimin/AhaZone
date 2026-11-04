@@ -744,24 +744,24 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '絕對值幾何距離法',
         description: '利用數線幾何距離快速求解，免去代數分段討論：',
         formulas: [
-          '等式解：|x - a| = d  ⟹  x = a ± d',
-          '區間解：|x - c| < r  ⟹  c - r < x < c + r',
-          '兩側解：|x - c| > r  ⟹  x > c + r 或 x < c - r'
+          '等式解：|x - a| = d \\implies x = a \\pm d',
+          '區間解：|x - c| < r \\implies c - r < x < c + r',
+          '兩側解：|x - c| > r \\implies x > c + r \\text{ 或 } x < c - r'
         ]
       },
       {
         title: '算幾不等式求極值',
         description: '若 a > 0 且 b > 0，則算術平均數恆大於或等於幾何平均數（當且僅當 a = b 時等號成立）：',
         formulas: [
-          '(a + b) / 2 ≥ √(ab) （a = b 時取等號，和定求積大、積定求和最小）'
+          '\\frac{a + b}{2} \\ge \\sqrt{ab} \\quad (a > 0, b > 0)'
         ]
       },
       {
         title: '雙重根號化簡',
         description: '化為完全平方根號形式 √(a + b ± 2√(ab)) = √a ± √b (其中 a ≥ b > 0)：',
         formulas: [
-          '√(a + b + 2√(ab)) = √a + √b',
-          '√(a + b - 2√(ab)) = √a - √b （注意：a ≥ b）'
+          '\\sqrt{a + b + 2\\sqrt{ab}} = \\sqrt{a} + \\sqrt{b} \\quad (a \\ge b > 0)',
+          '\\sqrt{a + b - 2\\sqrt{ab}} = \\sqrt{a} - \\sqrt{b} \\quad (a \\ge b > 0)'
         ]
       }
     ],
@@ -781,15 +781,15 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '直線斜率與點到直線距離',
         description: '過點 (x₀, y₀) 到直線 L: ax + by + c = 0 的垂直距離公式：',
         formulas: [
-          '距離公式：d = |ax₀ + by₀ + c| / √(a² + b²)',
-          '兩平行線距離：d(L₁, L₂) = |c₁ - c₂| / √(a² + b²)'
+          '距離公式：d = \\frac{|ax_0 + by_0 + c|}{\\sqrt{a^2 + b^2}}',
+          '兩平行線距離：d(L_1, L_2) = \\frac{|c_1 - c_2|}{\\sqrt{a^2 + b^2}}'
         ]
       },
       {
         title: '圓的方程式與幾何判別',
         description: '圓心 (h, k)，半徑 r 的標準式為 (x - h)² + (y - k)² = r²；圓與直線關係完全由圓心距離 d 與半徑 r 決定：',
         formulas: [
-          'd < r：相交兩點（割線，弦長 = 2√(r² - d²)）',
+          'd < r：相交兩點（割線，弦長 = 2\\sqrt{r^2 - d^2}）',
           'd = r：相切於一點（切線）',
           'd > r：不相交（外離）'
         ]
@@ -811,16 +811,16 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '除法原理與餘式定理',
         description: '除式為一次式時，餘式必為常數，直接代入求值：',
         formulas: [
-          '除法原理：f(x) = (x - c) · q(x) + r',
-          '餘式定理：餘式 r = f(c)',
-          '推廣公式：f(x) 除以 (ax - b) 之餘式為 f(b/a)'
+          '除法原理：f(x) = (x - c) \\cdot q(x) + r',
+          '餘式定理：r = f(c)',
+          '推廣公式：f(x) \\text{ 除以 } (ax - b) \\text{ 之餘式為 } f\\left(\\frac{b}{a}\\right)'
         ]
       },
       {
         title: '三次函數對稱中心',
         description: '三次函數 f(x) = ax³ + bx² + cx + d 的圖形必關於反曲點對稱中心 (h, k) 點對稱：',
         formulas: [
-          '對稱中心橫坐標：h = -b / (3a)',
+          '對稱中心橫坐標：h = -\\frac{b}{3a}',
           '對稱中心縱坐標：k = f(h)'
         ]
       }
@@ -871,18 +871,18 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '一維數據分析與標準差',
         description: '衡量資料離散程度，資料線性轉換 y = ax + b 的性質：',
         formulas: [
-          '標準差公式：σ = √[ (1/n) ∑(xi - μ)² ]',
-          '線性轉換平均值：μ_y = a · μ_x + b',
-          '線性轉換標準差：σ_y = |a| · σ_x'
+          '標準差公式：\\sigma = \\sqrt{ \\frac{1}{n} \\sum_{i=1}^n (x_i - \\mu_x)^2 }',
+          '線性轉換平均值：\\mu_y = a \\mu_x + b',
+          '線性轉換標準差：\\sigma_y = |a| \\sigma_x'
         ]
       },
       {
         title: '二維數據相關係數與回歸直線',
         description: '衡量兩變數線性關聯強度與最佳擬合直線：',
         formulas: [
-          '相關係數：r = ∑(x* · y*) / n （-1 ≤ r ≤ 1）',
-          '回歸直線斜率：m = r · (σ_y / σ_x)',
-          '回歸直線方程式：y - μ_y = m(x - μ_x)'
+          '相關係數：r = \\frac{\\sum (x_i - \\bar{x})(y_i - \\bar{y})}{\\sqrt{\\sum (x_i - \\bar{x})^2} \\sqrt{\\sum (y_i - \\bar{y})^2}} \\quad (-1 \\le r \\le 1)',
+          '回歸直線斜率：m = r \\cdot \\frac{\\sigma_y}{\\sigma_x}',
+          '回歸直線方程式：y - \\mu_y = m(x - \\mu_x)'
         ]
       }
     ],
@@ -902,9 +902,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '排列、組合與重複組合',
         description: '常見計數工具與重複組合公式：',
         formulas: [
-          '相異物直線排列：P(n, r) = n! / (n - r)!',
-          '組合公式：C(n, r) = n! / [ r! (n - r)! ]',
-          '重複組合公式：H(n, r) = C(n + r - 1, r)'
+          '相異物直線排列：P(n, r) = \\frac{n!}{(n - r)!}',
+          '組合公式：C(n, r) = \\binom{n}{r} = \\frac{n!}{r!(n - r)!}',
+          '重複組合公式：H(n, r) = \\binom{n + r - 1}{r}'
         ]
       },
       {
@@ -932,28 +932,28 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '廣義角三角比與單位圓',
         description: '在單位圓上，有向角 θ 的終邊與圓交點坐標定義如下：',
         formulas: [
-          '坐標定義：x = cos θ,  y = sin θ',
-          '商數關係：tan θ = sin θ / cos θ  (cos θ ≠ 0)',
-          '平方關係：sin² θ + cos² θ = 1'
+          '坐標定義：x = \\cos\\theta, \\quad y = \\sin\\theta',
+          '商數關係：\\tan\\theta = \\frac{\\sin\\theta}{\\cos\\theta} \\quad (\\cos\\theta \\ne 0)',
+          '平方關係：\\sin^2\\theta + \\cos^2\\theta = 1'
         ]
       },
       {
         title: '正弦定理與餘弦定理',
         description: '斜三角形的核心幾何邊角定律：',
         formulas: [
-          '正弦定理：a / sin A = b / sin B = c / sin C = 2R',
-          '餘弦定理：c² = a² + b² - 2ab · cos C',
-          '求角公式：cos C = (a² + b² - c²) / (2ab)'
+          '正弦定理：\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C} = 2R',
+          '餘弦定理：c^2 = a^2 + b^2 - 2ab \\cos C',
+          '求角公式：\\cos C = \\frac{a^2 + b^2 - c^2}{2ab}'
         ]
       },
       {
         title: '三角形面積公式彙整',
         description: '依據給定條件靈活選擇合適的求法：',
         formulas: [
-          '兩邊一夾角：Area = (1/2)ab · sin C',
-          '外接圓半徑 R：Area = abc / (4R)',
-          '內切圓半徑 r：Area = r · s  （s = (a+b+c)/2）',
-          '海龍公式：Area = √[s(s-a)(s-b)(s-c)]'
+          '兩邊一夾角：\\text{Area} = \\frac{1}{2}ab \\sin C',
+          '外接圓半徑 R：\\text{Area} = \\frac{abc}{4R}',
+          '內切圓半徑 r：\\text{Area} = r \\cdot s \\quad \\left(s = \\frac{a+b+c}{2}\\right)',
+          '海龍公式：\\text{Area} = \\sqrt{s(s-a)(s-b)(s-c)}'
         ]
       }
     ],
@@ -976,9 +976,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '三角函數圖形與週期振幅',
         description: '正弦、餘弦與正切函數圖形特徵，y = A sin(Bx + C) + D 的幾何變換：',
         formulas: [
-          '振幅：Amplitude = |A|',
-          '週期：Period T = 2π / |B|  (正弦/餘弦)；T = π / |B|  (正切)',
-          '水平平移：向左或向右平移 |C/B| 單位'
+          '振幅：\\text{Amplitude} = |A|',
+          '週期：T = \\frac{2\\pi}{|B|} \\quad (\\text{正弦/餘弦})；\\quad T = \\frac{\\pi}{|B|} \\quad (\\text{正切})',
+          '水平平移：\\text{向左或向右平移 } \\left|\\frac{C}{B}\\right| \\text{ 單位}'
         ],
         diagramType: 'unit-circle',
         track: 'common'
@@ -987,9 +987,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '和角與差角公式',
         description: '由單位圓向量內積推導之基本和差角恆等式（數A專屬）：',
         formulas: [
-          'cos(α ∓ β) = cos α · cos β ± sin α · sin β',
-          'sin(α ± β) = sin α · cos β ± cos α · sin β',
-          'tan(α ± β) = (tan α ± tan β) / (1 ∓ tan α · tan β)'
+          '\\cos(\\alpha \\mp \\beta) = \\cos\\alpha \\cos\\beta \\pm \\sin\\alpha \\sin\\beta',
+          '\\sin(\\alpha \\pm \\beta) = \\sin\\alpha \\cos\\beta \\pm \\cos\\alpha \\sin\\beta',
+          '\\tan(\\alpha \\pm \\beta) = \\frac{\\tan\\alpha \\pm \\tan\\beta}{1 \\mp \\tan\\alpha \\tan\\beta}'
         ],
         track: 'mathA'
       },
@@ -997,9 +997,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '二倍角公式與正餘弦疊合',
         description: '求解三角多項式極值之必考技巧（數A專屬）：',
         formulas: [
-          '正弦二倍角：sin 2θ = 2 sin θ · cos θ',
-          '餘弦二倍角：cos 2θ = 2 cos² θ - 1 = 1 - 2 sin² θ',
-          '正餘弦疊合：a sin x + b cos x = √(a² + b²) · sin(x + φ)'
+          '正弦二倍角：\\sin 2\\theta = 2 \\sin\\theta \\cos\\theta',
+          '餘弦二倍角：\\cos 2\\theta = 2 \\cos^2\\theta - 1 = 1 - 2 \\sin^2\\theta',
+          '正餘弦疊合：a \\sin x + b \\cos x = \\sqrt{a^2 + b^2} \\sin(x + \\varphi)'
         ],
         track: 'mathA'
       },
@@ -1007,8 +1007,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '週期現象生活模型擬合',
         description: '利用三角函數模擬潮汐升降、摩天輪旋轉車廂高度、氣溫年度規律（數B專屬重點）：',
         formulas: [
-          '基準高度中線：D = (最高值 + 最低值) / 2',
-          '上下波動振幅：A = (最高值 - 最低值) / 2'
+          '基準高度中線：D = \\frac{\\text{最高值} + \\text{最低值}}{2}',
+          '上下波動振幅：A = \\frac{\\text{最高值} - \\text{最低值}}{2}'
         ],
         track: 'mathB'
       }
@@ -1043,9 +1043,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
             title: '和差角公式與二倍角',
             description: '常用於角度化簡與求值：',
             formulas: [
-              'sin(α ± β) = sin α · cos β ± cos α · sin β',
-              'cos(α ± β) = cos α · cos β ∓ sin α · sin β',
-              'sin 2θ = 2 sin θ · cos θ,  cos 2θ = 2 cos² θ - 1'
+              '\\sin(\\alpha \\pm \\beta) = \\sin\\alpha \\cos\\beta \\pm \\cos\\alpha \\sin\\beta',
+              '\\cos(\\alpha \\pm \\beta) = \\cos\\alpha \\cos\\beta \\mp \\sin\\alpha \\sin\\beta',
+              '\\sin 2\\theta = 2 \\sin\\theta \\cos\\theta, \\quad \\cos 2\\theta = 2 \\cos^2\\theta - 1'
             ],
             track: 'mathA'
           },
@@ -1053,7 +1053,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
             title: '正餘弦疊合',
             description: '化不同相角的正弦與餘弦為單一正弦函數：',
             formulas: [
-              'a sin x + b cos x = √(a² + b²) · sin(x + φ)'
+              'a \\sin x + b \\cos x = \\sqrt{a^2 + b^2} \\sin(x + \\varphi)'
             ],
             track: 'mathA'
           }
@@ -1099,10 +1099,10 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '四大對數律與換底公式',
         description: '對數簡化指數次方運算之核心法則：',
         formulas: [
-          '積化和：log_a (xy) = log_a x + log_a y',
-          '商化差：log_a (x / y) = log_a x - log_a y',
-          '次方提出：log_a (x^k) = k · log_a x',
-          '換底公式：log_a b = (log_c b) / (log_c a)'
+          '積化和：\\log_a (xy) = \\log_a x + \\log_a y',
+          '商化差：\\log_a \\left(\\frac{x}{y}\\right) = \\log_a x - \\log_a y',
+          '次方提出：\\log_a (x^k) = k \\cdot \\log_a x',
+          '換底公式：\\log_a b = \\frac{\\log_c b}{\\log_c a} \\quad (c > 0, c \\ne 1)'
         ],
         track: 'common'
       },
@@ -1110,8 +1110,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '常用對數首數與尾數',
         description: '將正數以科學記號表示 N = a × 10^n 轉換為對數形式 log N = n + log a：',
         formulas: [
-          '首數 n：若 n ≥ 0，N 的整數位數為 n + 1 位；若 n < 0，N 在小數點後第 |n| 位開始出現非零數字',
-          '尾數 log a (0 ≤ log a < 1)：決定 N 的最高位有效數字'
+          '首數 n：若 n \\ge 0，N 的整數位數為 n + 1 位；若 n < 0，N 在小數點後第 |n| 位開始出現非零數字',
+          '尾數 \\log a \\quad (0 \\le \\log a < 1)：決定 N 的最高位有效數字'
         ],
         track: 'common'
       }
@@ -1132,9 +1132,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '平面向量線性組合與內積',
         description: '向量表示法與內積的核心定義（數A+B共同）：',
         formulas: [
-          '分點公式：P = (n / (m+n)) A + (m / (m+n)) B',
-          '內積幾何定義：u · v = |u| · |v| · cos θ',
-          '內積坐標計算：(x₁, y₁) · (x₂, y₂) = x₁x₂ + y₁y₂'
+          '分點公式：\\vec{OP} = \\frac{n}{m+n}\\vec{OA} + \\frac{m}{m+n}\\vec{OB}',
+          '內積幾何定義：\\vec{u} \\cdot \\vec{v} = |\\vec{u}| |\\vec{v}| \\cos\\theta',
+          '內積坐標計算：(x_1, y_1) \\cdot (x_2, y_2) = x_1 x_2 + y_1 y_2'
         ],
         track: 'common'
       },
@@ -1142,7 +1142,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '二階行列式與面積',
         description: '兩平面向量所張成之平行四邊形面積：',
         formulas: [
-          '面積公式：Area = | det(u, v) | = | x₁y₂ - x₂y₁ |'
+          '面積公式：\\text{Area} = |\\det(\\vec{u}, \\vec{v})| = |x_1 y_2 - x_2 y_1|'
         ],
         track: 'common'
       },
@@ -1150,9 +1150,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '柯西不等式與正射影',
         description: '向量極值求解與投影向量（數A專屬）：',
         formulas: [
-          '柯西不等式：(a₁² + a₂²)(b₁² + b₂²) ≥ (a₁b₁ + a₂b₂)² （等號成立於 a₁/b₁ = a₂/b₂）',
-          '正射影向量：proj_v u = [ (u · v) / |v|² ] · v',
-          '正射影長度：|proj_v u| = |u · v| / |v|'
+          '柯西不等式：(a_1^2 + a_2^2)(b_1^2 + b_2^2) \\ge (a_1 b_1 + a_2 b_2)^2 \\quad \\left(\\frac{a_1}{b_1} = \\frac{a_2}{b_2}\\right)',
+          '正射影向量：\\text{proj}_{\\vec{v}} \\vec{u} = \\left(\\frac{\\vec{u} \\cdot \\vec{v}}{|\\vec{v}|^2}\\right) \\vec{v}',
+          '正射影長度：|\\text{proj}_{\\vec{v}} \\vec{u}| = \\frac{|\\vec{u} \\cdot \\vec{v}|}{|\\vec{v}|}'
         ],
         diagramType: 'vector-projection',
         track: 'mathA'
@@ -1161,7 +1161,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '平面向量圖形設計與視覺藝術',
         description: '利用向量平移與基底網格線性組合，拼貼出對稱規律圖形（數B專屬）：',
         formulas: [
-          '幾何圖案位置向量：P = x · e₁ + y · e₂'
+          '幾何圖案位置向量：\\vec{P} = x \\vec{e}_1 + y \\vec{e}_2'
         ],
         track: 'mathB'
       }
@@ -1233,8 +1233,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '空間坐標系與距離',
         description: '三維坐標點 P(x, y, z) 的空間距離與投影特徵：',
         formulas: [
-          '空間兩點距離：d(A, B) = √[ (x₁-x₂)² + (y₁-y₂)² + (z₁-z₂)² ]',
-          '在 xy 平面的投影點為 (x, y, 0)，對稱點為 (x, y, -z)'
+          '空間兩點距離：d(A, B) = \\sqrt{ (x_1 - x_2)^2 + (y_1 - y_2)^2 + (z_1 - z_2)^2 }',
+          '投影點：P(x,y,z) \\text{ 在 } xy \\text{ 平面投影為 } (x, y, 0)，\\text{對稱點為 } (x, y, -z)'
         ],
         track: 'common'
       },
@@ -1242,8 +1242,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '空間向量外積與三階行列式',
         description: '外積向量垂直於兩向量，三階行列式為平行六面體體積（數A專屬）：',
         formulas: [
-          '外積公式：u × v = (y₁z₂ - z₁y₂,  z₁x₂ - x₁z₂,  x₁y₂ - y₁x₂)',
-          '六面體體積：Volume = | det(u, v, w) |'
+          '外積公式：\\vec{u} \\times \\vec{v} = (y_1 z_2 - z_1 y_2, \\; z_1 x_2 - x_1 z_2, \\; x_1 y_2 - y_1 x_2)',
+          '六面體體積：\\text{Volume} = | \\det(\\vec{u}, \\vec{v}, \\vec{w}) |'
         ],
         track: 'mathA'
       },
@@ -1251,8 +1251,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '空間平面方程式',
         description: '通過點 (x₀, y₀, z₀) 且法向量為 n=(a, b, c) 的平面方程式（數A專屬）：',
         formulas: [
-          '點法式：a(x - x₀) + b(y - y₀) + c(z - z₀) = 0',
-          '點到平面距離：d = |ax₀ + by₀ + cz₀ - d| / √(a² + b² + c²)'
+          '點法式：a(x - x_0) + b(y - y_0) + c(z - z_0) = 0',
+          '點到平面距離：d = \\frac{|ax_0 + by_0 + cz_0 - d|}{\\sqrt{a^2 + b^2 + c^2}}'
         ],
         track: 'mathA'
       },
@@ -1265,8 +1265,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '球面經緯度坐標與大圓航線',
         description: '地球經緯度、經度時差與大圓最短航線球面幾何（數B專屬特色）：',
         formulas: [
-          '緯度 φ 處的小圓半徑：r = R · cos φ',
-          '大圓球面最短航程：Arc = R · θ （θ 為球心角弧度）'
+          '小圓半徑：r = R \\cos \\varphi \\quad (\\varphi \\text{ 為緯度})',
+          '大圓最短航程：\\text{Arc} = R \\cdot \\theta \\quad (\\theta \\text{ 為球心角弧度})'
         ],
         track: 'mathB'
       },
@@ -1274,7 +1274,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '圓錐截面幾何特性與日晷模型',
         description: '平面截雙圓錐產生的正圓、橢圓、拋物線與雙曲線幾何直觀及日晷光影應用（數B專屬特色）：',
         formulas: [
-          'θ = 90°：正圓；θ > 45°：橢圓；θ = 45°：拋物線；θ < 45°：雙曲線'
+          '\\theta = 90^\\circ：\\text{正圓}；\\; \\theta > 45^\\circ：\\text{橢圓}；\\; \\theta = 45^\\circ：\\text{拋物線}；\\; \\theta < 45^\\circ：\\text{雙曲線}'
         ],
         diagramType: 'conic-sections',
         track: 'mathB'
@@ -1350,9 +1350,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '條件機率與獨立事件',
         description: '在已知事件 B 發生下，事件 A 發生的機率：',
         formulas: [
-          '條件機率定義：P(A | B) = P(A ∩ B) / P(B)',
-          '乘法規則：P(A ∩ B) = P(B) · P(A | B)',
-          '獨立事件充要條件：P(A ∩ B) = P(A) · P(B)  ⟺  P(A | B) = P(A)'
+          '條件機率定義：P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)} \\quad (P(B) > 0)',
+          '乘法規則：P(A \\cap B) = P(B) \\cdot P(A \\mid B)',
+          '獨立事件充要條件：P(A \\cap B) = P(A) \\cdot P(B) \\iff P(A \\mid B) = P(A)'
         ],
         track: 'common'
       },
@@ -1360,8 +1360,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '全機率公式與貝氏定理',
         description: '由結果推知是由某一特定原因所產生的事後機率：',
         formulas: [
-          '全機率定理：P(A) = P(B₁)P(A|B₁) + P(B₂)P(A|B₂) + ...',
-          '貝氏定理：P(B₁ | A) = [ P(B₁) · P(A | B₁) ] / P(A)'
+          '全機率定理：P(A) = \\sum_{i=1}^k P(B_i) \\cdot P(A \\mid B_i)',
+          '貝氏定理：P(B_k \\mid A) = \\frac{P(B_k) \\cdot P(A \\mid B_k)}{\\sum_{i=1}^n P(B_i) \\cdot P(A \\mid B_i)}'
         ],
         track: 'common'
       }
@@ -1382,8 +1382,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '矩陣四則運算規則',
         description: '矩陣乘法條件與基本性質（數A+B共同）：',
         formulas: [
-          '相乘條件：A (m×n) 與 B (n×p) 相乘得 C (m×p) （前矩陣行數 = 後矩陣列數）',
-          '非交換性：一般情形下 A · B ≠ B · A'
+          '相乘條件：A_{m \\times n} \\cdot B_{n \\times p} = C_{m \\times p}',
+          '非交換性：\\text{一般情形下 } A \\cdot B \\ne B \\cdot A'
         ],
         track: 'common'
       },
@@ -1391,8 +1391,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '二階轉移矩陣與穩定狀態',
         description: '馬可夫鏈狀態轉移機率矩陣特徵與長期極限（數A+B共同）：',
         formulas: [
-          '轉移矩陣特徵：所有元素 a_ij ≥ 0，且每行（直行）元素總和恆為 1',
-          '穩定狀態向量：P 滿足 A · P = P （且 P 的元素和為 1）'
+          '轉移矩陣特徵：a_{ij} \\ge 0，\\text{且每行（直行）元素總和恆為 } 1',
+          '穩定狀態向量：A \\vec{P} = \\vec{P} \\quad (\\sum p_i = 1)'
         ],
         track: 'common'
       },
@@ -1400,10 +1400,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '平面線性變換二階方陣',
         description: '二階方陣對平面坐標點的幾何變換（數A專屬）：',
         formulas: [
-          '旋轉矩陣 R(θ)：[ cos θ, -sin θ ; sin θ, cos θ ] （逆時針旋轉 θ 角）',
-          '鏡射矩陣：關於直線 y = (tan θ)x 鏡射',
-          '二階反方陣：A⁻¹ = (1 / det A) [ d, -b ; -c, a ]  (det A = ad - bc ≠ 0)',
-          '面積放大率：變換後面積 = | det A | × 原面積'
+          '旋轉矩陣：R(\\theta) = \\begin{bmatrix} \\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta \\end{bmatrix}',
+          '二階反方陣：A^{-1} = \\frac{1}{\\det A}\\begin{bmatrix} d & -b \\\\ -c & a \\end{bmatrix} \\quad (\\det A = ad - bc \\ne 0)',
+          '面積放大率：\\text{變換後面積} = |\\det A| \\times \\text{原面積}'
         ],
         track: 'mathA'
       }
