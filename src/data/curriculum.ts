@@ -36,19 +36,20 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
           {
             name: '七年級上學期 (第 1 冊)',
             chapters: [
-              { name: '整數的運算與數線', semester: '7上', mathTrack: 'none' },
-              { name: '因數分解與標準分解式', semester: '7上', mathTrack: 'none' },
-              { name: '分數的四則運算', semester: '7上', mathTrack: 'none' },
-              { name: '一元一次方程式與生活應用', semester: '7上', mathTrack: 'none' }
+              { name: '數與數線', semester: '7上', mathTrack: 'none' },
+              { name: '標準分解式與分數運算', semester: '7上', mathTrack: 'none' },
+              { name: '一元一次方程式', semester: '7上', mathTrack: 'none' }
             ]
           },
           {
             name: '七年級下學期 (第 2 冊)',
             chapters: [
               { name: '二元一次聯立方程式', semester: '7下', mathTrack: 'none' },
-              { name: '平面直角坐標與二元一次圖形', semester: '7下', mathTrack: 'none' },
-              { name: '比與比例式 (連比與正反比)', semester: '7下', mathTrack: 'none' },
-              { name: '一元一次不等式', semester: '7下', mathTrack: 'none' }
+              { name: '直角坐標與二元一次方程式圖形', semester: '7下', mathTrack: 'none' },
+              { name: '比例', semester: '7下', mathTrack: 'none' },
+              { name: '一元一次不等式', semester: '7下', mathTrack: 'none' },
+              { name: '統計圖表與統計數據', semester: '7下', mathTrack: 'none' },
+              { name: '線對稱與三視圖', semester: '7下', mathTrack: 'none' }
             ]
           }
         ]
@@ -60,19 +61,20 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
           {
             name: '八年級上學期 (第 3 冊)',
             chapters: [
-              { name: '乘法公式與多項式運算', semester: '8上', mathTrack: 'none' },
+              { name: '乘法公式', semester: '8上', mathTrack: 'none' },
               { name: '二次方根與畢氏定理', semester: '8上', mathTrack: 'none' },
-              { name: '因式分解 (十字交乘法)', semester: '8上', mathTrack: 'none' },
-              { name: '一元二次方程式解法與應用', semester: '8上', mathTrack: 'none' }
+              { name: '因式分解', semester: '8上', mathTrack: 'none' },
+              { name: '一元二次方程式', semester: '8上', mathTrack: 'none' },
+              { name: '統計資料處理', semester: '8上', mathTrack: 'none' }
             ]
           },
           {
             name: '八年級下學期 (第 4 冊)',
             chapters: [
-              { name: '等差數列與等差級數', semester: '8下', mathTrack: 'none' },
-              { name: '幾何圖形與尺規作圖', semester: '8下', mathTrack: 'none' },
-              { name: '三角形全等性質與角平分線', semester: '8下', mathTrack: 'none' },
-              { name: '平行線與四邊形性質', semester: '8下', mathTrack: 'none' }
+              { name: '數列與級數', semester: '8下', mathTrack: 'none' },
+              { name: '線型函數與其圖形', semester: '8下', mathTrack: 'none' },
+              { name: '三角形的基本性質', semester: '8下', mathTrack: 'none' },
+              { name: '平行與四邊形', semester: '8下', mathTrack: 'none' }
             ]
           }
         ]
@@ -84,18 +86,17 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
           {
             name: '九年級上學期 (第 5 冊)',
             chapters: [
-              { name: '相似形與截比例線段', semester: '9上', mathTrack: 'none' },
-              { name: '圓形 (圓心角、圓周角、切線)', semester: '9上', mathTrack: 'none' },
-              { name: '幾何推理與三角形三心 (外心、內心、重心)', semester: '9上', mathTrack: 'none' }
+              { name: '相似形與三角比', semester: '9上', mathTrack: 'none' },
+              { name: '圓形', semester: '9上', mathTrack: 'none' },
+              { name: '推理證明與三角形的心', semester: '9上', mathTrack: 'none' }
             ]
           },
           {
             name: '九年級下學期 (第 6 冊)',
             chapters: [
-              { name: '二次函數與極值應用', semester: '9下', mathTrack: 'none' },
-              { name: '統計圖表、四分位數與盒狀圖', semester: '9下', mathTrack: 'none' },
-              { name: '機率與抽樣統計', semester: '9下', mathTrack: 'none' },
-              { name: '立體幾何圖形與三視圖', semester: '9下', mathTrack: 'none' }
+              { name: '二次函數', semester: '9下', mathTrack: 'none' },
+              { name: '統計與機率', semester: '9下', mathTrack: 'none' },
+              { name: '立體圖形', semester: '9下', mathTrack: 'none' }
             ]
           }
         ]

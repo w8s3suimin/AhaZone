@@ -148,7 +148,7 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     gradeLabel: '國二',
     subject: 'math',
     subjectLabel: '國中數學',
-    chapter: '乘法公式與多項式運算',
+    chapter: '乘法公式',
     tags: ['國二數學', '乘法公式', '多項式四則', '段考複習', '題目與解答'],
     filePath: '/papers/junior-math-g8-ch1-review-q.pdf',
     answerPath: '/papers/junior-math-g8-ch1-review-a.pdf',
