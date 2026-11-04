@@ -13,8 +13,8 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     gradeLabel: '高二 (數B專屬)',
     subject: 'math',
     subjectLabel: '高中數學',
-    chapter: '圓錐截面',
-    tags: ['動態3D', '數B專屬', '圓錐截面', '雙圓錐', '幾何解析', '日晷光影'],
+    chapter: '空間概念與空間坐標',
+    tags: ['動態3D', '數B專屬', '空間概念與空間坐標', '圓錐截面', '日晷光影'],
     filePath: '/simulations/conic-sections.html',
     ahaInsight: '當平面傾角 θ = 半頂角 α (45°) 時，截面平行母線形成「拋物線」臨界；θ < α 同時割雙錐兩葉成「雙曲線」；θ > α 則截斷單葉封閉成「橢圓」。',
     learningGoals: [
@@ -32,7 +32,7 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
   {
     id: 'res-pdf-math-g10-exam1',
     title: '高一上第一次段考數學複習卷 (含題目卷與詳解)',
-    subtitle: '實數運算、絕對值不等式、乘法公式與多項式餘式定理綜合演練',
+    subtitle: '實數運算、絕對值不等式、乘法公式與算幾不等式綜合演練',
     description: '精選第一學期第一次段考高頻題型，涵蓋絕對值幾何意涵、算幾不等式、多項式除法原理與綜合除法，附完整手寫詳細解析卷。',
     type: 'pdf-exam',
     stage: 'senior',
@@ -40,8 +40,8 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     gradeLabel: '高一',
     subject: 'math',
     subjectLabel: '高中數學',
-    chapter: '實數與絕對值不等式',
-    tags: ['段考複習', '題目卷', '詳解卷', '多項式', '絕對值不等式'],
+    chapter: '數與式',
+    tags: ['高一數學', '數與式', '段考複習', '題目卷', '詳解卷'],
     filePath: '/papers/senior-math-g10-exam1-q.pdf',
     answerPath: '/papers/senior-math-g10-exam1-a.pdf',
     ahaInsight: '絕對值不等式 |x - a| < d 代表「數線上 x 到 a 的距離小於 d」，利用中心點與距離幾何法，秒殺代數聯立分段討論。',
@@ -55,10 +55,10 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     rating: 4.8
   },
 
-  // 3. 高一下三角函數重點整理與精選練習
+  // 3. 高一下三角比核心觀念整理與精選練習
   {
     id: 'res-pdf-math-g10-trig',
-    title: '高一下三角函數核心觀念整理與練習卷',
+    title: '高一下三角比核心觀念整理與練習卷',
     subtitle: '銳角三角比、廣義角、正弦餘弦定理與三角測量統整',
     description: '濃縮 108 課綱高一下三角函數精華，整理特殊角、象限正負號規律、同界角與極坐標互換，隨附實戰模擬題與完整步驟解答。',
     type: 'pdf-lecture',
@@ -67,8 +67,8 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     gradeLabel: '高一',
     subject: 'math',
     subjectLabel: '高中數學',
-    chapter: '廣義角與三角比',
-    tags: ['重點整理', '三角函數', '正弦餘弦', '公式彙整'],
+    chapter: '三角比的定義及其性質',
+    tags: ['高一數學', '三角比的定義及其性質', '正弦餘弦', '重點整理'],
     filePath: '/papers/senior-math-g10-trig-practice.pdf',
     answerPath: '/papers/senior-math-g10-trig-answer.pdf',
     ahaInsight: '廣義角三角函數不用死記正負號，只需牢記單位圓上「x 坐標是 cos，y 坐標是 sin」，象限正負立即自然浮現。',

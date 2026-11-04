@@ -204,56 +204,40 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
           {
             name: '高一上學期 (第 1 冊 共同)',
             chapters: [
-              { name: '實數與絕對值不等式', semester: '10上', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '直線方程式與圓的幾何', semester: '10上', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '多項式函數 (除法原理、餘式定理)', semester: '10上', mathTrack: 'common', tagLabel: '[數A+B]' }
+              { name: '數與式', semester: '10上', mathTrack: 'none' },
+              { name: '直線與圓', semester: '10上', mathTrack: 'none' },
+              { name: '多項式', semester: '10上', mathTrack: 'none' }
             ]
           },
           {
             name: '高一下學期 (第 2 冊 共同)',
             chapters: [
-              { name: '數列與級數 (等差、等比、sigma運算)', semester: '10下', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '數據分析 (一維數據與二維相關係數)', semester: '10下', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '古典機率與排列組合導論', semester: '10下', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '廣義角與三角比', semester: '10下', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '正弦定理、餘弦定理與三角測量', semester: '10下', mathTrack: 'common', tagLabel: '[數A+B]' }
+              { name: '數列級數', semester: '10下', mathTrack: 'none' },
+              { name: '數據分析', semester: '10下', mathTrack: 'none' },
+              { name: '排列組合與古典機率', semester: '10下', mathTrack: 'none' },
+              { name: '三角比的定義及其性質', semester: '10下', mathTrack: 'none' }
             ]
           }
         ]
       },
       {
         gradeId: 's11-math',
-        gradeName: '高中二年級 (高二 "數A/數甲" & "數B/數乙" 兩種分流)',
+        gradeName: '高中二年級 (高二 "數A" & "數B" 兩種分流)',
         semesters: [
           {
             name: '高二上學期 (第 3 冊進度)',
             chapters: [
-              // 數A
-              { name: '三角函數圖形與正餘弦疊合', semester: '11上', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '差角公式與倍半角公式', semester: '11上', mathTrack: 'mathA', tagLabel: '[數A專屬]' },
-              { name: '指數與對數函數圖形與運算', semester: '11上', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '平面向量的運算與內積', semester: '11上', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '向量柯西不等式與正射影', semester: '11上', mathTrack: 'mathA', tagLabel: '[數A專屬]' },
-              { name: '二階行列式與平面面積', semester: '11上', mathTrack: 'common', tagLabel: '[數A+B]' }
+              { name: '三角函數', semester: '11上', mathTrack: 'common', tagLabel: '[數A+B]' },
+              { name: '指數函數與對數函數', semester: '11上', mathTrack: 'common', tagLabel: '[數A+B]' },
+              { name: '平面向量', semester: '11上', mathTrack: 'common', tagLabel: '[數A+B]' }
             ]
           },
           {
             name: '高二下學期 (第 4 冊進度)',
             chapters: [
-              // 數A+B 共同
-              { name: '空間概念與空間坐標系', semester: '11下', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '條件機率與貝氏定理', semester: '11下', mathTrack: 'common', tagLabel: '[數A+B]' },
-              { name: '矩陣運算與二階轉移矩陣', semester: '11下', mathTrack: 'common', tagLabel: '[數A+B]' },
-
-              // 數A 專屬
-              { name: '空間向量與三維平面方程式', semester: '11下', mathTrack: 'mathA', tagLabel: '[數A專屬]' },
-              { name: '空間向量外積與三階行列式體積', semester: '11下', mathTrack: 'mathA', tagLabel: '[數A專屬]' },
-              { name: '平面線性變換與旋轉矩陣', semester: '11下', mathTrack: 'mathA', tagLabel: '[數A專屬]' },
-
-              // 數B 專屬
-              { name: '單點透視圖與立體視圖繪製', semester: '11下', mathTrack: 'mathB', tagLabel: '[數B專屬]' },
-              { name: '球面經緯度坐標與大圓航線', semester: '11下', mathTrack: 'mathB', tagLabel: '[數B專屬]' },
-              { name: '圓錐截面', semester: '11下', mathTrack: 'mathB', tagLabel: '[數B專屬]' }
+              { name: '空間概念與空間坐標', semester: '11下', mathTrack: 'common', tagLabel: '[數A+B]' },
+              { name: '條件機率', semester: '11下', mathTrack: 'common', tagLabel: '[數A+B]' },
+              { name: '矩陣運算及其應用', semester: '11下', mathTrack: 'common', tagLabel: '[數A+B]' }
             ]
           }
         ]

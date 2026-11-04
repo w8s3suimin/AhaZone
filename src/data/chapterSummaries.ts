@@ -4,6 +4,14 @@ export interface ChapterConcept {
   title: string;
   description: string;
   formulas?: string[]; // 每條公式獨立一列
+  track?: 'common' | 'mathA' | 'mathB'; // 標註為共同、數A專屬或數B專屬
+}
+
+export interface TrackVariant {
+  scopeNotice?: string;
+  ahaInsight?: string;
+  coreConcepts?: ChapterConcept[];
+  pitfalls?: string[];
 }
 
 export interface ChapterSummary {
@@ -13,6 +21,11 @@ export interface ChapterSummary {
   ahaInsight: string; // 核心觀念精要
   coreConcepts: ChapterConcept[];
   pitfalls: string[]; // 常見迷思與避坑提醒
+  trackVariants?: {
+    common?: TrackVariant;
+    mathA?: TrackVariant;
+    mathB?: TrackVariant;
+  };
 }
 
 export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
@@ -717,12 +730,12 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
   },
 
   // =========================================================================
-  // 【高中數學】
+  // 【高中數學 - 高一必修共同】
   // =========================================================================
-  '實數與絕對值不等式': {
-    chapter: '實數與絕對值不等式',
-    mathTrack: 'common',
-    scopeNotice: '【高一上第 1 冊 數A+B 共同核心】絕對值幾何意義、算幾不等式求極值、雙重根號化簡。',
+  '數與式': {
+    chapter: '數與式',
+    mathTrack: 'none',
+    scopeNotice: '【高一上第 1 冊 必修共同】實數性質、算幾不等式求極值、絕對值方程式與不等式幾何意義、雙重根號化簡。',
     ahaInsight: '絕對值 |x - c| < r 代表「數線上點 x 到中心 c 的距離小於半徑 r」，解集直接寫成 c - r < x < c + r，免去代數正負分段討論。',
     coreConcepts: [
       {
@@ -735,30 +748,68 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         ]
       },
       {
-        title: '算幾不等式',
+        title: '算幾不等式求極值',
         description: '若 a > 0 且 b > 0，則算術平均數恆大於或等於幾何平均數（當且僅當 a = b 時等號成立）：',
         formulas: [
-          '(a + b) / 2 ≥ √(ab)'
+          '(a + b) / 2 ≥ √(ab) （a = b 時取等號，和定求積大、積定求和最小）'
+        ]
+      },
+      {
+        title: '雙重根號化簡',
+        description: '化為完全平方根號形式 √(a + b ± 2√(ab)) = √a ± √b (其中 a ≥ b > 0)：',
+        formulas: [
+          '√(a + b + 2√(ab)) = √a + √b',
+          '√(a + b - 2√(ab)) = √a - √b （注意：a ≥ b）'
         ]
       }
     ],
     pitfalls: [
       '使用算幾不等式時未檢查條件是否「全為正數」，以及等號成立條件能否發生。',
-      '循環小數化分數時公式背錯：純循環小數分母全為 9，混循環小數循環位補 9，不循環位補 0。'
+      '雙重根號化簡時根號前方係數必須調整為 2，減號時必須「大減小」，確保開方值恆為正。'
     ]
   },
 
-  '多項式函數 (餘式定理、綜合除法)': {
-    chapter: '多項式函數 (餘式定理、綜合除法)',
-    mathTrack: 'common',
-    scopeNotice: '【高一上第 1 冊 數A+B 共同核心】多項式除法原理、餘式定理 f(a)、因式定理與牛頓一次因式檢驗法。',
-    ahaInsight: '多項式 f(x) 除以 (x - a) 的餘式就是「令除式為零代入」的函數值 f(a)！求餘式不需要真正做長除法，代入 x = a 即可求出。',
+  '直線與圓': {
+    chapter: '直線與圓',
+    mathTrack: 'none',
+    scopeNotice: '【高一上第 1 冊 必修共同】直線斜率、點到直線距離公式、圓標準式與圓與直線的相交相切判別。',
+    ahaInsight: '求圓與直線的交點或關係，不要直接代入解聯立二次方程式！直接算「圓心到直線距離 d 與半徑 r 的大小關係」：d < r 相交兩點、d = r 相切、d > r 不相交！',
+    coreConcepts: [
+      {
+        title: '直線斜率與點到直線距離',
+        description: '過點 (x₀, y₀) 到直線 L: ax + by + c = 0 的垂直距離公式：',
+        formulas: [
+          '距離公式：d = |ax₀ + by₀ + c| / √(a² + b²)',
+          '兩平行線距離：d(L₁, L₂) = |c₁ - c₂| / √(a² + b²)'
+        ]
+      },
+      {
+        title: '圓的方程式與幾何判別',
+        description: '圓心 (h, k)，半徑 r 的標準式為 (x - h)² + (y - k)² = r²；圓與直線關係完全由圓心距離 d 與半徑 r 決定：',
+        formulas: [
+          'd < r：相交兩點（割線，弦長 = 2√(r² - d²)）',
+          'd = r：相切於一點（切線）',
+          'd > r：不相交（外離）'
+        ]
+      }
+    ],
+    pitfalls: [
+      '直線垂直於 x 軸時（x = k），斜率不存在，不可設為 y = mx + b。',
+      '過圓外一點作圓的切線必有兩條，若只算出一個斜率 m，另一條切線必為鉛直線 x = x₀。'
+    ]
+  },
+
+  '多項式': {
+    chapter: '多項式',
+    mathTrack: 'none',
+    scopeNotice: '【高一上第 1 冊 必修共同】多項式除法原理、餘式定理、因式定理、插值多項式與三次多項式函數對稱中心。',
+    ahaInsight: '多項式 f(x) 除以 (x - a) 的餘式就是「令除式為零代入」的函數值 f(a)！求餘式不需要真正做長除法，代入 x = a 即可求出！',
     coreConcepts: [
       {
         title: '除法原理與餘式定理',
-        description: '設 f(x) 除以一次式，餘式為常數，可直接以函數值計算：',
+        description: '除式為一次式時，餘式必為常數，直接代入求值：',
         formulas: [
-          '除法原理：f(x) = (x - c) · q(x) + f(c)',
+          '除法原理：f(x) = (x - c) · q(x) + r',
           '餘式定理：餘式 r = f(c)',
           '推廣公式：f(x) 除以 (ax - b) 之餘式為 f(b/a)'
         ]
@@ -773,60 +824,128 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       }
     ],
     pitfalls: [
-      '除式為 (ax - b) 時，餘式依然是 f(b/a)，但綜合除法求出的商式各項係數必須再除以 a。',
-      '高次不等式畫數線穿針引線法時，偶數次方根「切點不穿透」，奇數次方根「穿透交點」。'
+      '除式為 (ax - b) 時，餘式依然是 f(b/a)，但綜合除法算出的商式必須再除以 a。',
+      '高次不等式畫數線穿針引線法時，偶數次方根為切點不穿透，奇數次方根穿透交點。'
     ]
   },
 
-  '廣義角與三角比': {
-    chapter: '廣義角與三角比',
-    mathTrack: 'common',
-    scopeNotice: '【高一下第 2 冊 數A+B 共同核心】有向角、象限角、特殊角三角比、同界角與極坐標。',
-    ahaInsight: '廣義角三角函數不用死記「正負號口訣」！在單位圓上，任意角度 θ 的終邊與圓交點坐標就是 (cos θ, sin θ)。看交點在第幾象限，坐標的正負立即決定三角比的正負！',
+  '數列級數': {
+    chapter: '數列級數',
+    mathTrack: 'none',
+    scopeNotice: '【高一下第 2 冊 必修共同】等差數列、等比數列、Sigma (∑) 運算符號與常見求和公式、遞迴關係式。',
+    ahaInsight: '等比級數首要觀察公比 r！r ≠ 1 時 Sn = a₁(1 - r^n) / (1 - r)；∑ 的線性性質只對「加減與純量倍數」成立，∑(ak · bk) 絕對不能拆成 (∑ak) × (∑bk)！',
     coreConcepts: [
       {
-        title: '單位圓上的三角函數定義',
-        description: '以原點為圓心、半徑為 1 的單位圓上，有向角 θ 的終邊交點 P 坐標定義如下：',
+        title: '等比數列一般項與求和公式',
+        description: '首項為 a₁，公比為 r (r ≠ 1)：',
+        formulas: [
+          '一般項：an = a₁ · r^(n - 1)',
+          '求和公式：Sn = a₁(1 - r^n) / (1 - r) = a₁(r^n - 1) / (r - 1)'
+        ]
+      },
+      {
+        title: 'Sigma 運算核心公式',
+        description: '自然數列前 n 項次方和：',
+        formulas: [
+          '一次方和：∑k = n(n + 1) / 2',
+          '二次方和：∑k² = n(n + 1)(2n + 1) / 6',
+          '三次方和：∑k³ = [n(n + 1) / 2]²'
+        ]
+      }
+    ],
+    pitfalls: [
+      '等比數列求和時，若公比 r = 1，公式分母為零無意義，總和應為 n · a₁。',
+      'Sigma 下標若不是從 1 開始，公式不能直接代入，需平移或頭尾相減。'
+    ]
+  },
+
+  '數據分析': {
+    chapter: '數據分析',
+    mathTrack: 'none',
+    scopeNotice: '【高一下第 2 冊 必修共同】一維數據分析（平均數、標準差、標準化數據、線性變換）與二維數據分析（散布圖、相關係數、回歸直線）。',
+    ahaInsight: '相關係數 r 永遠在 -1 到 1 之間！r 只看線性關聯強度，平移或同乘正數不改變 r，同乘一正一負 r 變相反數！回歸直線必過「重心 (μx, μy)」，斜率 m = r · (σy / σx)！',
+    coreConcepts: [
+      {
+        title: '一維數據分析與標準差',
+        description: '衡量資料離散程度，資料線性轉換 y = ax + b 的性質：',
+        formulas: [
+          '標準差公式：σ = √[ (1/n) ∑(xi - μ)² ]',
+          '線性轉換平均值：μ_y = a · μ_x + b',
+          '線性轉換標準差：σ_y = |a| · σ_x'
+        ]
+      },
+      {
+        title: '二維數據相關係數與回歸直線',
+        description: '衡量兩變數線性關聯強度與最佳擬合直線：',
+        formulas: [
+          '相關係數：r = ∑(x* · y*) / n （-1 ≤ r ≤ 1）',
+          '回歸直線斜率：m = r · (σ_y / σ_x)',
+          '回歸直線方程式：y - μ_y = m(x - μ_x)'
+        ]
+      }
+    ],
+    pitfalls: [
+      '相關係數 r = 0 僅代表「無線性相關」，不代表「無關聯」（可能有二次或對稱非線性關係）。',
+      '線性變換時標準差需加上絕對值 |a|，標準差恆非負。'
+    ]
+  },
+
+  '排列組合與古典機率': {
+    chapter: '排列組合與古典機率',
+    mathTrack: 'none',
+    scopeNotice: '【高一下第 2 冊 必修共同】加法與乘法原理、直線排列、重複組合、二項式定理與古典機率。',
+    ahaInsight: '排列看順序，組合不看順序！相鄰問題用「綑綁法」，不相鄰問題用「插空法」，相同物分給相異人必用「重複組合 H(n, r) = C(n+r-1, r)」！',
+    coreConcepts: [
+      {
+        title: '排列、組合與重複組合',
+        description: '常見計數工具與重複組合公式：',
+        formulas: [
+          '相異物直線排列：P(n, r) = n! / (n - r)!',
+          '組合公式：C(n, r) = n! / [ r! (n - r)! ]',
+          '重複組合公式：H(n, r) = C(n + r - 1, r)'
+        ]
+      },
+      {
+        title: '二項式定理與排容原理',
+        description: '多項展開通式與機率計算：',
+        formulas: [
+          '二項式定理：(x + y)^n = ∑ C(n, k) · x^(n-k) · y^k',
+          '排容原理：P(A ∪ B) = P(A) + P(B) - P(A ∩ B)'
+        ]
+      }
+    ],
+    pitfalls: [
+      '古典機率計算時，樣本點必須保證「出現機會均等」，即使球外觀相同也要視為相異物編號。',
+      '重複組合 H(n, k) 中，n 是「能收東西的箱子/人種數」，k 是「被分配的物品個數」，常弄反。'
+    ]
+  },
+
+  '三角比的定義及其性質': {
+    chapter: '三角比的定義及其性質',
+    mathTrack: 'none',
+    scopeNotice: '【高一下第 2 冊 必修共同】銳角與廣義角三角比、同界角與極坐標、正弦定理、餘弦定理與三角測量應用。',
+    ahaInsight: '廣義角看單位圓坐標：x 是 cos，y 是 sin！何時用正弦？已知「對邊對角」或「外接圓直徑」用正弦定理；已知「兩邊夾一角」或「三邊求角」必用餘弦定理！',
+    coreConcepts: [
+      {
+        title: '廣義角三角比與單位圓',
+        description: '在單位圓上，有向角 θ 的終邊與圓交點坐標定義如下：',
         formulas: [
           '坐標定義：x = cos θ,  y = sin θ',
-          '斜率關係：tan θ = y / x = sin θ / cos θ  (cos θ ≠ 0)',
+          '商數關係：tan θ = sin θ / cos θ  (cos θ ≠ 0)',
           '平方關係：sin² θ + cos² θ = 1'
         ]
       },
       {
-        title: '化任意角為銳角法則',
-        description: 'sin(180° - θ) = sin θ；cos(180° - θ) = -cos θ；sin(90° - θ) = cos θ；cos(90° - θ) = sin θ。'
-      }
-    ],
-    pitfalls: [
-      '計算 tan 90° 與 tan 270° 時未注意無意義（分母 cos θ = 0）。',
-      '極坐標 [r, θ] 中，半徑 r 規定必須大於等於 0。'
-    ]
-  },
-
-  '正弦定理、餘弦定理與三角測量': {
-    chapter: '正弦定理、餘弦定理與三角測量',
-    mathTrack: 'common',
-    scopeNotice: '【高一下第 2 冊 數A+B 共同核心】斜三角形邊角關係、外接圓半徑 R、三角形面積公式與海龍公式。',
-    ahaInsight: '何時用正弦？何時用餘弦？「已知對邊對角」或「外接圓直徑」用正弦定理；「已知兩邊夾一角」或「三邊求角」必用餘弦定理！',
-    coreConcepts: [
-      {
-        title: '正弦定理 (外接圓直徑關係)',
-        description: '三角形各邊與其對角正弦值之比值相等，且等於外接圓直徑：',
+        title: '正弦定理與餘弦定理',
+        description: '斜三角形的核心幾何邊角定律：',
         formulas: [
-          'a / sin A = b / sin B = c / sin C = 2R'
+          '正弦定理：a / sin A = b / sin B = c / sin C = 2R',
+          '餘弦定理：c² = a² + b² - 2ab · cos C',
+          '求角公式：cos C = (a² + b² - c²) / (2ab)'
         ]
       },
       {
-        title: '餘弦定理 (三邊求一角 / 兩邊夾一角求對邊)',
-        description: '任意三角形邊角關係的推廣畢氏定理：',
-        formulas: [
-          '邊長公式：a² = b² + c² - 2bc · cos A',
-          '求角公式：cos A = (b² + c² - a²) / (2bc)'
-        ]
-      },
-      {
-        title: '三角形面積公式',
+        title: '三角形面積公式彙整',
         description: '依據給定條件靈活選擇合適的求法：',
         formulas: [
           '兩邊一夾角：Area = (1/2)ab · sin C',
@@ -837,42 +956,495 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       }
     ],
     pitfalls: [
-      '正弦定理利用兩邊與其中一邊對角 (SSA) 求另一個角時，可能出現「一解或兩解（鈍角銳角皆可能）」的情況，需檢驗三角形內角和大於 180° 的限制。'
+      '正弦定理利用兩邊與其中一邊對角 (SSA) 求另一個角時，可能存在「一解或兩解（鈍角銳角皆可能）」的情況，需檢驗三角形內角和不大於 180°。',
+      '鈍角的餘弦值 cosθ 必為負數，計算餘弦定理時負號需小心分配。'
     ]
   },
 
-  '差角公式與倍半角公式': {
-    chapter: '差角公式與倍半角公式',
-    mathTrack: 'mathA',
-    scopeNotice: '【高二上第 3A 冊 數A專屬】差角、和角、二倍角、半角公式僅於數A評量；數B不考此單元。',
-    ahaInsight: '所有差角和角公式皆可由「單位圓上兩向量內積」推得：向量 u=(cosα, sinα) 與 v=(cosβ, sinβ) 的內積即為 cos(α-β) = cosα cosβ + sinα sinβ。',
+  // =========================================================================
+  // 【高中數學 - 高二 "數A" & "數B" 分流重點】
+  // =========================================================================
+  '三角函數': {
+    chapter: '三角函數',
+    mathTrack: 'common',
+    scopeNotice: '【高二上第 3 冊 數A/數B分流重點】數A與數B皆涵蓋三角函數圖形與生活週期模型；數A額外深化和差角、倍半角公式與正餘弦疊合求極值。',
+    ahaInsight: '正弦 y = sin x 週期是 2π，振幅為 1；正餘弦疊合 a sin x + b cos x = √(a²+b²) sin(x + φ) 是求極值的終極大招，振幅直接化為 √(a²+b²)！',
     coreConcepts: [
       {
-        title: '正餘弦和差角公式',
-        description: '由單位圓向量內積推導之基本和差角恆等式：',
+        title: '三角函數圖形與週期振幅',
+        description: '正弦、餘弦與正切函數圖形特徵，y = A sin(Bx + C) + D 的幾何變換：',
         formulas: [
-          'cos(α - β) = cos α · cos β + sin α · sin β',
-          'cos(α + β) = cos α · cos β - sin α · sin β',
-          'sin(α + β) = sin α · cos β + cos α · sin β',
-          'sin(α - β) = sin α · cos β - cos α · sin β'
-        ]
+          '振幅：Amplitude = |A|',
+          '週期：Period T = 2π / |B|  (正弦/餘弦)；T = π / |B|  (正切)',
+          '水平平移：向左或向右平移 |C/B| 單位'
+        ],
+        track: 'common'
       },
       {
-        title: '二倍角公式與降次',
-        description: '常用於角度化簡、疊合與平方項降次：',
+        title: '和角與差角公式',
+        description: '由單位圓向量內積推導之基本和差角恆等式（數A專屬）：',
+        formulas: [
+          'cos(α ∓ β) = cos α · cos β ± sin α · sin β',
+          'sin(α ± β) = sin α · cos β ± cos α · sin β',
+          'tan(α ± β) = (tan α ± tan β) / (1 ∓ tan α · tan β)'
+        ],
+        track: 'mathA'
+      },
+      {
+        title: '二倍角公式與正餘弦疊合',
+        description: '求解三角多項式極值之必考技巧（數A專屬）：',
         formulas: [
           '正弦二倍角：sin 2θ = 2 sin θ · cos θ',
-          '餘弦二倍角：cos 2θ = cos² θ - sin² θ = 2 cos² θ - 1 = 1 - 2 sin² θ',
-          '降次公式：cos² θ = (1 + cos 2θ) / 2,  sin² θ = (1 - cos 2θ) / 2'
-        ]
+          '餘弦二倍角：cos 2θ = 2 cos² θ - 1 = 1 - 2 sin² θ',
+          '正餘弦疊合：a sin x + b cos x = √(a² + b²) · sin(x + φ)'
+        ],
+        track: 'mathA'
+      },
+      {
+        title: '週期現象生活模型擬合',
+        description: '利用三角函數模擬潮汐升降、摩天輪旋轉車廂高度、氣溫年度規律（數B專屬重點）：',
+        formulas: [
+          '基準高度中線：D = (最高值 + 最低值) / 2',
+          '上下波動振幅：A = (最高值 - 最低值) / 2'
+        ],
+        track: 'mathB'
       }
     ],
     pitfalls: [
-      '正切和角公式分母為減號：tan(α+β) = (tanα + tanβ) / (1 - tanα tanβ)。',
-      '半角公式開根號正負號由半角所在的象限決定，而非原角度。'
+      '正餘弦疊合時若角度 x 有給定區間範圍（非全實數），最大最小值不一定落在波峰波谷，需檢驗端點值。',
+      '數B不考和角公式與正餘弦疊合運算，著重於週期現象情境解讀與圖形判讀。'
+    ],
+    trackVariants: {
+      common: {
+        scopeNotice: '【數A+B 共同核心】三角函數圖形（正弦、餘弦、正切）、週期性、振幅與生活週期現象模型。',
+        ahaInsight: '觀察函數 y = A sin(Bx) + D：|A| 是振幅，2π/|B| 是週期，D 是垂直中線！',
+        coreConcepts: [
+          {
+            title: '正餘弦函數圖形與性質',
+            description: '正弦 y = sin x 恆過原點，餘弦 y = cos x 恆過 (0, 1)，週期為 2π，值域為 [-1, 1]。'
+          },
+          {
+            title: '週期性生活現象模型',
+            description: '用正餘弦函數模擬摩天輪離地高度、潮汐水位漲落與聲波振幅。'
+          }
+        ],
+        pitfalls: [
+          'x 的係數 B 會縮放週期（週期為 2π/|B|），常誤以為乘上 B 週期會變長。'
+        ]
+      },
+      mathA: {
+        scopeNotice: '【數A 專屬深化】和角公式、差角公式、倍角公式、半角公式與正餘弦疊合求極值。',
+        ahaInsight: '疊合必記口訣：提出 √(a²+b²)，前面除以斜邊成 cosφ，後面除以斜邊成 sinφ！最大值恆為 √(a²+b²)，最小值恆為 -√(a²+b²)！',
+        coreConcepts: [
+          {
+            title: '和差角公式與二倍角',
+            description: '常用於角度化簡與求值：',
+            formulas: [
+              'sin(α ± β) = sin α · cos β ± cos α · sin β',
+              'cos(α ± β) = cos α · cos β ∓ sin α · sin β',
+              'sin 2θ = 2 sin θ · cos θ,  cos 2θ = 2 cos² θ - 1'
+            ],
+            track: 'mathA'
+          },
+          {
+            title: '正餘弦疊合',
+            description: '化不同相角的正弦與餘弦為單一正弦函數：',
+            formulas: [
+              'a sin x + b cos x = √(a² + b²) · sin(x + φ)'
+            ],
+            track: 'mathA'
+          }
+        ],
+        pitfalls: [
+          '正切和角公式分母為減號：tan(α+β) = (tanα + tanβ) / (1 - tanα tanβ)。',
+          '區間限制下疊合需畫單位圓檢查 (x + φ) 是否能取到波峰 90° 或波谷 270°。'
+        ]
+      },
+      mathB: {
+        scopeNotice: '【數B 專屬特色】著重生活週期現象（聲音振幅、日照長度、摩天輪運動）模型化，不考複雜和差角運算。',
+        ahaInsight: '數B重視圖形直觀：觀察圖形的波峰與波谷，波峰減波谷的一半就是振幅，兩相鄰波峰間距就是週期！',
+        coreConcepts: [
+          {
+            title: '生活週期現象模型解讀',
+            description: '依據給定的最高點、最低點與週期快速反推三角函數式 y = A sin(Bx) + D。',
+            track: 'mathB'
+          }
+        ],
+        pitfalls: [
+          '數B不考和角公式與繁複的代數疊合計算，切忌盲目套用數A公式。'
+        ]
+      }
+    }
+  },
+
+  '指數函數與對數函數': {
+    chapter: '指數函數與對數函數',
+    mathTrack: 'common',
+    scopeNotice: '【高二上第 3 冊 數A+B 共同核心】指數與對數函數圖形與運算、常用對數、首數與尾數、科學記號與生活複利/地震規模模型。',
+    ahaInsight: '指數是連乘的累計，對數是尋找次方次數的鏡子！log(A·B) = log A + log B（相乘變相加，化繁為簡）。首數決定「位數或小數非零位置」，尾數決定「數字排列最高位」！',
+    coreConcepts: [
+      {
+        title: '指數函數與對數函數圖形',
+        description: '底數 a > 1 遞增，0 < a < 1 遞減；兩函數關於 y = x 對稱（互為反函數）：',
+        formulas: [
+          '指數圖形：y = a^x 恆過 (0, 1)，以 x 軸為漸近線',
+          '對數圖形：y = log_a x 恆過 (1, 0)，以 y 軸為漸近線（定義域 x > 0）'
+        ],
+        track: 'common'
+      },
+      {
+        title: '四大對數律與換底公式',
+        description: '對數簡化指數次方運算之核心法則：',
+        formulas: [
+          '積化和：log_a (xy) = log_a x + log_a y',
+          '商化差：log_a (x / y) = log_a x - log_a y',
+          '次方提出：log_a (x^k) = k · log_a x',
+          '換底公式：log_a b = (log_c b) / (log_c a)'
+        ],
+        track: 'common'
+      },
+      {
+        title: '常用對數首數與尾數',
+        description: '將正數以科學記號表示 N = a × 10^n 轉換為對數形式 log N = n + log a：',
+        formulas: [
+          '首數 n：若 n ≥ 0，N 的整數位數為 n + 1 位；若 n < 0，N 在小數點後第 |n| 位開始出現非零數字',
+          '尾數 log a (0 ≤ log a < 1)：決定 N 的最高位有效數字'
+        ],
+        track: 'common'
+      }
+    ],
+    pitfalls: [
+      '對數的真數必須嚴格大於 0（x > 0），底數必須大於 0 且不等於 1。',
+      '負數對數首數與尾數需注意尾數恆非負：例如 log x = -3.4 = -4 + 0.6，首數是 -4 而非 -3。'
     ]
   },
 
+  '平面向量': {
+    chapter: '平面向量',
+    mathTrack: 'common',
+    scopeNotice: '【高二上第 3 冊 數A/數B分流重點】向量加減純量乘法、內積幾何意義與二階行列式；數A深化柯西不等式與正射影，數B著重幾何圖形設計與向量美學應用。',
+    ahaInsight: '向量內積等於零代表「互相垂直」！二階行列式絕對值代表「平行四邊形面積」！數A正射影是把影子投在目標線上，數B用向量線性組合拼貼出無限幾何圖案！',
+    coreConcepts: [
+      {
+        title: '平面向量線性組合與內積',
+        description: '向量表示法與內積的核心定義（數A+B共同）：',
+        formulas: [
+          '分點公式：P = (n / (m+n)) A + (m / (m+n)) B',
+          '內積幾何定義：u · v = |u| · |v| · cos θ',
+          '內積坐標計算：(x₁, y₁) · (x₂, y₂) = x₁x₂ + y₁y₂'
+        ],
+        track: 'common'
+      },
+      {
+        title: '二階行列式與面積',
+        description: '兩平面向量所張成之平行四邊形面積：',
+        formulas: [
+          '面積公式：Area = | det(u, v) | = | x₁y₂ - x₂y₁ |'
+        ],
+        track: 'common'
+      },
+      {
+        title: '柯西不等式與正射影',
+        description: '向量極值求解與投影向量（數A專屬）：',
+        formulas: [
+          '柯西不等式：(a₁² + a₂²)(b₁² + b₂²) ≥ (a₁b₁ + a₂b₂)² （等號成立於 a₁/b₁ = a₂/b₂）',
+          '正射影向量：proj_v u = [ (u · v) / |v|² ] · v',
+          '正射影長度：|proj_v u| = |u · v| / |v|'
+        ],
+        track: 'mathA'
+      },
+      {
+        title: '平面向量圖形設計與視覺藝術',
+        description: '利用向量平移與基底網格線性組合，拼貼出對稱規律圖形（數B專屬）：',
+        formulas: [
+          '幾何圖案位置向量：P = x · e₁ + y · e₂'
+        ],
+        track: 'mathB'
+      }
+    ],
+    pitfalls: [
+      '正射影公式分母是 |v|² 不是 |v|；正射影「長度」才是純量，正射影「向量」包含方向。',
+      '柯西不等式等號成立條件在兩向量平行時，切記檢查各組係數比例是否相等。'
+    ],
+    trackVariants: {
+      common: {
+        scopeNotice: '【數A+B 共同核心】向量加減、純量乘法、分點公式、內積運算與二階行列式面積。',
+        ahaInsight: '向量內積等於零代表「兩向量垂直」！二階行列式的絕對值代表兩向量張開的「平行四邊形面積」。',
+        coreConcepts: [
+          {
+            title: '向量運算與內積',
+            description: 'u · v = |u||v|cosθ = x₁x₂ + y₁y₂。兩向量夾角 cosθ = (u · v) / (|u||v|)。'
+          },
+          {
+            title: '二階行列式與面積',
+            description: '由兩向量 (x₁, y₁) 與 (x₂, y₁) 張成的三角形面積為 (1/2)|x₁y₂ - x₂y₁|。'
+          }
+        ]
+      },
+      mathA: {
+        scopeNotice: '【數A 專屬深化】向量柯西不等式與正射影向量、正射影長公式推導與實戰。',
+        ahaInsight: '柯西不等式本質就是向量內積不等式：|u · v| ≤ |u| · |v|！正射影是把向量投影在基準線上形成的影子向量。',
+        coreConcepts: [
+          {
+            title: '向量柯西不等式',
+            description: '(a₁² + a₂²)(b₁² + b₂²) ≥ (a₁b₁ + a₂b₂)²，當兩向量平行 (a₁/b₁ = a₂/b₂) 時取等號。',
+            track: 'mathA'
+          },
+          {
+            title: '向量正射影與正射影長',
+            description: '正射影向量 = [ (u · v) / |v|² ] · v；正射影長 = |u · v| / |v|。',
+            track: 'mathA'
+          }
+        ]
+      },
+      mathB: {
+        scopeNotice: '【數B 專屬特色】平面向量圖形設計、視覺藝術幾何拼貼與力學平衡直觀。',
+        ahaInsight: '向量是圖形變換的指針！透過基底向量的伸縮平移線性組合，可在平面上生成各種規則幾何網格與藝術瓷磚鑲嵌！',
+        coreConcepts: [
+          {
+            title: '平面圖形設計與網格鑲嵌',
+            description: '利用向量平移與基底向量在平面上生成週期性格狀圖樣與空間立體感設計。',
+            track: 'mathB'
+          }
+        ]
+      }
+    }
+  },
+
+  '空間概念與空間坐標': {
+    chapter: '空間概念與空間坐標',
+    mathTrack: 'common',
+    scopeNotice: '【高二下第 4 冊 數A/數B分流重點】空間位置關係、三垂線定理與空間坐標；數A深化三維平面與向量外積體積，數B專屬透視圖、球面經緯度大圓航線與圓錐截面。',
+    ahaInsight: '空間是平面的昇華！數A用法向量一刀切出三維平面，外積一秒算出體積；數B用透視圖看穿空間遠近，在地球大圓上規劃最短航線，用雙圓錐截痕解構光影！',
+    coreConcepts: [
+      {
+        title: '空間幾何概念與三垂線定理',
+        description: '平面的決定條件、歪斜線性質與三垂線定理（數A+B共同）：',
+        formulas: [
+          '三垂線定理：若 AB ⊥ E 於 B，L 在 E 上且 BC ⊥ L 於 C，則 AC ⊥ L 於 C'
+        ],
+        track: 'common'
+      },
+      {
+        title: '空間坐標系與距離',
+        description: '三維坐標點 P(x, y, z) 的空間距離與投影特徵：',
+        formulas: [
+          '空間兩點距離：d(A, B) = √[ (x₁-x₂)² + (y₁-y₂)² + (z₁-z₂)² ]',
+          '在 xy 平面的投影點為 (x, y, 0)，對稱點為 (x, y, -z)'
+        ],
+        track: 'common'
+      },
+      {
+        title: '空間向量外積與三階行列式',
+        description: '外積向量垂直於兩向量，三階行列式為平行六面體體積（數A專屬）：',
+        formulas: [
+          '外積公式：u × v = (y₁z₂ - z₁y₂,  z₁x₂ - x₁z₂,  x₁y₂ - y₁x₂)',
+          '六面體體積：Volume = | det(u, v, w) |'
+        ],
+        track: 'mathA'
+      },
+      {
+        title: '空間平面方程式',
+        description: '通過點 (x₀, y₀, z₀) 且法向量為 n=(a, b, c) 的平面方程式（數A專屬）：',
+        formulas: [
+          '點法式：a(x - x₀) + b(y - y₀) + c(z - z₀) = 0',
+          '點到平面距離：d = |ax₀ + by₀ + cz₀ - d| / √(a² + b² + c²)'
+        ],
+        track: 'mathA'
+      },
+      {
+        title: '單點透視圖與立體視圖繪製',
+        description: '消失點原理、地平線、透視縮放（數B專屬特色）：',
+        track: 'mathB'
+      },
+      {
+        title: '球面經緯度坐標與大圓航線',
+        description: '地球經緯度、經度時差與大圓最短航線球面幾何（數B專屬特色）：',
+        formulas: [
+          '緯度 φ 處的小圓半徑：r = R · cos φ',
+          '大圓球面最短航程：Arc = R · θ （θ 為球心角弧度）'
+        ],
+        track: 'mathB'
+      },
+      {
+        title: '圓錐截面幾何特性與日晷模型',
+        description: '平面截雙圓錐產生的正圓、橢圓、拋物線與雙曲線幾何直觀及日晷光影應用（數B專屬特色）：',
+        formulas: [
+          'θ = 90°：正圓；θ > 45°：橢圓；θ = 45°：拋物線；θ < 45°：雙曲線'
+        ],
+        track: 'mathB'
+      }
+    ],
+    pitfalls: [
+      '外積不滿足交換律：u × v = -(v × u)，方向由右手定則決定。',
+      '地球大圓航線球面最短距離必須走「過球心的大圓」，不是沿著同一條緯線小圓飛行。',
+      '數B不考平面方程式代數運算，著重於透視圖、經緯度航線與圓錐截痕之空間模型直觀。'
+    ],
+    trackVariants: {
+      common: {
+        scopeNotice: '【數A+B 共同核心】空間兩線位置關係（相交、平行、歪斜）、三垂線定理與空間坐標系距離。',
+        ahaInsight: '空間中既不平行也不相交的兩條直線稱為「歪斜線」；三垂線定理是解決立體線面垂直的最重要樞紐！',
+        coreConcepts: [
+          {
+            title: '空間幾何與三垂線定理',
+            description: '若 AB ⊥ 平面 E，BC ⊥ 直線 L，則斜線 AC 必垂直於直線 L。'
+          },
+          {
+            title: '空間直角坐標系',
+            description: '三維點 P(x, y, z) 到三軸、三坐標平面的投影與距離公式。'
+          }
+        ]
+      },
+      mathA: {
+        scopeNotice: '【數A 專屬深化】空間向量外積 (u × v)、三階行列式體積、空間平面方程式與點到平面距離。',
+        ahaInsight: '外積向量同時垂直於兩原向量，長度即為平行四邊形面積！平面的法向量係數就是方程式 ax + by + cz = d 的 (a, b, c)！',
+        coreConcepts: [
+          {
+            title: '空間外積與平行六面體體積',
+            description: '外積 u × v 垂直於 u 與 v；三向量張成的平行六面體體積為三階行列式之絕對值。',
+            track: 'mathA'
+          },
+          {
+            title: '空間中的平面方程式',
+            description: '平面方程式 ax + by + cz = d，法向量為 (a, b, c)；點到平面距離公式。',
+            track: 'mathA'
+          }
+        ]
+      },
+      mathB: {
+        scopeNotice: '【數B 專屬特色】單點透視圖與立體視圖繪製、球面經緯度大圓航線最短距離、圓錐截面幾何特性與日晷模型。',
+        ahaInsight: '透視圖所有深度平行線匯聚於消失點；飛越大洋的大圓航線走的是過球心大圓劣弧；平面截雙圓錐形成日晷竿影軌跡！',
+        coreConcepts: [
+          {
+            title: '單點透視圖與立體視圖',
+            description: '利用地平線與消失點原理將三維立體景觀在二維畫布上精準呈現縮放深淺感。',
+            track: 'mathB'
+          },
+          {
+            title: '球面經緯度與大圓航線',
+            description: '經度差換算時差 (15° = 1 小時)；球面最短距離必為通過球心的大圓劣弧長。',
+            track: 'mathB'
+          },
+          {
+            title: '圓錐截面與光影模型',
+            description: '平面與沙漏雙圓錐在不同傾角下形成的四種截痕，對應探照燈光影與日晷竿影軌跡。',
+            track: 'mathB'
+          }
+        ]
+      }
+    }
+  },
+
+  '條件機率': {
+    chapter: '條件機率',
+    mathTrack: 'common',
+    scopeNotice: '【高二下第 4 冊 數A+B 共同核心】條件機率、乘法規則、獨立事件判定、全機率定理與貝氏定理生活決策。',
+    ahaInsight: '條件機率就是「縮減樣本空間」！在已知 B 發生的條件下，世界只剩下 B，A 發生機率就是 P(A ∩ B) / P(B)。貝氏定理是逆向推論的科學：從結果反推源頭的機率！',
+    coreConcepts: [
+      {
+        title: '條件機率與獨立事件',
+        description: '在已知事件 B 發生下，事件 A 發生的機率：',
+        formulas: [
+          '條件機率定義：P(A | B) = P(A ∩ B) / P(B)',
+          '乘法規則：P(A ∩ B) = P(B) · P(A | B)',
+          '獨立事件充要條件：P(A ∩ B) = P(A) · P(B)  ⟺  P(A | B) = P(A)'
+        ],
+        track: 'common'
+      },
+      {
+        title: '全機率公式與貝氏定理',
+        description: '由結果推知是由某一特定原因所產生的事後機率：',
+        formulas: [
+          '全機率定理：P(A) = P(B₁)P(A|B₁) + P(B₂)P(A|B₂) + ...',
+          '貝氏定理：P(B₁ | A) = [ P(B₁) · P(A | B₁) ] / P(A)'
+        ],
+        track: 'common'
+      }
+    ],
+    pitfalls: [
+      '獨立與互斥截然不同：若 A, B 為互斥事件（P(A ∩ B) = 0），且兩者機率皆非零，則 A 與 B 絕不可能獨立（反而強烈相依）。',
+      '醫療檢驗判讀時，需注意偽陽性機率高是因為「母體患病率本身極低」導致的貝氏分母效應。'
+    ]
+  },
+
+  '矩陣運算及其應用': {
+    chapter: '矩陣運算及其應用',
+    mathTrack: 'common',
+    scopeNotice: '【高二下第 4 冊 數A/數B分流重點】矩陣四則運算、二階轉移矩陣與馬可夫鏈穩定狀態；數A深化二階線性變換（旋轉、鏡射、推移、伸縮）與反方陣。',
+    ahaInsight: '轉移矩陣每行總和必為 1，長期轉移乘到無窮次方會達到不動點穩定狀態 (AP = P)！數A線性變換把幾何圖形當作點向量，左乘一個矩陣就能完成旋轉、鏡射或拉伸！',
+    coreConcepts: [
+      {
+        title: '矩陣四則運算規則',
+        description: '矩陣乘法條件與基本性質（數A+B共同）：',
+        formulas: [
+          '相乘條件：A (m×n) 與 B (n×p) 相乘得 C (m×p) （前矩陣行數 = 後矩陣列數）',
+          '非交換性：一般情形下 A · B ≠ B · A'
+        ],
+        track: 'common'
+      },
+      {
+        title: '二階轉移矩陣與穩定狀態',
+        description: '馬可夫鏈狀態轉移機率矩陣特徵與長期極限（數A+B共同）：',
+        formulas: [
+          '轉移矩陣特徵：所有元素 a_ij ≥ 0，且每行（直行）元素總和恆為 1',
+          '穩定狀態向量：P 滿足 A · P = P （且 P 的元素和為 1）'
+        ],
+        track: 'common'
+      },
+      {
+        title: '平面線性變換二階方陣',
+        description: '二階方陣對平面坐標點的幾何變換（數A專屬）：',
+        formulas: [
+          '旋轉矩陣 R(θ)：[ cos θ, -sin θ ; sin θ, cos θ ] （逆時針旋轉 θ 角）',
+          '鏡射矩陣：關於直線 y = (tan θ)x 鏡射',
+          '二階反方陣：A⁻¹ = (1 / det A) [ d, -b ; -c, a ]  (det A = ad - bc ≠ 0)',
+          '面積放大率：變換後面積 = | det A | × 原面積'
+        ],
+        track: 'mathA'
+      }
+    ],
+    pitfalls: [
+      '矩陣乘法不滿足交換律 (AB ≠ BA)，且 AB = 0 不能推得 A = 0 或 B = 0（存在零因子）。',
+      '轉移矩陣必須檢查「每一行（直列）」和為 1，常有學生誤寫成每列和為 1。',
+      '數B不考平面線性變換二階方陣與反方陣，著重於轉移矩陣日常生活應用。'
+    ],
+    trackVariants: {
+      common: {
+        scopeNotice: '【數A+B 共同核心】矩陣加減、純量乘法、矩陣乘法運算規則、二階轉移矩陣與馬可夫鏈穩定狀態。',
+        ahaInsight: '矩陣乘法只有在前矩陣的行數等於後矩陣的列數時才能進行；轉移矩陣長期轉移會達到穩定狀態向量 AP = P！',
+        coreConcepts: [
+          {
+            title: '矩陣加減與乘法運算',
+            description: '矩陣乘法不滿足交換律；滿足結合律 A(BC) = (AB)C 與分配律。'
+          },
+          {
+            title: '二階轉移矩陣與長期穩定狀態',
+            description: '行和為 1 的隨機矩陣，求解長期轉移比例 AP = P。'
+          }
+        ]
+      },
+      mathA: {
+        scopeNotice: '【數A 專屬深化】二階方陣平面線性變換（旋轉、鏡射、推移、伸縮）、二階反方陣與面積放大率。',
+        ahaInsight: '二階方陣就是平面幾何的變換器！旋轉矩陣讓平面繞原點旋轉，行列式絕對值 |det A| 就是圖形面積的放大倍率！',
+        coreConcepts: [
+          {
+            title: '特殊幾何變換方陣',
+            description: '旋轉矩陣 [cosθ -sinθ; sinθ cosθ]、鏡射矩陣、推移矩陣 [1 k; 0 1] 與伸縮矩陣 [h 0; 0 k]。',
+            track: 'mathA'
+          },
+          {
+            title: '反方陣與面積變換率',
+            description: 'det A ≠ 0 時存在唯一反方陣 A⁻¹；幾何變換後圖形面積 = |det A| × 原圖形面積。',
+            track: 'mathA'
+          }
+        ]
+      }
+    }
+  },
+
+  // =========================================================================
+  // 【高中數學 - 高三選修數學甲】
+  // =========================================================================
   '二次曲線 (拋物線、橢圓、雙曲線)': {
     chapter: '二次曲線 (拋物線、橢圓、雙曲線)',
     mathTrack: 'mathA',
@@ -885,7 +1457,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         formulas: [
           '左右開口型：(y - k)² = 4c(x - h)',
           '上下開口型：(x - h)² = 4c(y - k)'
-        ]
+        ],
+        track: 'mathA'
       },
       {
         title: '橢圓標準式 (PF₁ + PF₂ = 2a > 2c)',
@@ -894,7 +1467,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
           '水平長軸型：(x - h)² / a² + (y - k)² / b² = 1  (a > b > 0)',
           '鉛直長軸型：(x - h)² / b² + (y - k)² / a² = 1  (a > b > 0)',
           '基本關係式：a² = b² + c² （a 最大）'
-        ]
+        ],
+        track: 'mathA'
       },
       {
         title: '雙曲線標準式 (|PF₁ - PF₂| = 2a < 2c)',
@@ -904,39 +1478,13 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
           '上下貫軸型：(y - k)² / a² - (x - h)² / b² = 1',
           '基本關係式：c² = a² + b² （c 最大）',
           '漸近線方程式：(x - h)² / a² - (y - k)² / b² = 0'
-        ]
+        ],
+        track: 'mathA'
       }
     ],
     pitfalls: [
       '混淆橢圓 (a 最大，a² = b² + c²) 與雙曲線 (c 最大，c² = a² + b²) 的參數關係。',
       '雙曲線漸近線斜率為 ±b/a（左右型）或 ±a/b（上下型），需依貫軸方向判別。'
-    ]
-  },
-
-  '圓錐截面': {
-    chapter: '圓錐截面',
-    mathTrack: 'mathB',
-    scopeNotice: '【高二下第 4B 冊 數B專屬】108課綱數B核心特色單元！著重視覺化立體幾何模型，探討平面與雙圓錐面的交截曲線（正圓、橢圓、拋物線、雙曲線）與日晷光影生活情境。不涉及複雜代數方程式計算。',
-    ahaInsight: '當平面傾角 θ = 半頂角 α (45°) 時，截面平行母線形成「拋物線」臨界；θ < α 同時割雙錐兩葉成「雙曲線」；θ > α 則截斷單葉封閉成「橢圓」；θ = 90° (水平) 則為「正圓」。',
-    coreConcepts: [
-      {
-        title: '截面傾角 θ 與母線半頂角 α (45°) 的四種截痕',
-        description: '觀察空間平面切過雙葉圓錐時的截痕曲線分類：',
-        formulas: [
-          'θ = 90° (水平)：截斷單葉成「正圓」',
-          'θ > 45° (傾斜但不平行母線)：截斷單葉封閉成「橢圓」',
-          'θ = 45° (平行母線)：單葉開口臨界邊界成「拋物線」',
-          'θ < 45° (更陡峭)：同時切過上下兩葉成「雙曲線」'
-        ]
-      },
-      {
-        title: '日晷竿影與生活光影應用',
-        description: '太陽光線照射晷針形成的竿影軌跡，實質即為地平面截取光錐所形成的雙曲線或拋物線路徑。'
-      }
-    ],
-    pitfalls: [
-      '數B不考拋物線、橢圓、雙曲線的代數標準方程式（焦點、準線代數計算為高三數甲內容），數B評量核心為幾何直觀與截面模型判別。',
-      '注意雙圓錐頂點若在截面上：傾角大於母線時退化為「單點」；等於母線時退化為「一條直線」；小於母線時退化為「兩條相交直線」。'
     ]
   },
 
