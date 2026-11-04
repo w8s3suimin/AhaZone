@@ -284,14 +284,19 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
         gradeName: '高中一年級 (高一必修物理)',
         semesters: [
           {
-            name: '高一全學年進度',
+            name: '高一上學期',
             chapters: [
-              { name: '科學態度與物理量單位', semester: '10全', mathTrack: 'none' },
-              { name: '物質的組成與原子結構', semester: '10全', mathTrack: 'none' },
-              { name: '物體的運動與牛頓力學', semester: '10全', mathTrack: 'none' },
-              { name: '自然界的四大基本交互作用力', semester: '10全', mathTrack: 'none' },
-              { name: '電與磁的統一與光電效應導論', semester: '10全', mathTrack: 'none' },
-              { name: '能量的形式與守恆定律', semester: '10全', mathTrack: 'none' }
+              { name: '科學態度與物理量單位', semester: '10上', mathTrack: 'none' },
+              { name: '物質的組成與交互作用', semester: '10上', mathTrack: 'none' },
+              { name: '物體的運動', semester: '10上', mathTrack: 'none' }
+            ]
+          },
+          {
+            name: '高一下學期',
+            chapters: [
+              { name: '電與磁的統一', semester: '10下', mathTrack: 'none' },
+              { name: '能量', semester: '10下', mathTrack: 'none' },
+              { name: '量子現象', semester: '10下', mathTrack: 'none' }
             ]
           }
         ]
@@ -301,20 +306,22 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
         gradeName: '高中二年級 (高二選修物理 I & II)',
         semesters: [
           {
-            name: '高二上學期 (選修物理 I 力學進階)',
+            name: '高二上學期 (選修物理 I 力學)',
             chapters: [
-              { name: '直線運動 (v-t 圖、等加速度公式解析)', semester: '11上', mathTrack: 'none' },
-              { name: '平面運動 (向量分解、水平拋體、斜向拋體)', semester: '11上', mathTrack: 'none' },
-              { name: '牛頓運動定律與力學平衡', semester: '11上', mathTrack: 'none' }
+              { name: '測量與不確定度', semester: '11上', mathTrack: 'none' },
+              { name: '直線運動', semester: '11上', mathTrack: 'none' },
+              { name: '平面運動', semester: '11上', mathTrack: 'none' },
+              { name: '牛頓運動定律', semester: '11上', mathTrack: 'none', tagLabel: '[含圓周、SHM]' },
+              { name: '萬有引力定律', semester: '11上', mathTrack: 'none' }
             ]
           },
           {
-            name: '高二下學期 (選修物理 II 運動與能量)',
+            name: '高二下學期 (選修物理 II 力學與熱學)',
             chapters: [
-              { name: '等速率圓周運動與向心加速度', semester: '11下', mathTrack: 'none' },
-              { name: '萬有引力定律與人造衛星軌道', semester: '11下', mathTrack: 'none' },
               { name: '動量守恆與碰撞 (彈性/非彈性碰撞)', semester: '11下', mathTrack: 'none' },
-              { name: '功與位能、力學能守恆', semester: '11下', mathTrack: 'none' }
+              { name: '力矩與角動量守恆', semester: '11下', mathTrack: 'none' },
+              { name: '功與能量', semester: '11下', mathTrack: 'none' },
+              { name: '熱學', semester: '11下', mathTrack: 'none' }
             ]
           }
         ]
@@ -324,22 +331,23 @@ export const CURRICULUM_DATA: SubjectCurriculum[] = [
         gradeName: '高中三年級 (高三選修物理 III ~ V)',
         semesters: [
           {
-            name: '高三上學期 (波動、熱學與電磁學)',
+            name: '高三上學期 (選修物理 III 波動)',
             chapters: [
-              { name: '簡諧運動 (SHM) 與彈簧單擺', semester: '12上', mathTrack: 'none' },
-              { name: '力矩與角動量守恆', semester: '12上', mathTrack: 'none' },
-              { name: '波動現象與聲波駐波、都卜勒效應', semester: '12上', mathTrack: 'none' },
+              { name: '波動', semester: '12上', mathTrack: 'none' },
+              { name: '聲波', semester: '12上', mathTrack: 'none' },
               { name: '幾何光學 (折射定律、薄透鏡成像)', semester: '12上', mathTrack: 'none' },
-              { name: '靜電學與電位差、高斯定律', semester: '12上', mathTrack: 'none' }
+              { name: '光的干涉與繞射', semester: '12上', mathTrack: 'none' }
             ]
           },
           {
-            name: '高三下學期 (電磁學與近代物理)',
+            name: '高三下學期 (選修物理 IV~V 電磁學與近代物理)',
             chapters: [
-              { name: '電路學、克希荷夫定律與RC電路', semester: '12下', mathTrack: 'none' },
-              { name: '磁場與安培力、載流導線受力', semester: '12下', mathTrack: 'none' },
-              { name: '法拉第電磁感應與冷次定律', semester: '12下', mathTrack: 'none' },
-              { name: '近代物理 (波粒二象性、氫原子模型)', semester: '12下', mathTrack: 'none' }
+              { name: '靜電學', semester: '12下', mathTrack: 'none', tagLabel: '[電位差、高斯定律]' },
+              { name: '電流與電路', semester: '12下', mathTrack: 'none', tagLabel: '[克希荷夫、RC電路]' },
+              { name: '電流的磁效應', semester: '12下', mathTrack: 'none' },
+              { name: '電磁感應', semester: '12下', mathTrack: 'none' },
+              { name: '近代物理的重大發現', semester: '12下', mathTrack: 'none', tagLabel: '[波粒二象性]' },
+              { name: '原子結構與原子核', semester: '12下', mathTrack: 'none', tagLabel: '[氫原子模型]' }
             ]
           }
         ]
