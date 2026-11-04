@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "scan:drive": "node scripts/matchResources.mjs",
+    "pick:drive": "node scripts/pickDriveResources.mjs"
   },
   "dependencies": {
     "@types/katex": "^0.16.8",

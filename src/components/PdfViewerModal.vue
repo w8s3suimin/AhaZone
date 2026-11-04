@@ -37,6 +37,23 @@ const currentPdfUrl = computed(() => {
     ? props.resource.answerPath 
     : props.resource.filePath;
 });
+
+const iframeSrc = computed(() => {
+  if (!currentPdfUrl.value) return '';
+  if (currentPdfUrl.value.includes('drive.google.com')) {
+    return currentPdfUrl.value;
+  }
+  return `${currentPdfUrl.value}#toolbar=1&navpanes=0`;
+});
+
+const downloadUrl = computed(() => {
+  if (!currentPdfUrl.value) return '';
+  const driveMatch = currentPdfUrl.value.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveMatch) {
+    return `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`;
+  }
+  return currentPdfUrl.value;
+});
 </script>
 
 <template>
@@ -86,7 +103,7 @@ const currentPdfUrl = computed(() => {
 
           <!-- Download Button -->
           <a
-            :href="currentPdfUrl"
+            :href="downloadUrl"
             download
             class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-colors"
           >
@@ -96,7 +113,7 @@ const currentPdfUrl = computed(() => {
 
           <!-- Open in new tab -->
           <a
-            :href="currentPdfUrl"
+            :href="downloadUrl"
             target="_blank"
             rel="noopener noreferrer"
             class="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition-colors"
@@ -131,7 +148,7 @@ const currentPdfUrl = computed(() => {
       <!-- PDF Viewer Body -->
       <div class="flex-1 w-full bg-slate-950 relative">
         <iframe
-          :src="`${currentPdfUrl}#toolbar=1&navpanes=0`"
+          :src="iframeSrc"
           :title="resource.title"
           class="w-full h-full border-0"
         />
