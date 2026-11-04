@@ -26,5 +26,36 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     date: '2026-11-03',
     downloads: 1420,
     rating: 4.9
-  }
+  },
+
+  // --- 由 Python 發布器自動掛載的 Google Drive 資源 ---
+  {
+    "id": "res-drive-1a1a74cb443",
+    "title": "高一下三角函數重點整理",
+    "subtitle": "高一數學 三角比 精選練習",
+    "description": "精選 三角比 練習卷，透過 Google 雲端即時載入，題目與解析齊備。",
+    "type": "pdf-exam",
+    "stage": "senior",
+    "grade": "s10-math",
+    "gradeLabel": "高一數學",
+    "subject": "math",
+    "subjectLabel": "高中數學",
+    "chapter": "三角比",
+    "tags": [
+      "高一數學",
+      "三角比",
+      "含題目與詳解"
+    ],
+    "filePath": "https://drive.google.com/file/d/1-DsoKOxKeVXdJdupGGRWJT93aBtN4qy_/preview",
+    "ahaInsight": "掌握核心觀念與幾何幾何意涵，快速突破常見盲點。",
+    "learningGoals": [
+      "掌握考題題型與解法思維",
+      "建立關鍵公式與定理直覺"
+    ],
+    "featured": false,
+    "date": "2026-11-05",
+    "downloads": 0,
+    "rating": 5.0,
+    "answerPath": "https://drive.google.com/file/d/1rVWwnW3QKc1tPzOaat7WKnRJhxpbHUtf/preview"
+  },
 ];

@@ -1,5 +1,27 @@
 // AhaZone Google Drive PDF 掃描與分析模組
-const API_KEY = 'AIzaSyDJMCs1DLoPCZLAEzuAmVeerBNetX_wpI4';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const envPath = path.resolve(__dirname, '../.env');
+
+let envApiKey = process.env.GOOGLE_DRIVE_API_KEY;
+if (!envApiKey && fs.existsSync(envPath)) {
+  const content = fs.readFileSync(envPath, 'utf8');
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+      const [k, ...v] = trimmed.split('=');
+      if (k.trim() === 'GOOGLE_DRIVE_API_KEY') {
+        envApiKey = v.join('=').trim().replace(/^['"]|['"]$/g, '');
+        break;
+      }
+    }
+  }
+}
+
+const API_KEY = envApiKey || '';
 const ROOT_FOLDER_ID = '1fu_i-yZBr6bZipxT5sok_UqLDeenV05n';
 
 const IGNORED_FOLDERS = new Set([
