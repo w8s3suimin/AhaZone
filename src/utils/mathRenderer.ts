@@ -35,7 +35,14 @@ export function formulaToLatex(raw: string): string {
   // 2. 下標符號替換
   s = s.replace(/₀/g, '_0')
        .replace(/₁/g, '_1')
-       .replace(/₂/g, '_2');
+       .replace(/₂/g, '_2')
+       .replace(/₃/g, '_3')
+       .replace(/₄/g, '_4')
+       .replace(/₅/g, '_5')
+       .replace(/₆/g, '_6')
+       .replace(/₇/g, '_7')
+       .replace(/₈/g, '_8')
+       .replace(/₉/g, '_9');
 
   // 3. 希臘字母轉義
   s = s.replace(/ω/g, '\\omega ')
@@ -84,9 +91,18 @@ export function formulaToLatex(raw: string): string {
     }
   }
 
-  // 7. 下標轉換：a_c, F_c, v_0, a_avg 等 (避免影響已有的 LaTeX 指令如 \text{})
-  s = s.replace(/([a-zA-Z])_([a-zA-Z0-9]+)/g, (match, p1, p2) => {
-    if (p2.length > 1 && !/^\d+$/.test(p2) && !match.startsWith('\\')) {
+  // 7. 下標轉換：
+  // 7a. 數字下標（純數字，如 H_2O -> H_{2}O, Fe_2O_3 -> Fe_{2}O_{3}, v_0 -> v_{0}, a_1 -> a_{1}）
+  // 嚴格只匹配連續數字，絕不把接續的大寫化學元素符號 (如 H_2O 的 O) 納入下標
+  s = s.replace(/([a-zA-Z])_(\d+)/g, '$1_{$2}');
+
+  // 7b. 中文下標（如 R_串 -> R_{\text{串}}, P_入 -> P_{\text{入}}）
+  s = s.replace(/([a-zA-Z])_([\u4e00-\u9fa5]+)/g, '$1_{\\text{$2}}');
+
+  // 7c. 英文下標（如 a_c -> a_{c}, v_max -> v_{\text{max}}, F_net -> F_{\text{net}}）
+  s = s.replace(/([a-zA-Z])_([a-zA-Z]+)/g, (match, p1, p2) => {
+    if (match.startsWith('\\')) return match;
+    if (p2.length > 1) {
       return `${p1}_{\\text{${p2}}}`;
     }
     return `${p1}_{${p2}}`;

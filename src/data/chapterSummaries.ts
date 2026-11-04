@@ -560,7 +560,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '常見有機官能基與反應',
         description: '烴類（烷烯炔）、醇類 (-OH)、羧酸 (-COOH)、酯類 (-COO-)。酯化反應生成芳香酯：',
         formulas: [
-          '酯化反應通式：\\text{羧酸} + \\text{醇} \\xrightleftharpoons{\\text{濃硫酸}} \\text{酯} + \\text{水}'
+          '酯化反應通式：\\text{羧酸} + \\text{醇} \\underset{\\text{濃硫酸}}{\\rightleftharpoons} \\text{酯} + \\text{水}'
         ]
       },
       {
