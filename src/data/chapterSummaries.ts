@@ -51,9 +51,9 @@ export interface ChapterSummary {
   ahaInsight: string; // 核心觀念精要
   coreConcepts: ChapterConcept[];
   pitfalls: string[]; // 常見迷思與避坑提醒
-  sopModules?: SopModule[]; // 老師獨家破題思維（解題 SOP）
-  classicExamples?: ClassicExample[]; // 經典範例與步驟化詳解
-  quizQuestions?: QuizQuestion[]; // 課後微檢測（觀念思考題）
+  sopModules?: SopModule[]; // 經典題型與破題核心（題目 → 破題心法 → 步驟 → 答案）
+  classicExamples?: ClassicExample[]; // [舊格式] 渲染時自動併入「經典題型與破題核心」，新內容請改寫入 sopModules
+  quizQuestions?: QuizQuestion[]; // 自我挑戰（觀念思考題）
   trackVariants?: {
     common?: TrackVariant;
     mathA?: TrackVariant;

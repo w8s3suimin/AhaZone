@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { Lightbulb, AlertTriangle, BookOpen, Sparkles, FileText, ArrowLeft, CheckCircle2, Layers, Share2, Check, Compass, Target, HelpCircle, ChevronDown, ChevronUp } from 'lucide-vue-next';
-import { getChapterSummary, ChapterSummary } from '../data/chapterSummaries';
+import { getChapterSummary, ChapterSummary, SopModule, ClassicExample } from '../data/chapterSummaries';
 import { renderFormulaItem, renderRichMathText } from '../utils/mathRenderer';
 import { ResourceItem } from '../types';
 import ResourceCard from './ResourceCard.vue';
@@ -53,7 +53,6 @@ const activeTrackTab = ref<'all' | 'mathA' | 'mathB'>('all');
 
 watch(() => props.chapterName, () => {
   activeTrackTab.value = 'all';
-  openSolutions.value = {};
   openSopSteps.value = {};
 });
 
@@ -155,37 +154,27 @@ const toggleAllSopSteps = () => {
   });
 };
 
-// Solution steps folding state (折疊解題步驟)
-const openSolutions = ref<Record<number, boolean>>({});
-const toggleSolution = (idx: number) => {
-  openSolutions.value[idx] = !openSolutions.value[idx];
-};
-const areAllSolutionsOpen = computed(() => {
-  const list = displayedClassicExamples.value;
-  if (!list || list.length === 0) return false;
-  return list.every((_, idx) => !!openSolutions.value[idx]);
-});
-const toggleAllSolutions = () => {
-  const target = !areAllSolutionsOpen.value;
-  displayedClassicExamples.value.forEach((_, idx) => {
-    openSolutions.value[idx] = target;
-  });
-};
-
-// Dynamically displayed SOP modules
-const displayedSopModules = computed(() => {
-  if (hasTrackVariants.value && activeTrackTab.value === 'mathB' && summary.value.trackVariants?.mathB?.sopModules) {
-    return summary.value.trackVariants.mathB.sopModules;
-  }
-  return summary.value.sopModules || [];
-});
-
-// Dynamically displayed classic examples
-const displayedClassicExamples = computed(() => {
+// Dynamically displayed classic examples (舊格式資料，渲染時併入「經典題型與破題核心」)
+const displayedClassicExamples = computed<ClassicExample[]>(() => {
   if (hasTrackVariants.value && activeTrackTab.value === 'mathB' && summary.value.trackVariants?.mathB?.classicExamples) {
     return summary.value.trackVariants.mathB.classicExamples;
   }
   return summary.value.classicExamples || [];
+});
+
+// Dynamically displayed SOP modules：破題思維模組 + 經典範例合併為單一「經典題型與破題核心」區塊
+const displayedSopModules = computed<SopModule[]>(() => {
+  const sop = (hasTrackVariants.value && activeTrackTab.value === 'mathB' && summary.value.trackVariants?.mathB?.sopModules)
+    ? summary.value.trackVariants.mathB.sopModules
+    : (summary.value.sopModules || []);
+  const fromClassic: SopModule[] = displayedClassicExamples.value.map(ex => ({
+    moduleName: ex.title,
+    question: ex.question,
+    diagramType: ex.diagramType,
+    steps: (ex.solutionSteps || []).map(st => ({ label: st.step, text: st.content })),
+    answer: ex.answer
+  }));
+  return [...sop, ...fromClassic];
 });
 
 // Dynamically displayed quiz questions
@@ -509,7 +498,7 @@ const chapterResources = computed(() => {
       <div class="flex items-center justify-between">
         <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
           <Compass class="w-4 h-4 text-amber-400" />
-          <span>核心破題思維與典型範例</span>
+          <span>經典題型與破題核心</span>
         </h3>
         <div class="flex items-center gap-2">
           <button 
@@ -636,107 +625,12 @@ const chapterResources = computed(() => {
       </div>
     </div>
 
-    <!-- Classic Examples Section -->
-    <div v-if="displayedClassicExamples && displayedClassicExamples.length > 0" class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
-          <CheckCircle2 class="w-4 h-4 text-emerald-400" />
-          <span>經典範例與步驟化詳解</span>
-        </h3>
-        <button 
-          type="button"
-          @click="toggleAllSolutions"
-          class="text-xs text-slate-400 hover:text-emerald-400 font-medium px-2.5 py-1 rounded-lg bg-slate-800/60 border border-slate-700/60 hover:border-emerald-500/40 transition-colors flex items-center gap-1.5 cursor-pointer"
-        >
-          <span>{{ areAllSolutionsOpen ? '全部折疊步驟' : '全部展開步驟' }}</span>
-        </button>
-      </div>
-
-      <div class="space-y-5">
-        <div 
-          v-for="(ex, exIdx) in displayedClassicExamples"
-          :key="exIdx"
-          class="p-5 sm:p-6 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-slate-700/80 transition-all shadow-md space-y-4"
-        >
-          <!-- 題目抬頭 -->
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
-            <h4 class="text-sm sm:text-base font-bold text-emerald-300 flex items-center gap-2">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              <span>{{ ex.title }}</span>
-            </h4>
-          </div>
-
-          <!-- 題目內容 -->
-          <div class="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800/90 text-xs sm:text-sm text-slate-200 leading-relaxed">
-            <span class="font-bold text-emerald-400 mr-1.5">【題目】：</span>
-            <span v-html="renderRichMathText(ex.question)"></span>
-          </div>
-
-          <!-- 折疊解題步驟控制列 -->
-          <button 
-            type="button"
-            @click="toggleSolution(exIdx)"
-            class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-900/80 transition-all cursor-pointer group"
-          >
-            <span class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-emerald-400 group-hover:text-emerald-300">
-              <CheckCircle2 class="w-4 h-4" />
-              <span>{{ openSolutions[exIdx] ? '收合步驟詳解' : '展開解題步驟' }}</span>
-              <span class="text-xs text-slate-400 font-normal">（共 {{ ex.solutionSteps.length }} 步）</span>
-            </span>
-            <span class="flex items-center gap-1.5 text-xs text-slate-400 group-hover:text-emerald-400 font-medium">
-              <span>{{ openSolutions[exIdx] ? '點擊收合' : '點擊查看詳解' }}</span>
-              <ChevronDown 
-                class="w-4 h-4 text-slate-400 group-hover:text-emerald-400 transition-transform duration-200" 
-                :class="{ 'rotate-180': openSolutions[exIdx] }" 
-              />
-            </span>
-          </button>
-
-          <!-- 折疊區域：圖形 + 步驟解析 + 最終答案 -->
-          <div v-if="openSolutions[exIdx]" class="space-y-4 pt-1 transition-all duration-300">
-            <!-- 若範例附有函數圖形解析則動態呈現 -->
-            <div 
-              v-if="ex.diagramType"
-              class="my-2.5 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
-            >
-              <ConceptDiagram :type="ex.diagramType" />
-            </div>
-
-            <!-- 步驟解析 -->
-            <div class="space-y-3">
-              <div 
-                v-for="(st, stIdx) in ex.solutionSteps"
-                :key="stIdx"
-                class="p-4 sm:p-5 rounded-xl bg-slate-950/70 border border-slate-800/80 text-sm sm:text-base text-slate-200 leading-relaxed space-y-2.5 shadow-inner"
-              >
-                <div class="font-bold text-sky-300 flex items-center gap-2 text-sm sm:text-base">
-                  <span class="w-2 h-2 rounded-full bg-sky-400 shrink-0"></span>
-                  <span v-html="renderRichMathText(st.step)"></span>
-                </div>
-                <div class="text-slate-200 pl-3.5 border-l-2 border-slate-700/80 whitespace-pre-line text-sm sm:text-base leading-relaxed overflow-x-auto py-0.5" v-html="renderRichMathText(st.content)"></div>
-              </div>
-            </div>
-
-            <!-- 最終答案 -->
-            <div 
-              v-if="ex.answer"
-              class="px-4 py-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-sm sm:text-base font-bold text-emerald-300 flex items-center gap-2 shadow-inner"
-            >
-              <Check class="w-4 h-4 text-emerald-400 shrink-0" />
-              <span class="shrink-0">結論答案：</span>
-              <span class="text-emerald-200 overflow-x-auto" v-html="renderRichMathText(ex.answer)"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Practice Quiz Questions Section -->
     <div v-if="displayedQuizQuestions && displayedQuizQuestions.length > 0" class="space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
           <HelpCircle class="w-4 h-4 text-purple-400" />
-          <span>課後微檢測（觀念思考題）</span>
+          <span>自我挑戰</span>
         </h3>
         <span class="text-xs text-purple-400/90 font-semibold px-2.5 py-0.5 rounded-full bg-purple-950/60 border border-purple-800/50">
           觀念微檢測
