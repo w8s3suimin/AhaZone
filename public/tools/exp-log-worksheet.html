@@ -615,52 +615,76 @@
       // Render Type 1 (指數律 15 題)
       currentQuestions.type1.forEach((q, idx) => {
         const item = document.createElement('div');
-        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center text-base';
+        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center justify-between text-base';
+        
+        const leftWrap = document.createElement('div');
+        leftWrap.className = 'flex items-center gap-1.5 shrink-0';
         
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base shrink-0 mr-1.5';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base shrink-0';
         numSpan.textContent = `(${idx + 1})`;
         
         const mathSpan = document.createElement('span');
-        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg flex items-center';
+        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg whitespace-nowrap';
+        renderMath(mathSpan, q.questionLatex, false);
         
-        // When showInlineAnswers is true: show bold colored answer
-        // When false: show authentic KaTeX baseline underline right after =
-        let latex = '';
-        if (showInlineAnswers) {
-          latex = q.questionLatex + ' \\; \\mathbf{\\textcolor{#0284c7}{' + q.ansLatex + '}}';
-        } else {
-          latex = q.questionLatex + ' \\; \\underline{\\hspace{2.8cm}}';
-        }
-        renderMath(mathSpan, latex, false);
-        
-        item.appendChild(numSpan);
-        item.appendChild(mathSpan);
+        leftWrap.appendChild(numSpan);
+        leftWrap.appendChild(mathSpan);
+
+        // Right side: TRUE Bottom Underline for students to write answers
+        const rightWrap = document.createElement('div');
+        rightWrap.className = 'flex items-end self-stretch pb-2 shrink-0 pl-2';
+
+        const answerSpan = document.createElement('span');
+        answerSpan.className = `inline-answer font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-300 text-base ${showInlineAnswers ? '' : 'hidden'}`;
+        renderMath(answerSpan, q.ansLatex, false);
+
+        // A genuine bottom line: border-b-2 positioned at the bottom of the row!
+        const blankLine = document.createElement('span');
+        blankLine.className = `answer-placeholder border-b-2 border-slate-600 w-16 sm:w-20 block mb-0.5 ${showInlineAnswers ? 'hidden' : ''}`;
+
+        rightWrap.appendChild(answerSpan);
+        rightWrap.appendChild(blankLine);
+
+        item.appendChild(leftWrap);
+        item.appendChild(rightWrap);
         t1Container.appendChild(item);
       });
 
       // Render Type 2 (對數律 15 題)
       currentQuestions.type2.forEach((q, idx) => {
         const item = document.createElement('div');
-        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center text-base';
+        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center justify-between text-base';
+
+        const leftWrap = document.createElement('div');
+        leftWrap.className = 'flex items-center gap-1.5 shrink-0';
 
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base shrink-0 mr-1.5';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base shrink-0';
         numSpan.textContent = `(${idx + 1})`;
 
         const mathSpan = document.createElement('span');
-        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg flex items-center';
+        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg whitespace-nowrap';
+        renderMath(mathSpan, q.questionLatex, false);
 
-        let latex = '';
-        if (showInlineAnswers) {
-          latex = q.questionLatex + ' \\; \\mathbf{\\textcolor{#4f46e5}{' + q.logValStr + '}}';
-        } else {
-          latex = q.questionLatex + ' \\; \\underline{\\hspace{2.8cm}}';
-        }
-        renderMath(mathSpan, latex, false);
+        leftWrap.appendChild(numSpan);
+        leftWrap.appendChild(mathSpan);
 
-        item.appendChild(numSpan);
-        item.appendChild(mathSpan);
+        const rightWrap = document.createElement('div');
+        rightWrap.className = 'flex items-end self-stretch pb-2 shrink-0 pl-2';
+
+        const answerSpan = document.createElement('span');
+        answerSpan.className = `inline-answer font-bold font-mono text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-300 text-base ${showInlineAnswers ? '' : 'hidden'}`;
+        answerSpan.textContent = q.logValStr;
+
+        const blankLine = document.createElement('span');
+        blankLine.className = `answer-placeholder border-b-2 border-slate-600 w-16 sm:w-20 block mb-0.5 ${showInlineAnswers ? 'hidden' : ''}`;
+
+        rightWrap.appendChild(answerSpan);
+        rightWrap.appendChild(blankLine);
+
+        item.appendChild(leftWrap);
+        item.appendChild(rightWrap);
         t2Container.appendChild(item);
       });
     }
@@ -735,7 +759,19 @@
     function toggleAnswers() {
       showInlineAnswers = !showInlineAnswers;
       document.getElementById('toggleAnswerText').textContent = showInlineAnswers ? '隱藏答案' : '顯示答案';
-      renderPage1();
+      
+      const inlines = document.querySelectorAll('.inline-answer');
+      const blanks = document.querySelectorAll('.answer-placeholder');
+
+      inlines.forEach(el => {
+        if (showInlineAnswers) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+
+      blanks.forEach(el => {
+        if (showInlineAnswers) el.classList.add('hidden');
+        else el.classList.remove('hidden');
+      });
     }
 
     // Toggle Answer Sheet Page
