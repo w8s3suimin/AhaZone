@@ -1872,7 +1872,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       },
       {
         title: '2. 對數函數凹凸性、琴生不等式幾何直觀與反函數對稱',
-        description: '函數 $y = a^x$ 與 $y = \\log_a x$ 互為反函數，兩者圖形對稱於直線 $y = x$。\n• **凹凸性判別（以底數 $a > 1$ 為例）**：對數函數 $f(x) = \\log_a x$（$a > 1$）在定義域內為**嚴格遞增且凹向下（上凸函數）**。\n• **琴生不等式（幾何意涵）**：$$\\frac{f(x_1) + f(x_2)}{2} < f\\left(\\frac{x_1 + x_2}{2}\\right) \\quad (x_1 \\ne x_2)$$\n  - **幾何直觀口訣**：「**曲線上的實際高度 高於 割線中點的平均高度**」。\n  - 割線中點坐標：$\\left(\\frac{x_1 + x_2}{2}, \\frac{f(x_1) + f(x_2)}{2}\\right)$\n  - 曲線對應點坐標：$\\left(\\frac{x_1 + x_2}{2}, f\\left(\\frac{x_1 + x_2}{2}\\right)\\right)$\n• **割線斜率變化趨勢**：當 $x$ 等比增加（翻倍）時，$y$ 僅等差增加（$+1$），故割線斜率隨 $x$ 增大而遞減並逐漸趨向於 $0$（圖形愈往右走愈平緩）。',
+        description: '函數 $y = a^x$ 與 $y = \\log_a x$ 互為反函數，兩者圖形對稱於直線 $y = x$。\n• **凹凸性判別（以底數 $a > 1$ 為例）**：對數函數 $f(x) = \\log_a x$（$a > 1$）在定義域內為**嚴格遞增且凹向下（上凸函數）**。\n• **琴生不等式（幾何意涵）**：$$\\frac{f(x_1) + f(x_2)}{2} < f\\left(\\frac{x_1 + x_2}{2}\\right) \\quad (x_1 \\ne x_2)$$\n　　- **幾何直觀口訣**：「**曲線上的實際高度 高於 割線中點的平均高度**」。\n　　- 割線中點坐標：$\\left(\\frac{x_1 + x_2}{2}, \\frac{f(x_1) + f(x_2)}{2}\\right)$\n　　- 曲線對應點坐標：$\\left(\\frac{x_1 + x_2}{2}, f\\left(\\frac{x_1 + x_2}{2}\\right)\\right)$\n• **割線斜率變化趨勢**：當 $x$ 等比增加（翻倍）時，$y$ 僅等差增加（$+1$），故割線斜率隨 $x$ 增大而遞減並逐漸趨向於 $0$（圖形愈往右走愈平緩）。',
         diagramType: 'exp-log-symmetry',
         formulas: [
           '反函數對稱性：y = a^x \\longleftrightarrow y = \\log_a x （兩圖形對稱於直線 y = x）',

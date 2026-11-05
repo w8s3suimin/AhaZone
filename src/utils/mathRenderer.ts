@@ -208,7 +208,8 @@ export function renderRichMathText(text: string): string {
   }
 
   // 3. 處理 $$...$$ 獨立區塊數學式（Display Math）
-  sanitized = sanitized.replace(/\$\$([\s\S]+?)\$\$/g, (_, math) => {
+  // （吸收區塊前後的換行，避免在 whitespace-pre-line 容器中產生多餘空行）
+  sanitized = sanitized.replace(/\n?\$\$([\s\S]+?)\$\$\n?/g, (_, math) => {
     try {
       const latex = formulaToLatex(math);
       const mathHtml = katex.renderToString(`\\displaystyle ${latex}`, {

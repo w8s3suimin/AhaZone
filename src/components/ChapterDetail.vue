@@ -381,7 +381,7 @@ const chapterResources = computed(() => {
               <ConceptDiagram :type="concept.diagramType" />
             </div>
 
-            <div class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3" v-html="renderRichMathText(concept.description)"></div>
+            <div class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3 whitespace-pre-line" v-html="renderRichMathText(concept.description)"></div>
           </div>
 
           <!-- 佈局分支：若設定 diagramPosition === 'right'，在寬螢幕將短公式置於左、圖形置於右 -->
