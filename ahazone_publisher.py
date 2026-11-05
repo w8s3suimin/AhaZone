@@ -170,8 +170,20 @@ def fetch_drive_pdfs(folder_id=ROOT_FOLDER_ID, current_path=""):
 
     return crawl_folder(folder_id, current_path)
 
+def get_existing_drive_ids():
+    """讀取 resources.ts 中所有已發布的 Google Drive File ID"""
+    if not os.path.exists(RESOURCES_TS_PATH):
+        return set()
+    try:
+        with open(RESOURCES_TS_PATH, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return set(re.findall(r'drive\.google\.com/file/d/([a-zA-Z0-9_-]+)', content))
+    except Exception:
+        return set()
+
 def group_and_match(pdf_list):
     """分析題目卷、詳解卷與題解合一卷，並自動比對課綱"""
+    existing_ids = get_existing_drive_ids()
     groups = {}
     for f in pdf_list:
         name = f['name']
@@ -231,6 +243,13 @@ def group_and_match(pdf_list):
                     matched_chapter = opt
                     break
 
+        # 檢查是否已存在於 resources.ts
+        ids_to_check = []
+        if g['q']: ids_to_check.append(g['q']['id'])
+        if g['c']: ids_to_check.append(g['c']['id'])
+        if g['a']: ids_to_check.append(g['a']['id'])
+        is_pub = any(fid in existing_ids for fid in ids_to_check)
+
         candidates.append({
             'base_key': base_key,
             'clean_title': clean_title,
@@ -239,6 +258,7 @@ def group_and_match(pdf_list):
             'q': g['q'],
             'a': g['a'],
             'c': g['c'],
+            'is_published': is_pub,
             'matched_chapter': matched_chapter or CHAPTER_OPTIONS[0]
         })
 
@@ -405,13 +425,14 @@ def launch_gui():
     tree.heading("type", text="卷別")
     tree.heading("raw", text="原檔名關鍵字")
 
-    tree.column("#0", width=330, minwidth=220)
-    tree.column("status", width=55, minwidth=50, anchor=tk.CENTER)
+    tree.column("#0", width=320, minwidth=220)
+    tree.column("status", width=68, minwidth=60, anchor=tk.CENTER)
     tree.column("type", width=95, minwidth=80, anchor=tk.CENTER)
     tree.column("raw", width=250, minwidth=150)
 
     tree.tag_configure("folder", font=('Microsoft JhengHei', 9, 'bold'), foreground="#38bdf8")
     tree.tag_configure("item", font=('Microsoft JhengHei', 9), foreground="#f1f5f9")
+    tree.tag_configure("item_published", font=('Microsoft JhengHei', 9), foreground="#34d399")
 
     tree_y_scroll = ttk.Scrollbar(tree_container, orient=tk.VERTICAL, command=tree.yview)
     tree_x_scroll = ttk.Scrollbar(tree_container, orient=tk.HORIZONTAL, command=tree.xview)
@@ -535,22 +556,28 @@ def launch_gui():
             else:
                 type_str = "單卷"
 
-            status_str = "[ ✔ ]" if i in selected_indices else "[   ]"
+            is_pub = c.get('is_published', False)
+            if i in selected_indices:
+                status_str = "[ ✔ 上線]" if is_pub else "[ ✔ ]"
+            else:
+                status_str = "[已上線]" if is_pub else "[   ]"
             item_iid = f"item_{i}"
+            item_tag = "item_published" if is_pub else "item"
 
             # 散落在外面的檔案 (parent_iid == "") 直接掛在 Treeview 最外層根目錄（與國中、高中並列）
-            tree.insert(parent_iid, tk.END, iid=item_iid, text=f"📄 {c['clean_title']}", values=(status_str, type_str, c['base_key']), tags=("item",))
+            tree.insert(parent_iid, tk.END, iid=item_iid, text=f"📄 {c['clean_title']}", values=(status_str, type_str, c['base_key']), tags=(item_tag,))
 
         update_summary_status(is_searching, query, len(indices_to_show))
 
     def update_summary_status(is_searching=False, query="", filtered_count=0):
         total_items = len(candidates_data)
         sel_count = len(selected_indices)
+        pub_count = sum(1 for c in candidates_data if c.get('is_published'))
         if is_searching:
-            status_var.set(f"🔍 搜尋「{query}」：符合 {filtered_count} 筆教材 (總已勾選 {sel_count} 份)")
+            status_var.set(f"🔍 搜尋「{query}」：符合 {filtered_count} 筆教材 (總已勾選 {sel_count} 份，共 {pub_count} 份已在線上)")
         else:
-            status_var.set(f"✔ 共 {total_items} 組可用教材 (已勾選 {sel_count} 份)")
-        selected_count_label.config(text=f"已選取：{sel_count} / 共 {total_items} 份")
+            status_var.set(f"✔ 共 {total_items} 組可用教材 (已上線 {pub_count} 份，已勾選 {sel_count} 份)")
+        selected_count_label.config(text=f"已選取：{sel_count} / 共 {total_items} 份 (已上線 {pub_count} 份)")
 
     # 搜尋與展開折疊處理
     def on_search_change(*args):
@@ -601,6 +628,8 @@ def launch_gui():
                 chapter_combo.set(ch_label)
 
             detail_text.delete("1.0", tk.END)
+            pub_tag = "【🟢 已發布上線】" if c.get('is_published') else "【⚪ 尚未發布】"
+            detail_text.insert(tk.END, f"★ 線上狀態：{pub_tag}\n")
             if c['type'] == 'pair':
                 detail_text.insert(tk.END, f"【成對雙卷】\n目錄: {c.get('path') or '/'}\n題目卷: {c['q']['name']}\n詳解卷: {c['a']['name']}")
             elif c['type'] == 'combined':
@@ -615,7 +644,8 @@ def launch_gui():
             folder_text = tree.item(selected_item, "text")
             detail_text.delete("1.0", tk.END)
             folder_sel = sum(1 for idx in indices if idx in selected_indices)
-            detail_text.insert(tk.END, f"【資料夾】{folder_text}\n\n• 包含教材：{len(leaves)} 份\n• 目前已勾選：{folder_sel} 份\n\n提示：點擊狀態欄或按空白鍵 Space，可批次勾選/取消本資料夾內的所有教材！")
+            folder_pub = sum(1 for idx in indices if candidates_data[idx].get('is_published'))
+            detail_text.insert(tk.END, f"【資料夾】{folder_text}\n\n• 包含教材：{len(leaves)} 份 (已上線 {folder_pub} 份)\n• 目前已勾選：{folder_sel} 份\n\n提示：點擊狀態欄或按空白鍵 Space，可批次勾選/取消本資料夾內的所有教材！")
 
     tree.bind("<<TreeviewSelect>>", update_detail_view)
 
@@ -625,24 +655,28 @@ def launch_gui():
             return
         if item_id.startswith("item_"):
             idx = int(item_id[5:])
+            c = candidates_data[idx]
+            is_pub = c.get('is_published', False)
             if idx in selected_indices:
                 selected_indices.remove(idx)
-                tree.set(item_id, "status", "[   ]")
+                tree.set(item_id, "status", "[已上線]" if is_pub else "[   ]")
             else:
                 selected_indices.add(idx)
-                tree.set(item_id, "status", "[ ✔ ]")
+                tree.set(item_id, "status", "[ ✔ 上線]" if is_pub else "[ ✔ ]")
         else:
             # 整批切換資料夾
             leaves = get_descendants(item_id)
             indices = [int(l[5:]) for l in leaves]
             all_selected = bool(indices) and all(idx in selected_indices for idx in indices)
             for l, idx in zip(leaves, indices):
+                c = candidates_data[idx]
+                is_pub = c.get('is_published', False)
                 if all_selected:
                     selected_indices.discard(idx)
-                    tree.set(l, "status", "[   ]")
+                    tree.set(l, "status", "[已上線]" if is_pub else "[   ]")
                 else:
                     selected_indices.add(idx)
-                    tree.set(l, "status", "[ ✔ ]")
+                    tree.set(l, "status", "[ ✔ 上線]" if is_pub else "[ ✔ ]")
         update_summary_status(bool(search_var.get()), search_var.get(), len(currently_shown_indices))
 
     def on_space_key(event):
@@ -717,7 +751,8 @@ def launch_gui():
             selected_indices.add(idx)
             item_id = f"item_{idx}"
             if tree.exists(item_id):
-                tree.set(item_id, "status", "[ ✔ ]")
+                is_pub = candidates_data[idx].get('is_published', False)
+                tree.set(item_id, "status", "[ ✔ 上線]" if is_pub else "[ ✔ ]")
         update_summary_status(bool(search_var.get()), search_var.get(), len(currently_shown_indices))
 
     def clear_all_selection():
@@ -725,7 +760,8 @@ def launch_gui():
         for idx in currently_shown_indices:
             item_id = f"item_{idx}"
             if tree.exists(item_id):
-                tree.set(item_id, "status", "[   ]")
+                is_pub = candidates_data[idx].get('is_published', False)
+                tree.set(item_id, "status", "[已上線]" if is_pub else "[   ]")
         update_summary_status(bool(search_var.get()), search_var.get(), len(currently_shown_indices))
 
     # Git 自動提交與推送
@@ -749,14 +785,56 @@ def launch_gui():
         if p_push.returncode != 0:
             raise RuntimeError(f"git push 失敗：\n{p_push.stderr or p_push.stdout}")
 
-    # 執行一鍵發布
+    # 執行一鍵發布 (具備智慧去重與防重複發布機制)
     def do_publish():
         save_current_edit()
         if not selected_indices:
             messagebox.showwarning("提示", "您尚未勾選任何要發布的教材！\n(請選取項目後「按空白鍵 Space」或「點擊狀態欄」進行勾選)")
             return
 
-        to_publish = [candidates_data[i] for i in sorted(selected_indices)]
+        selected_candidates = [candidates_data[i] for i in sorted(selected_indices)]
+        already_pub = [c for c in selected_candidates if c.get('is_published')]
+        new_items = [c for c in selected_candidates if not c.get('is_published')]
+
+        # 智慧去重判斷
+        if already_pub:
+            if not new_items:
+                # 選取的教材全數都已上線
+                ans = messagebox.askyesno(
+                    "教材均已在線上",
+                    f"您勾選的 {len(already_pub)} 份教材全部都【已經發布上線】過了！\n\n請問您確定要強制【再次重複發布】嗎？\n(若選「否」將取消本次操作)"
+                )
+                if not ans:
+                    return
+                to_publish = already_pub
+            else:
+                # 混合：部分已上線、部分為新教材
+                pub_preview = "、".join([f"「{c['clean_title']}」" for c in already_pub[:3]])
+                if len(already_pub) > 3:
+                    pub_preview += f" 等 {len(already_pub)} 份"
+
+                ans = messagebox.askyesnocancel(
+                    "偵測到已發布教材 (防重複提醒)",
+                    f"您選取的 {len(selected_candidates)} 份教材中：\n"
+                    f"• 【全新教材】：{len(new_items)} 份\n"
+                    f"• 【已在線上】：{len(already_pub)} 份 ({pub_preview})\n\n"
+                    f"是否【自動跳過已發布項目】，僅發布另外 {len(new_items)} 份新教材？\n\n"
+                    f"【是 (Yes)】：自動跳過重複，僅發布全新教材 (推薦)\n"
+                    f"【否 (No)】：不跳過，全部強制發布\n"
+                    f"【取消 (Cancel)】：取消本次發布"
+                )
+                if ans is None:
+                    return
+                elif ans is True:
+                    to_publish = new_items
+                else:
+                    to_publish = selected_candidates
+        else:
+            to_publish = selected_candidates
+
+        if not to_publish:
+            return
+
         will_git = auto_git_var.get()
 
         msg = f"即將把以下 {len(to_publish)} 份教材寫入 AhaZone：\n\n"
@@ -779,17 +857,26 @@ def launch_gui():
             def publish_worker():
                 try:
                     count = write_to_resources_ts(to_publish)
+                    # 標記剛剛發布的項目為已發布，並從勾選中解除
+                    for item in to_publish:
+                        item['is_published'] = True
+                    for i in list(selected_indices):
+                        if candidates_data[i] in to_publish:
+                            selected_indices.discard(i)
+
                     if will_git:
                         root.after(0, lambda: status_var.set("正在執行 Git Commit & Push 至 GitHub..."))
                         sync_to_git(count)
                         root.after(0, lambda: (
                             btn_publish.config(state="normal", text="一鍵寫入 AhaZone 教材庫"),
+                            render_tree(search_var.get()),
                             status_var.set(f"✔ 成功發布並 Push {count} 筆資源至 GitHub！"),
                             messagebox.showinfo("發布成功", f"成功寫入 {count} 筆資源至 resources.ts，並已同步 Push 至 GitHub！\n\n線上網站將在數分鐘內自動完成雲端部署。")
                         ))
                     else:
                         root.after(0, lambda: (
                             btn_publish.config(state="normal", text="一鍵寫入 AhaZone 教材庫"),
+                            render_tree(search_var.get()),
                             status_var.set(f"✔ 成功寫入 {count} 筆資源至 resources.ts！"),
                             messagebox.showinfo("寫入成功", f"成功寫入 {count} 筆資源至 resources.ts！\n\n(提示：未勾選自動 Push，請記得在終端機執行 git push 以部署到線上網站)")
                         ))
@@ -860,7 +947,8 @@ def run_cli():
         else:
             t = "單卷"
         path_str = c.get('path') or '/'
-        print(f"[{i+1}] [{t}] [{path_str}] 【{c['matched_chapter']['label']}】{c['clean_title']}")
+        pub_str = " (★已在線上)" if c.get('is_published') else ""
+        print(f"[{i+1}] [{t}] [{path_str}] 【{c['matched_chapter']['label']}】{c['clean_title']}{pub_str}")
         if c['type'] == 'pair':
             print(f"     題目: {c['q']['name']}\n     詳解: {c['a']['name']}")
         elif c['type'] == 'combined':

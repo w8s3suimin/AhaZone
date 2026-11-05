@@ -162,3 +162,24 @@ export function renderFormulaItem(raw: string): FormattedFormula {
     return { label, mathHtml: `<span>${text}</span>`, note };
   }
 }
+
+/**
+ * 渲染包含 $...$ LaTeX 語法的富文字字串
+ */
+export function renderRichMathText(text: string): string {
+  if (!text) return '';
+  // 若未包含 $ 符號，直接回傳
+  if (!text.includes('$')) return text;
+
+  return text.replace(/\$([^$]+)\$/g, (_, math) => {
+    try {
+      const latex = formulaToLatex(math);
+      return katex.renderToString(`\\textstyle ${latex}`, {
+        throwOnError: false,
+        displayMode: false
+      });
+    } catch {
+      return math;
+    }
+  });
+}

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { Lightbulb, AlertTriangle, BookOpen, Sparkles, FileText, ArrowLeft, CheckCircle2, Layers, Share2, Check } from 'lucide-vue-next';
+import { Lightbulb, AlertTriangle, BookOpen, Sparkles, FileText, ArrowLeft, CheckCircle2, Layers, Share2, Check, Compass, Target, HelpCircle, ChevronDown, ChevronUp } from 'lucide-vue-next';
 import { getChapterSummary, ChapterSummary } from '../data/chapterSummaries';
-import { renderFormulaItem } from '../utils/mathRenderer';
+import { renderFormulaItem, renderRichMathText } from '../utils/mathRenderer';
 import { ResourceItem } from '../types';
 import ResourceCard from './ResourceCard.vue';
 import ConceptDiagram from './ConceptDiagram.vue';
@@ -128,6 +128,36 @@ const displayedPitfalls = computed(() => {
     return allPitfalls.filter(p => !p.includes('數A專屬') && !p.includes('數A深化'));
   }
   return allPitfalls;
+});
+
+// Hint toggle state
+const openHints = ref<Record<number, boolean>>({});
+const toggleHint = (idx: number) => {
+  openHints.value[idx] = !openHints.value[idx];
+};
+
+// Dynamically displayed SOP modules
+const displayedSopModules = computed(() => {
+  if (hasTrackVariants.value && activeTrackTab.value === 'mathB' && summary.value.trackVariants?.mathB?.sopModules) {
+    return summary.value.trackVariants.mathB.sopModules;
+  }
+  return summary.value.sopModules || [];
+});
+
+// Dynamically displayed classic examples
+const displayedClassicExamples = computed(() => {
+  if (hasTrackVariants.value && activeTrackTab.value === 'mathB' && summary.value.trackVariants?.mathB?.classicExamples) {
+    return summary.value.trackVariants.mathB.classicExamples;
+  }
+  return summary.value.classicExamples || [];
+});
+
+// Dynamically displayed quiz questions
+const displayedQuizQuestions = computed(() => {
+  if (hasTrackVariants.value && activeTrackTab.value === 'mathB' && summary.value.trackVariants?.mathB?.quizQuestions) {
+    return summary.value.trackVariants.mathB.quizQuestions;
+  }
+  return summary.value.quizQuestions || [];
 });
 
 // Resources for this specific chapter
@@ -356,6 +386,55 @@ const chapterResources = computed(() => {
       </div>
     </div>
 
+    <!-- SOP Problem Solving Section -->
+    <div v-if="displayedSopModules && displayedSopModules.length > 0" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
+          <Compass class="w-4 h-4 text-amber-400" />
+          <span>老師獨家破題思維（解題 SOP）</span>
+        </h3>
+        <span class="text-[11px] text-amber-400/90 font-semibold px-2 py-0.5 rounded-full bg-amber-950/60 border border-amber-800/50">
+          高頻解題模組
+        </span>
+      </div>
+
+      <div class="space-y-4">
+        <div 
+          v-for="(mod, mIdx) in displayedSopModules"
+          :key="mIdx"
+          class="p-5 rounded-2xl bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-slate-950/90 border border-amber-500/30 shadow-lg space-y-3"
+        >
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <h4 class="text-sm sm:text-base font-extrabold text-amber-200 tracking-wide">
+              {{ mod.moduleName }}
+            </h4>
+          </div>
+
+          <div 
+            v-if="mod.mindset"
+            class="px-3.5 py-2 rounded-xl bg-amber-950/40 border border-amber-500/30 text-xs text-amber-200 font-medium"
+          >
+            {{ mod.mindset }}
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+            <div 
+              v-for="(step, sIdx) in mod.steps"
+              :key="sIdx"
+              class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 hover:border-amber-500/40 transition-colors flex flex-col justify-start space-y-2"
+            >
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 text-amber-300 font-bold text-xs border border-amber-600/50 self-start">
+                <Target class="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>{{ step.label }}</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed font-sans" v-html="renderRichMathText(step.text)"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Pitfalls Section -->
     <div v-if="displayedPitfalls && displayedPitfalls.length > 0" class="space-y-3">
       <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
@@ -373,6 +452,116 @@ const chapterResources = computed(() => {
             {{ idx + 1 }}
           </span>
           <span class="leading-relaxed">{{ pitfall }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Classic Examples Section -->
+    <div v-if="displayedClassicExamples && displayedClassicExamples.length > 0" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
+          <CheckCircle2 class="w-4 h-4 text-emerald-400" />
+          <span>經典範例與步驟化詳解</span>
+        </h3>
+        <span class="text-[11px] text-emerald-400/90 font-semibold px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-800/50">
+          名師步驟示範
+        </span>
+      </div>
+
+      <div class="space-y-5">
+        <div 
+          v-for="(ex, exIdx) in displayedClassicExamples"
+          :key="exIdx"
+          class="p-5 sm:p-6 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-slate-700/80 transition-all shadow-md space-y-4"
+        >
+          <!-- 題目抬頭 -->
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <h4 class="text-sm sm:text-base font-bold text-emerald-300 flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>{{ ex.title }}</span>
+            </h4>
+          </div>
+
+          <!-- 題目內容 -->
+          <div class="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800/90 text-xs sm:text-sm text-slate-200 leading-relaxed">
+            <span class="font-bold text-emerald-400 mr-1.5">【題目】：</span>
+            <span v-html="renderRichMathText(ex.question)"></span>
+          </div>
+
+          <!-- 步驟解析 -->
+          <div class="space-y-2.5">
+            <div 
+              v-for="(st, stIdx) in ex.solutionSteps"
+              :key="stIdx"
+              class="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/70 text-xs text-slate-300 leading-relaxed space-y-1.5"
+            >
+              <div class="font-bold text-sky-300 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                <span>{{ st.step }}</span>
+              </div>
+              <div class="text-slate-300 pl-3 border-l-2 border-slate-800 whitespace-pre-line" v-html="renderRichMathText(st.content)"></div>
+            </div>
+          </div>
+
+          <!-- 最終答案 -->
+          <div 
+            v-if="ex.answer"
+            class="px-4 py-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-xs font-bold text-emerald-300 flex items-center gap-2"
+          >
+            <Check class="w-4 h-4 text-emerald-400" />
+            <span>結論答案：</span>
+            <span class="text-emerald-200" v-html="renderRichMathText(ex.answer)"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Practice Quiz Questions Section -->
+    <div v-if="displayedQuizQuestions && displayedQuizQuestions.length > 0" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
+          <HelpCircle class="w-4 h-4 text-purple-400" />
+          <span>課後微檢測（觀念思考題）</span>
+        </h3>
+        <span class="text-[11px] text-purple-400/90 font-semibold px-2 py-0.5 rounded-full bg-purple-950/60 border border-purple-800/50">
+          即時自我檢驗
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4">
+        <div 
+          v-for="(q, qIdx) in displayedQuizQuestions"
+          :key="qIdx"
+          class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-purple-500/30 transition-all space-y-3 shadow-md"
+        >
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md bg-purple-950 text-purple-300 border border-purple-700/60 text-xs font-bold">
+              第 {{ q.questionNumber || qIdx + 1 }} 題
+            </span>
+            <h4 class="text-sm font-bold text-purple-200">
+              {{ q.title }}
+            </h4>
+          </div>
+
+          <p class="text-xs sm:text-sm text-slate-200 leading-relaxed p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80" v-html="renderRichMathText(q.question)"></p>
+
+          <div v-if="q.hint" class="pt-1">
+            <button
+              @click="toggleHint(qIdx)"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-purple-950/50 hover:bg-purple-900/60 text-purple-300 border border-purple-700/50"
+            >
+              <Lightbulb class="w-3.5 h-3.5 text-purple-400" />
+              <span>{{ openHints[qIdx] ? '收起名師思考提示' : '展開名師思考提示' }}</span>
+              <component :is="openHints[qIdx] ? ChevronUp : ChevronDown" class="w-3.5 h-3.5" />
+            </button>
+
+            <div 
+              v-if="openHints[qIdx]"
+              class="mt-2.5 p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/30 text-xs text-purple-200/90 leading-relaxed whitespace-pre-line animate-in fade-in duration-150"
+              v-html="renderRichMathText(q.hint)"
+            >
+            </div>
+          </div>
         </div>
       </div>
     </div>
