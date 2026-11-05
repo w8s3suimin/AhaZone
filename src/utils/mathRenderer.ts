@@ -142,7 +142,7 @@ export function renderFormulaItem(raw: string): FormattedFormula {
       || /^[a-zA-Z0-9_\^\{\}\s\\ne=<>±+-\\*\/]+$/.test(innerNote);
 
     // 只有確實含有中文字，且不是 (a ≠ 0) 等純數學條件時，才視為說明備註抽離
-    if (hasChinese && !isMathCondition && !mainPart.includes('/') && !mainPart.includes('\\frac')) {
+    if (hasChinese && !isMathCondition) {
       text = mainPart;
       note = noteMatch[2].trim();
     }
@@ -207,7 +207,7 @@ export function renderRichMathText(text: string): string {
   });
 
   // 4. 處理 $...$ 行內數學式（Inline Math）
-  return sanitized.replace(/\$([^$]+)\$/g, (_, math) => {
+  sanitized = sanitized.replace(/\$([^$]+)\$/g, (_, math) => {
     try {
       const latex = formulaToLatex(math);
       // 若包含分數、求和等，以 \displaystyle 渲染，確保分子分母與指數清晰好讀，避免字體過小縮水
@@ -222,4 +222,12 @@ export function renderRichMathText(text: string): string {
       return math;
     }
   });
+
+  // 5. 處理 Markdown 粗體語法 **...**
+  sanitized = sanitized.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-amber-300 font-bold">$1</strong>');
+
+  // 6. 處理項目符號 • 清單
+  sanitized = sanitized.replace(/^•\s*/gm, '<span class="text-amber-400 font-bold mr-1 shrink-0">•</span>');
+
+  return sanitized;
 }

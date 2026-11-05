@@ -54,6 +54,7 @@ const activeTrackTab = ref<'all' | 'mathA' | 'mathB'>('all');
 watch(() => props.chapterName, () => {
   activeTrackTab.value = 'all';
   openSolutions.value = {};
+  openSopSteps.value = { 0: true, 1: true, 2: true, 3: true };
 });
 
 // Check if current chapter has Math A / B differences
@@ -135,6 +136,23 @@ const displayedPitfalls = computed(() => {
 const openHints = ref<Record<number, boolean>>({});
 const toggleHint = (idx: number) => {
   openHints.value[idx] = !openHints.value[idx];
+};
+
+// SOP steps folding state (破題思維步驟折疊控制，預設展開前幾項方便閱讀)
+const openSopSteps = ref<Record<number, boolean>>({ 0: true, 1: true, 2: true, 3: true });
+const toggleSopSteps = (idx: number) => {
+  openSopSteps.value[idx] = !openSopSteps.value[idx];
+};
+const areAllSopStepsOpen = computed(() => {
+  const list = displayedSopModules.value;
+  if (!list || list.length === 0) return false;
+  return list.every((_, idx) => !!openSopSteps.value[idx]);
+});
+const toggleAllSopSteps = () => {
+  const target = !areAllSopStepsOpen.value;
+  displayedSopModules.value.forEach((_, idx) => {
+    openSopSteps.value[idx] = target;
+  });
 };
 
 // Solution steps folding state (折疊解題步驟)
@@ -448,82 +466,134 @@ const chapterResources = computed(() => {
       </div>
     </div>
 
-    <!-- Problem Solving Mindset Section -->
+    <!-- Problem Solving Mindset & Integrated Examples Section -->
     <div v-if="displayedSopModules && displayedSopModules.length > 0" class="space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
           <Compass class="w-4 h-4 text-amber-400" />
-          <span>核心破題思維</span>
+          <span>核心破題思維與典型範例</span>
         </h3>
-        <span class="text-xs text-amber-400/90 font-semibold px-2.5 py-0.5 rounded-full bg-amber-950/60 border border-amber-800/50">
-          解題關鍵
-        </span>
+        <div class="flex items-center gap-2">
+          <button 
+            type="button"
+            @click="toggleAllSopSteps"
+            class="text-xs text-slate-400 hover:text-amber-400 font-medium px-2.5 py-1 rounded-lg bg-slate-800/60 border border-slate-700/60 hover:border-amber-500/40 transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>{{ areAllSopStepsOpen ? '全部折疊步驟' : '全部展開步驟' }}</span>
+          </button>
+          <span class="text-xs text-amber-400/90 font-semibold px-2.5 py-0.5 rounded-full bg-amber-950/60 border border-amber-800/50">
+            解題關鍵
+          </span>
+        </div>
       </div>
 
-      <div class="space-y-4">
+      <div class="space-y-6">
         <div 
           v-for="(mod, mIdx) in displayedSopModules"
           :key="mIdx"
-          class="p-5 rounded-2xl bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-slate-950/90 border border-amber-500/30 shadow-lg space-y-3"
+          class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-slate-950/90 border border-amber-500/30 shadow-lg space-y-4"
         >
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-            <h4 class="text-sm sm:text-base font-extrabold text-amber-200 tracking-wide">
-              {{ mod.moduleName }}
-            </h4>
+          <!-- 模組標題 -->
+          <div class="flex items-center justify-between gap-2 border-b border-amber-500/20 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <h4 class="text-sm sm:text-base font-extrabold text-amber-200 tracking-wide">
+                {{ mod.moduleName }}
+              </h4>
+            </div>
           </div>
 
+          <!-- 先有題目：具體範例題目置頂 -->
+          <div 
+            v-if="mod.question"
+            class="p-4 rounded-xl bg-slate-950/90 border border-amber-500/30 text-xs sm:text-sm text-slate-100 leading-relaxed shadow-inner"
+          >
+            <span class="font-bold text-amber-400 mr-2 shrink-0">【典型範例題目】：</span>
+            <span v-html="renderRichMathText(mod.question)"></span>
+          </div>
+
+          <!-- 直覺心法提示 -->
           <div 
             v-if="mod.mindset"
-            class="px-3.5 py-2 rounded-xl bg-amber-950/40 border border-amber-500/30 text-xs text-amber-200 font-medium"
-          >
-            {{ mod.mindset }}
-          </div>
+            class="px-3.5 py-2.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-xs sm:text-sm text-amber-200 font-medium leading-relaxed"
+            v-html="renderRichMathText(mod.mindset)"
+          />
 
-          <!-- 若有幾何圖形視覺化則動態呈現 -->
+          <!-- 若有幾何圖形視覺化，採由上而下上下垂直排列（保留完整 1:1 視野） -->
           <div 
             v-if="mod.diagramType"
-            class="my-2.5 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
+            class="my-3 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
           >
             <ConceptDiagram :type="mod.diagramType" />
           </div>
 
-          <div 
-            :class="mod.steps.length === 2 ? 'grid grid-cols-1 md:grid-cols-2 gap-3 pt-1' : (mod.steps.length === 1 ? 'flex flex-col gap-3 pt-1' : 'grid grid-cols-1 md:grid-cols-3 gap-3 pt-1')"
+          <!-- 折疊步驟開關按鈕 -->
+          <button 
+            type="button"
+            @click="toggleSopSteps(mIdx)"
+            class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-900/80 transition-all cursor-pointer group"
           >
-            <div 
-              v-for="(step, sIdx) in mod.steps"
-              :key="sIdx"
-              class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 hover:border-amber-500/40 transition-colors flex flex-col justify-start space-y-2"
-            >
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 text-amber-300 font-bold text-xs sm:text-sm border border-amber-600/50 self-start">
-                <Target class="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span v-html="renderRichMathText(step.label)"></span>
+            <span class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-amber-400 group-hover:text-amber-300">
+              <Target class="w-4 h-4" />
+              <span>{{ openSopSteps[mIdx] ? '收合步驟化破題解析' : '展開步驟化破題解析' }}</span>
+              <span class="text-xs text-slate-400 font-normal">（共 {{ mod.steps.length }} 步）</span>
+            </span>
+            <span class="flex items-center gap-1.5 text-xs text-slate-400 group-hover:text-amber-400 font-medium">
+              <span>{{ openSopSteps[mIdx] ? '點擊收合' : '點擊查看解析' }}</span>
+              <ChevronDown 
+                class="w-4 h-4 text-slate-400 group-hover:text-amber-400 transition-transform duration-200" 
+                :class="{ 'rotate-180': openSopSteps[mIdx] }" 
+              />
+            </span>
+          </button>
+
+          <!-- 折疊區域：步驟 1, 2, 3 垂直單欄排列（由上而下） + 結論答案 -->
+          <div v-if="openSopSteps[mIdx]" class="space-y-3 pt-1 transition-all duration-300">
+            <div class="flex flex-col space-y-3">
+              <div 
+                v-for="(step, sIdx) in mod.steps"
+                :key="sIdx"
+                class="p-4 sm:p-5 rounded-xl bg-slate-950/80 border border-slate-800/80 hover:border-amber-500/40 transition-colors flex flex-col justify-start space-y-2.5 shadow-inner"
+              >
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 text-amber-300 font-bold text-xs sm:text-sm border border-amber-600/50 self-start">
+                  <Target class="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span v-html="renderRichMathText(step.label)"></span>
+                </div>
+                <div class="text-xs sm:text-sm text-slate-200 pl-3.5 border-l-2 border-slate-700/80 leading-relaxed font-sans whitespace-pre-line" v-html="renderRichMathText(step.text)"></div>
               </div>
-              <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans whitespace-pre-line" v-html="renderRichMathText(step.text)"></p>
+            </div>
+
+            <!-- 結論答案 -->
+            <div 
+              v-if="mod.answer"
+              class="px-4 py-3 rounded-xl bg-amber-950/30 border border-amber-500/40 text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-2 shadow-inner mt-2"
+            >
+              <Check class="w-4 h-4 text-amber-400 shrink-0" />
+              <span class="shrink-0">結論答案：</span>
+              <span class="text-amber-100 overflow-x-auto" v-html="renderRichMathText(mod.answer)"></span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Pitfalls Section -->
+    <!-- Pitfalls Section (垂直單欄，由上而下閱讀動線) -->
     <div v-if="displayedPitfalls && displayedPitfalls.length > 0" class="space-y-3">
       <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
         <AlertTriangle class="w-4 h-4 text-rose-400" />
         <span>常見解題盲點與避坑提醒</span>
       </h3>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="flex flex-col space-y-3">
         <div 
           v-for="(pitfall, idx) in displayedPitfalls" 
           :key="idx"
-          class="p-3.5 rounded-xl bg-rose-950/20 border border-rose-500/20 text-xs text-rose-200/90 flex items-start gap-2.5"
+          class="p-4 rounded-xl bg-rose-950/20 border border-rose-500/20 text-xs sm:text-sm text-rose-200/90 flex items-start gap-3"
         >
-          <span class="w-4 h-4 rounded-full bg-rose-900/60 text-rose-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+          <span class="w-5 h-5 rounded-full bg-rose-900/60 text-rose-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
             {{ idx + 1 }}
           </span>
-          <span class="leading-relaxed">{{ pitfall }}</span>
+          <span class="leading-relaxed whitespace-pre-line" v-html="renderRichMathText(pitfall)"></span>
         </div>
       </div>
     </div>
