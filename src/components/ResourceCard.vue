@@ -34,7 +34,7 @@ const handleLaunchLab = () => {
             class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-sky-500/20 to-indigo-500/20 text-sky-300 border border-sky-500/30"
           >
             <Sparkles class="w-3.5 h-3.5 text-sky-400" />
-            動態 3D 互動實驗室
+            {{ resource.categoryLabel || (resource.tags.includes('3D') ? '動態 3D 幾何實驗室' : '動態隨機出題卷') }}
           </span>
           <span 
             v-else-if="resource.type === 'pdf-exam'"
@@ -110,7 +110,7 @@ const handleLaunchLab = () => {
           class="flex-1 py-2 px-4 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-md shadow-sky-600/25 transition-all"
         >
           <Sparkles class="w-3.5 h-3.5" />
-          <span>啟動 3D 幾何模擬室</span>
+          <span>{{ resource.actionLabel || (resource.tags.includes('3D') ? '啟動 3D 幾何模擬室' : '開啟動態訓練卷') }}</span>
           <ArrowRight class="w-3.5 h-3.5" />
         </button>
         <a

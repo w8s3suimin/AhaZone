@@ -8,6 +8,8 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     subtitle: '3D 空間沙漏錐面與 2D 投影漸近線幾何解析',
     description: '利用 Three.js 即時運算雙圓錐在任意傾角 θ (0°~90°) 與平移距離 d 下的截痕曲線。視覺化解析雙曲線、拋物線（臨界平行母線）、橢圓與正圓之幾何本質。',
     type: 'dynamic',
+    categoryLabel: '動態 3D 幾何實驗室',
+    actionLabel: '啟動 3D 幾何模擬室',
     stage: 'senior',
     grade: 's11-math',
     gradeLabel: '高二 (數B專屬)',
@@ -22,19 +24,38 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
       '觀察過頂點基準面 π₀ 漸近線母線如何與平移截面 π_d 的曲線在無窮遠處貼合',
       '切換「剛體垂直投影」與「曲線中心對稱視圖」驗證對稱軸與中心位移'
     ],
+    operationTips: [
+      {
+        title: '1. 3D 視角自由旋轉：',
+        desc: '在左側 3D 視圖中，按住滑鼠左鍵拖曳旋轉錐體視角，滾輪縮放視角。',
+        color: 'sky'
+      },
+      {
+        title: '2. 觀察漸近線嚴密對偶：',
+        desc: '拖曳傾角 θ 至 0°~45°，點擊右上角「切換為：曲線中心對稱視圖」，直觀對比「剛體空間投影」與「標準代數坐標」。',
+        color: 'amber'
+      },
+      {
+        title: '3. 臨界拋物線：',
+        desc: '將傾角 θ 調整到剛好 45.0°，截面正好平行圓錐母線，此時兩條漸近線夾角壓縮為 0° 重合！',
+        color: 'emerald'
+      }
+    ],
     featured: true,
     date: '2026-11-03',
     downloads: 1420,
     rating: 4.9
   },
 
-  // 2. 指數律與對數律動態隨機出題卷（無限題庫）
+  // 2. 高一第一章【數與式】：指數律與對數律動態隨機出題卷（無限題庫）
   {
     id: 'res-dynamic-exp-log-worksheet',
     title: '指數律與對數律自動化出題訓練卷（無限隨機題庫）',
     subtitle: '一鍵動態出題 ｜ 仿真 A4 試卷 ｜ 支援即時列印與標準答案頁',
-    description: '依據高中數學常考運算演算法，一鍵隨機生成 30 道精選指數律與常用對數律基礎運算題。具備仿真標準 A4 試卷排版，點擊重新整理即可產生全新試卷與對應解答，支援瀏覽器一鍵列印成實體紙本測驗卷。',
+    description: '依據高一第一章【數與式】運算演算法，一鍵隨機生成 30 道精選指數律與常用對數律基礎運算題。具備仿真標準 A4 試卷排版，點擊重新整理即可產生全新試卷與對應解答，支援瀏覽器一鍵列印成實體紙本測驗卷。',
     type: 'dynamic',
+    categoryLabel: '動態隨機出題卷',
+    actionLabel: '開啟動態訓練卷',
     stage: 'senior',
     grade: 's10-math',
     gradeLabel: '高一數學',
@@ -48,6 +69,23 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
       '熟練分數次方與負整數指數的快速化簡互換',
       '精熟常用對數真數相乘除拆解與小數運算估計',
       '隨機無限出題，建立學生扎實無死角的計算基本功'
+    ],
+    operationTips: [
+      {
+        title: '1. 重新隨機出題 (快捷鍵 R)：',
+        desc: '點擊上方工具列「重新出題」按鈕（或按鍵盤 R 鍵），立即由演算法重新產生全新 30 道題目與對應解答。',
+        color: 'sky'
+      },
+      {
+        title: '2. 題目旁解答即時切換：',
+        desc: '點擊「顯示答案」可在題目等號後方直接呈現答案，適合課堂投影演示、快速批改或自修檢驗。',
+        color: 'amber'
+      },
+      {
+        title: '3. 標準 A4 列印 / 存為 PDF (快捷鍵 P)：',
+        desc: '點擊「列印 / 另存 PDF」，自動隱藏網頁邊界與按鈕，輸出精確兩頁（試卷與解答卷）標準 A4 考卷。',
+        color: 'emerald'
+      }
     ],
     featured: true,
     date: '2026-11-05',
