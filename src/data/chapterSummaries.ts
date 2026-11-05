@@ -1892,8 +1892,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         track: 'common'
       },
       {
-        title: '4. 對數的本質與數B必備對數律',
-        description: '對數白話定義：$\\log_a b$ 即「底數 $a$ 要升到幾次方才會等於真數 $b$」。數B必備四組核心公式：',
+        title: '4. 對數律',
+        description: '對數白話定義：$\\log_a b$ 即「$b$ 是 $a$ 的幾次方」：',
         formulas: [
           '分合公式：\\log_a(xy) = \\log_a x + \\log_a y, \\quad \\log_a\\left(\\frac{x}{y}\\right) = \\log_a x - \\log_a y',
           '次係公式合體版：\\log_{a^n}(x^m) = \\frac{m}{n} \\log_a x',
