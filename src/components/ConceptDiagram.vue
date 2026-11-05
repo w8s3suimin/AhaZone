@@ -747,8 +747,8 @@ const props = defineProps<{
           { x: -3, y: 0, color: '#f43f5e', label: '(-3, 0)', labelPos: 'bottom' },
           { x: 0, y: 3, color: '#f43f5e', label: '(0, 3)', labelPos: 'left' },
           { x: 0, y: 1, color: '#38bdf8', label: '(0, 1)', labelPos: 'right' },
-          { x: -2.857, y: 0.143, color: '#f59e0b', radius: 4.5, label: '交點A(-3,-2)', labelPos: 'top-left' },
-          { x: 2.457, y: 5.457, color: '#f59e0b', radius: 4.5, label: '交點B(0,3)', labelPos: 'bottom-right' }
+          { x: -2.857, y: 0.143, color: '#f59e0b', radius: 4.5, label: '交點A: x ∈ (-3, -2)', labelPos: 'top-left' },
+          { x: 2.457, y: 5.457, color: '#f59e0b', radius: 4.5, label: '交點B: x ∈ (2, 3)', labelPos: 'bottom-right' }
         ]"
         :lines="[
           { x1: 0, y1: 1, x2: 0, y2: 3, color: '#f59e0b', strokeWidth: 1.2, dashArray: '2 2' }
@@ -798,8 +798,8 @@ const props = defineProps<{
           { x: -6, y: 0, color: '#f43f5e', label: '(-6, 0)', labelPos: 'bottom' },
           { x: 0, y: 6, color: '#f43f5e', label: '(0, 6)', labelPos: 'left' },
           { x: 0, y: 1, color: '#38bdf8', label: '(0, 1)', labelPos: 'right' },
-          { x: -5.984, y: 0.016, color: '#f59e0b', radius: 4.5, label: '交點A(-6,-5)', labelPos: 'top-right' },
-          { x: 3.256, y: 9.256, color: '#f59e0b', radius: 4.5, label: '交點B(3,4)', labelPos: 'bottom-right' }
+          { x: -5.984, y: 0.016, color: '#f59e0b', radius: 4.5, label: '交點A: x ∈ (-6, -5)', labelPos: 'top-right' },
+          { x: 3.256, y: 9.256, color: '#f59e0b', radius: 4.5, label: '交點B: x ∈ (3, 4)', labelPos: 'bottom-right' }
         ]"
         :lines="[
           { x1: 0, y1: 1, x2: 0, y2: 6, color: '#f59e0b', strokeWidth: 1.2, dashArray: '2 2' }
@@ -845,7 +845,7 @@ const props = defineProps<{
             { fn: (x: number) => -x, color: '#f43f5e', strokeWidth: 2.2, label: 'y_2 = -x' }
           ]"
           :points="[
-            { x: -0.641, y: 0.641, color: '#f59e0b', label: '交點A(-1,0)', labelPos: 'top-left' }
+            { x: -0.641, y: 0.641, color: '#f59e0b', label: '交點A: x ∈ (-1, 0)', labelPos: 'top-left' }
           ]"
           :badges="[
             { x: -0.5, y: -0.8, text: '恰有 1 個相異實根', color: '#e0f2fe', bgColor: '#0369a1' }
@@ -866,9 +866,9 @@ const props = defineProps<{
             { fn: (x: number) => x * x, color: '#f59e0b', strokeWidth: 2.2, label: 'y_2 = x^2' }
           ]"
           :points="[
-            { x: -0.767, y: 0.588, color: '#f43f5e', label: '交點A(-1,0)', labelPos: 'top-left' },
-            { x: 2, y: 4, color: '#f43f5e', label: '交點B(2,4)', labelPos: 'bottom-right' },
-            { x: 4, y: 16, color: '#f43f5e', label: '交點C(4,16)', labelPos: 'top-left' }
+            { x: -0.767, y: 0.588, color: '#f43f5e', label: '交點A: x ∈ (-1, 0)', labelPos: 'top-left' },
+            { x: 2, y: 4, color: '#f43f5e', label: '交點B(2, 4)', labelPos: 'bottom-right' },
+            { x: 4, y: 16, color: '#f43f5e', label: '交點C(4, 16)', labelPos: 'top-left' }
           ]"
           :badges="[
             { x: 1.15, y: -0.8, text: '共有 3 個相異實根！', color: '#ede9fe', bgColor: '#6d28d9' }
