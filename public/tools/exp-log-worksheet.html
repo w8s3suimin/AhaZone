@@ -114,7 +114,7 @@
         display: inline-block !important;
       }
       .question-row {
-        min-height: 32px !important;
+        min-height: 44px !important; font-size: 15px !important;
         padding-top: 2px !important;
         padding-bottom: 2px !important;
       }
@@ -124,8 +124,14 @@
       border-right: 1.5px dashed #cbd5e1;
     }
 
+    /* Enforce at least 12pt (16px) font size for math symbols and text */
     .katex {
-      font-size: 1.05em !important;
+      font-size: 1.25em !important;
+    }
+
+    .question-row {
+      min-height: 46px !important;
+      font-size: 16px !important; /* >= 12pt */
     }
 
     .editable-title:hover {
@@ -235,31 +241,21 @@
               單元：數與式 ｜ 指數律與常用對數運算演練試卷
             </h2>
           </div>
-          <div class="text-right text-xs text-slate-500 font-mono">
-            <div>卷號：<span id="headerSerial" class="font-bold text-slate-800">#EXP-0000</span></div>
-            <div>時間：40 分鐘 ｜ 滿分：100 分</div>
+          <div class="text-right text-sm text-slate-500 font-mono">
+            <div>卷號：<span id="headerSerial" class="font-bold text-slate-800 text-base">#EXP-0000</span></div>
           </div>
         </div>
 
-        <!-- Student Info Fields -->
-        <div class="mt-2 pt-1.5 border-t border-slate-300 flex items-center justify-between text-xs font-medium text-slate-700">
-          <div class="flex items-center gap-6">
-            <span>班級：<span class="inline-block w-20 border-b border-slate-700"></span></span>
-            <span>姓名：<span class="inline-block w-28 border-b border-slate-700"></span></span>
-            <span>座號：<span class="inline-block w-16 border-b border-slate-700"></span></span>
+        <!-- Student Info Fields (No score box, no time limit) -->
+        <div class="mt-2.5 pt-2 border-t border-slate-300 flex items-center justify-between text-sm font-medium text-slate-700">
+          <div class="flex items-center gap-8">
+            <span>班級：<span class="inline-block w-28 border-b border-slate-700"></span></span>
+            <span>姓名：<span class="inline-block w-32 border-b border-slate-700"></span></span>
+            <span>座號：<span class="inline-block w-20 border-b border-slate-700"></span></span>
           </div>
           <div class="flex items-center gap-4">
             <span>日期：____ 年 ____ 月 ____ 日</span>
-            <div class="px-3 py-0.5 border border-slate-800 rounded font-bold text-slate-900 bg-slate-50">
-              得分：<span class="inline-block w-12 text-center text-sm"></span>
-            </div>
           </div>
-        </div>
-
-        <!-- Instructions -->
-        <div class="mt-1 text-[11px] text-slate-500 flex items-center justify-between">
-          <span>作答說明：全卷共 30 題，兩大題型各 15 題。第一大題請化簡為最簡整數或分數；第二大題請化為四位小數。</span>
-          <span class="text-sky-700 font-semibold">【請將最終答案整齊填寫於等號後方】</span>
         </div>
       </div>
 
@@ -269,8 +265,7 @@
         <!-- Left Column: 題型一 (指數律 15 題) -->
         <div class="dashed-divider pr-3 flex flex-col justify-between">
           <div class="bg-sky-50 border-l-4 border-sky-600 px-2 py-1 mb-1 flex items-center justify-between rounded-r">
-            <span class="text-xs font-bold text-sky-950">一、指數律化簡與求值（共 15 題）</span>
-            <span class="text-[10px] text-sky-700">每題 3 分</span>
+            <span class="text-sm sm:text-base font-bold text-sky-950">一、指數律化簡與求值（共 15 題）</span>
           </div>
 
           <!-- Type 1 Question List (15 items) -->
@@ -282,8 +277,7 @@
         <!-- Right Column: 題型二 (對數律 15 題) -->
         <div class="pl-1 flex flex-col justify-between">
           <div class="bg-indigo-50 border-l-4 border-indigo-600 px-2 py-1 mb-1 flex items-center justify-between rounded-r">
-            <span class="text-xs font-bold text-indigo-950">二、常用對數律化簡與求值（共 15 題）</span>
-            <span class="text-[10px] text-indigo-700">每題 3 分</span>
+            <span class="text-sm sm:text-base font-bold text-indigo-950">二、常用對數律化簡與求值（共 15 題）</span>
           </div>
 
           <!-- Type 2 Question List (15 items) -->
@@ -330,7 +324,7 @@
         <!-- Type 1 Answers -->
         <div class="dashed-divider pr-3 flex flex-col justify-between">
           <div class="bg-emerald-50 border-l-4 border-emerald-600 px-2 py-1 mb-1.5 rounded-r flex items-center justify-between">
-            <span class="text-xs font-bold text-emerald-950">一、指數律解答（15 題）</span>
+            <span class="text-sm sm:text-base font-bold text-emerald-950">一、指數律解答（15 題）</span>
             <span class="text-[10px] text-emerald-700 font-medium">最簡分數 / 整數</span>
           </div>
 
@@ -342,7 +336,7 @@
         <!-- Type 2 Answers -->
         <div class="pl-1 flex flex-col justify-between">
           <div class="bg-emerald-50 border-l-4 border-emerald-600 px-2 py-1 mb-1.5 rounded-r flex items-center justify-between">
-            <span class="text-xs font-bold text-emerald-950">二、常用對數律解答（15 題）</span>
+            <span class="text-sm sm:text-base font-bold text-emerald-950">二、常用對數律解答（15 題）</span>
             <span class="text-[10px] text-emerald-700 font-medium">小數四位 ｜ 質因數對數展開</span>
           </div>
 
@@ -615,17 +609,17 @@
       // Render Type 1 (指數律 15 題)
       currentQuestions.type1.forEach((q, idx) => {
         const item = document.createElement('div');
-        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center justify-between min-h-[34px]';
+        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center justify-between text-base';
         
         const leftWrap = document.createElement('div');
-        leftWrap.className = 'flex items-center gap-1.5';
+        leftWrap.className = 'flex items-center gap-2';
         
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-6 text-right';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base';
         numSpan.textContent = `(${idx + 1})`;
         
         const mathSpan = document.createElement('span');
-        mathSpan.className = 'font-serif text-slate-900';
+        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg';
         renderMath(mathSpan, q.questionLatex, false);
         
         leftWrap.appendChild(numSpan);
@@ -636,11 +630,11 @@
         rightWrap.className = 'flex items-center gap-1 text-right';
 
         const answerSpan = document.createElement('span');
-        answerSpan.className = `inline-answer font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200 ${showInlineAnswers ? '' : 'hidden'}`;
+        answerSpan.className = `inline-answer font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-300 text-base ${showInlineAnswers ? '' : 'hidden'}`;
         renderMath(answerSpan, q.ansLatex, false);
 
         const blankLine = document.createElement('span');
-        blankLine.className = `answer-placeholder border-b-2 border-slate-400 w-16 inline-block ${showInlineAnswers ? 'hidden' : ''}`;
+        blankLine.className = `answer-placeholder border-b-2 border-slate-400 w-20 sm:w-24 inline-block ${showInlineAnswers ? 'hidden' : ''}`;
 
         rightWrap.appendChild(answerSpan);
         rightWrap.appendChild(blankLine);
@@ -653,17 +647,17 @@
       // Render Type 2 (對數律 15 題)
       currentQuestions.type2.forEach((q, idx) => {
         const item = document.createElement('div');
-        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center justify-between min-h-[34px]';
+        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center justify-between text-base';
 
         const leftWrap = document.createElement('div');
-        leftWrap.className = 'flex items-center gap-1.5';
+        leftWrap.className = 'flex items-center gap-2';
 
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-6 text-right';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base';
         numSpan.textContent = `(${idx + 1})`;
 
         const mathSpan = document.createElement('span');
-        mathSpan.className = 'font-serif text-slate-900';
+        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg';
         renderMath(mathSpan, q.questionLatex, false);
 
         leftWrap.appendChild(numSpan);
@@ -674,11 +668,11 @@
         rightWrap.className = 'flex items-center gap-1 text-right';
 
         const answerSpan = document.createElement('span');
-        answerSpan.className = `inline-answer font-bold font-mono text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200 ${showInlineAnswers ? '' : 'hidden'}`;
+        answerSpan.className = `inline-answer font-bold font-mono text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-300 text-base ${showInlineAnswers ? '' : 'hidden'}`;
         answerSpan.textContent = q.logValStr;
 
         const blankLine = document.createElement('span');
-        blankLine.className = `answer-placeholder border-b-2 border-slate-400 w-16 inline-block ${showInlineAnswers ? 'hidden' : ''}`;
+        blankLine.className = `answer-placeholder border-b-2 border-slate-400 w-20 sm:w-24 inline-block ${showInlineAnswers ? 'hidden' : ''}`;
 
         rightWrap.appendChild(answerSpan);
         rightWrap.appendChild(blankLine);
@@ -698,20 +692,20 @@
       // Render Type 1 Answers: directly next to equal sign!
       currentQuestions.type1.forEach((q, idx) => {
         const row = document.createElement('div');
-        row.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center min-h-[34px] hover:bg-slate-50 transition-colors';
+        row.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center text-base hover:bg-slate-50 transition-colors';
 
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-6 text-right shrink-0 mr-1';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right shrink-0 mr-1.5 text-sm sm:text-base';
         numSpan.textContent = `(${idx + 1})`;
 
         const mathWrap = document.createElement('div');
-        mathWrap.className = 'flex items-center text-slate-800';
+        mathWrap.className = 'flex items-center text-slate-800 text-base sm:text-lg';
 
         const qMath = document.createElement('span');
         renderMath(qMath, q.questionLatex, false); // Contains '=' at the end
 
         const aMath = document.createElement('span');
-        aMath.className = 'font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300 ml-1.5';
+        aMath.className = 'font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300 ml-2 text-base';
         renderMath(aMath, q.ansLatex, false);
 
         mathWrap.appendChild(qMath);
@@ -725,24 +719,24 @@
       // Render Type 2 Answers: directly next to equal sign!
       currentQuestions.type2.forEach((q, idx) => {
         const row = document.createElement('div');
-        row.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center min-h-[34px] hover:bg-slate-50 transition-colors';
+        row.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center text-base hover:bg-slate-50 transition-colors';
 
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-6 text-right shrink-0 mr-1';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right shrink-0 mr-1.5 text-sm sm:text-base';
         numSpan.textContent = `(${idx + 1})`;
 
         const mathWrap = document.createElement('div');
-        mathWrap.className = 'flex items-center text-slate-800 flex-wrap gap-y-0.5';
+        mathWrap.className = 'flex items-center text-slate-800 text-base sm:text-lg flex-wrap gap-y-0.5';
 
         const qMath = document.createElement('span');
         renderMath(qMath, q.questionLatex, false); // Contains '=' at the end
 
         const valSpan = document.createElement('span');
-        valSpan.className = 'font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300 ml-1.5';
+        valSpan.className = 'font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300 ml-2 text-base';
         valSpan.textContent = q.logValStr;
 
         const decompSpan = document.createElement('span');
-        decompSpan.className = 'text-[11px] text-slate-500 ml-2 hidden sm:inline-block';
+        decompSpan.className = 'text-xs text-slate-500 ml-2 hidden sm:inline-block';
         renderMath(decompSpan, `(${q.decompLatex})`, false);
 
         mathWrap.appendChild(qMath);
