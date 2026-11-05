@@ -8,59 +8,57 @@ const props = defineProps<{
   type: string;
 }>();
 
-// 函數圖形平移伸縮與對稱動態操作狀態（順序感知步驟鏈模型）
+// 函數圖形平移伸縮與對稱動態操作狀態（向量平移 (h,k) 整合 ＆ 順序感知步驟鏈）
 const initialFamily = ref<'exp' | 'log'>('exp');
 
 export interface StepRecord {
   id: number;
-  type: 'shiftX' | 'shiftY' | 'scaleX' | 'scaleY' | 'reflectX' | 'reflectY' | 'inverse';
-  val?: number; // shift offset or scale index
+  type: 'shift' | 'scaleX' | 'scaleY' | 'reflectX' | 'reflectY' | 'inverse';
+  h?: number;
+  k?: number;
+  val?: number; // scale index
   label: string;
 }
 
 const stepHistory = ref<StepRecord[]>([]);
 let nextStepId = 1;
 
-// Active in-progress stepper state
-const activeAction = ref<'shiftX' | 'shiftY' | 'scaleX' | 'scaleY' | null>(null);
-const subtotalShiftX = ref(0);
-const subtotalShiftY = ref(0);
+// 進行中的步進小計狀態（切換動作時自動結算提交至履歷並歸零）
+const activeActionType = ref<'shift' | 'scaleX' | 'scaleY' | null>(null);
+const activeShiftH = ref(0);
+const activeShiftK = ref(0);
 
 const scaleValues = [0.25, 1 / 3, 0.5, 1, 2, 3, 4, 5, 6];
 const scaleLabels = ['1/4', '1/3', '1/2', '1', '2', '3', '4', '5', '6'];
-const subtotalScaleXIdx = ref(3); // default index 3 is 1x
-const subtotalScaleYIdx = ref(3); // default index 3 is 1x
+const activeScaleXIdx = ref(3); // 3 代表 1 倍
+const activeScaleYIdx = ref(3); // 3 代表 1 倍
 
-// Helper to commit current in-progress action if switching
+// 結算提交目前進行中的動作
 function commitActiveAction() {
-  if (!activeAction.value) return;
+  if (!activeActionType.value) return;
 
-  if (activeAction.value === 'shiftX' && subtotalShiftX.value !== 0) {
-    const h = subtotalShiftX.value;
+  if (activeActionType.value === 'shift' && (activeShiftH.value !== 0 || activeShiftK.value !== 0)) {
+    const h = activeShiftH.value;
+    const k = activeShiftK.value;
+    const hText = h > 0 ? `+${h}` : `${h}`;
+    const kText = k > 0 ? `+${k}` : `${k}`;
     stepHistory.value.push({
       id: nextStepId++,
-      type: 'shiftX',
-      val: h,
-      label: `X 平移 ${h > 0 ? `向右 ${h}` : `向左 ${-h}`} 單位`
+      type: 'shift',
+      h,
+      k,
+      label: `平移 (${hText}, ${kText})`
     });
-  } else if (activeAction.value === 'shiftY' && subtotalShiftY.value !== 0) {
-    const k = subtotalShiftY.value;
-    stepHistory.value.push({
-      id: nextStepId++,
-      type: 'shiftY',
-      val: k,
-      label: `Y 平移 ${k > 0 ? `向上 ${k}` : `向下 ${-k}`} 單位`
-    });
-  } else if (activeAction.value === 'scaleX' && subtotalScaleXIdx.value !== 3) {
-    const sIdx = subtotalScaleXIdx.value;
+  } else if (activeActionType.value === 'scaleX' && activeScaleXIdx.value !== 3) {
+    const sIdx = activeScaleXIdx.value;
     stepHistory.value.push({
       id: nextStepId++,
       type: 'scaleX',
       val: sIdx,
       label: `X 伸縮 ${scaleLabels[sIdx]} 倍`
     });
-  } else if (activeAction.value === 'scaleY' && subtotalScaleYIdx.value !== 3) {
-    const sIdx = subtotalScaleYIdx.value;
+  } else if (activeActionType.value === 'scaleY' && activeScaleYIdx.value !== 3) {
+    const sIdx = activeScaleYIdx.value;
     stepHistory.value.push({
       id: nextStepId++,
       type: 'scaleY',
@@ -69,74 +67,82 @@ function commitActiveAction() {
     });
   }
 
-  // Reset subtotals
-  subtotalShiftX.value = 0;
-  subtotalShiftY.value = 0;
-  subtotalScaleXIdx.value = 3;
-  subtotalScaleYIdx.value = 3;
-  activeAction.value = null;
+  // 小計歸零
+  activeShiftH.value = 0;
+  activeShiftK.value = 0;
+  activeScaleXIdx.value = 3;
+  activeScaleYIdx.value = 3;
+  activeActionType.value = null;
 }
 
-// Stepper click handlers
+// X 平移與 Y 平移合併為同一組平移 (h, k) 同時累計
 function handleShiftX(delta: number) {
-  if (activeAction.value !== 'shiftX') {
+  if (activeActionType.value !== 'shift') {
     commitActiveAction();
-    activeAction.value = 'shiftX';
-    subtotalShiftX.value = 0;
+    activeActionType.value = 'shift';
+    activeShiftH.value = 0;
+    activeShiftK.value = 0;
   }
-  subtotalShiftX.value += delta;
-  if (subtotalShiftX.value === 0) {
-    activeAction.value = null;
+  activeShiftH.value += delta;
+  if (activeShiftH.value === 0 && activeShiftK.value === 0) {
+    activeActionType.value = null;
   }
 }
 
 function handleShiftY(delta: number) {
-  if (activeAction.value !== 'shiftY') {
+  if (activeActionType.value !== 'shift') {
     commitActiveAction();
-    activeAction.value = 'shiftY';
-    subtotalShiftY.value = 0;
+    activeActionType.value = 'shift';
+    activeShiftH.value = 0;
+    activeShiftK.value = 0;
   }
-  subtotalShiftY.value += delta;
-  if (subtotalShiftY.value === 0) {
-    activeAction.value = null;
+  activeShiftK.value += delta;
+  if (activeShiftH.value === 0 && activeShiftK.value === 0) {
+    activeActionType.value = null;
   }
 }
 
+// 伸縮步進調整
 function handleScaleX(direction: 'up' | 'down') {
-  if (activeAction.value !== 'scaleX') {
+  if (activeActionType.value !== 'scaleX') {
     commitActiveAction();
-    activeAction.value = 'scaleX';
-    subtotalScaleXIdx.value = 3; // 1x
+    activeActionType.value = 'scaleX';
+    activeScaleXIdx.value = 3;
   }
-  if (direction === 'up' && subtotalScaleXIdx.value < scaleValues.length - 1) {
-    subtotalScaleXIdx.value++;
-  } else if (direction === 'down' && subtotalScaleXIdx.value > 0) {
-    subtotalScaleXIdx.value--;
+  if (direction === 'up' && activeScaleXIdx.value < scaleValues.length - 1) {
+    activeScaleXIdx.value++;
+  } else if (direction === 'down' && activeScaleXIdx.value > 0) {
+    activeScaleXIdx.value--;
   }
-  if (subtotalScaleXIdx.value === 3) {
-    activeAction.value = null;
+  if (activeScaleXIdx.value === 3) {
+    activeActionType.value = null;
   }
 }
 
 function handleScaleY(direction: 'up' | 'down') {
-  if (activeAction.value !== 'scaleY') {
+  if (activeActionType.value !== 'scaleY') {
     commitActiveAction();
-    activeAction.value = 'scaleY';
-    subtotalScaleYIdx.value = 3; // 1x
+    activeActionType.value = 'scaleY';
+    activeScaleYIdx.value = 3;
   }
-  if (direction === 'up' && subtotalScaleYIdx.value < scaleValues.length - 1) {
-    subtotalScaleYIdx.value++;
-  } else if (direction === 'down' && subtotalScaleYIdx.value > 0) {
-    subtotalScaleYIdx.value--;
+  if (direction === 'up' && activeScaleYIdx.value < scaleValues.length - 1) {
+    activeScaleYIdx.value++;
+  } else if (direction === 'down' && activeScaleYIdx.value > 0) {
+    activeScaleYIdx.value--;
   }
-  if (subtotalScaleYIdx.value === 3) {
-    activeAction.value = null;
+  if (activeScaleYIdx.value === 3) {
+    activeActionType.value = null;
   }
 }
 
-// Immediate Symmetries on the currently accumulated state
+// 連續相同翻轉直接取消翻轉（不用累計步驟）
 function applyReflectX() {
   commitActiveAction();
+  const lastStep = stepHistory.value[stepHistory.value.length - 1];
+  if (lastStep && lastStep.type === 'reflectX') {
+    stepHistory.value.pop(); // 相同的連續翻轉等同於取消翻轉
+    return;
+  }
   stepHistory.value.push({
     id: nextStepId++,
     type: 'reflectX',
@@ -146,6 +152,11 @@ function applyReflectX() {
 
 function applyReflectY() {
   commitActiveAction();
+  const lastStep = stepHistory.value[stepHistory.value.length - 1];
+  if (lastStep && lastStep.type === 'reflectY') {
+    stepHistory.value.pop(); // 相同的連續翻轉等同於取消翻轉
+    return;
+  }
   stepHistory.value.push({
     id: nextStepId++,
     type: 'reflectY',
@@ -155,6 +166,11 @@ function applyReflectY() {
 
 function applyInverse() {
   commitActiveAction();
+  const lastStep = stepHistory.value[stepHistory.value.length - 1];
+  if (lastStep && lastStep.type === 'inverse') {
+    stepHistory.value.pop(); // 相同的連續反函數等同於取消反函數
+    return;
+  }
   stepHistory.value.push({
     id: nextStepId++,
     type: 'inverse',
@@ -163,12 +179,12 @@ function applyInverse() {
 }
 
 function undoLastStep() {
-  if (activeAction.value) {
-    subtotalShiftX.value = 0;
-    subtotalShiftY.value = 0;
-    subtotalScaleXIdx.value = 3;
-    subtotalScaleYIdx.value = 3;
-    activeAction.value = null;
+  if (activeActionType.value) {
+    activeShiftH.value = 0;
+    activeShiftK.value = 0;
+    activeScaleXIdx.value = 3;
+    activeScaleYIdx.value = 3;
+    activeActionType.value = null;
   } else if (stepHistory.value.length > 0) {
     stepHistory.value.pop();
   }
@@ -176,11 +192,11 @@ function undoLastStep() {
 
 function resetAll() {
   stepHistory.value = [];
-  activeAction.value = null;
-  subtotalShiftX.value = 0;
-  subtotalShiftY.value = 0;
-  subtotalScaleXIdx.value = 3;
-  subtotalScaleYIdx.value = 3;
+  activeActionType.value = null;
+  activeShiftH.value = 0;
+  activeShiftK.value = 0;
+  activeScaleXIdx.value = 3;
+  activeScaleYIdx.value = 3;
 }
 
 function setInitialFamily(fam: 'exp' | 'log') {
@@ -189,73 +205,62 @@ function setInitialFamily(fam: 'exp' | 'log') {
 }
 
 function getActiveStepLabel(): string {
-  if (activeAction.value === 'shiftX') {
-    const h = subtotalShiftX.value;
-    return `X 平移 ${h > 0 ? `向右 ${h}` : `向左 ${-h}`} 單位`;
+  if (activeActionType.value === 'shift') {
+    const h = activeShiftH.value;
+    const k = activeShiftK.value;
+    return `平移 (${h > 0 ? `+${h}` : h}, ${k > 0 ? `+${k}` : k})`;
   }
-  if (activeAction.value === 'shiftY') {
-    const k = subtotalShiftY.value;
-    return `Y 平移 ${k > 0 ? `向上 ${k}` : `向下 ${-k}`} 單位`;
+  if (activeActionType.value === 'scaleX') {
+    return `X 伸縮 ${scaleLabels[activeScaleXIdx.value]} 倍`;
   }
-  if (activeAction.value === 'scaleX') {
-    return `X 伸縮 ${scaleLabels[subtotalScaleXIdx.value]} 倍`;
-  }
-  if (activeAction.value === 'scaleY') {
-    return `Y 伸縮 ${scaleLabels[subtotalScaleYIdx.value]} 倍`;
+  if (activeActionType.value === 'scaleY') {
+    return `Y 伸縮 ${scaleLabels[activeScaleYIdx.value]} 倍`;
   }
   return '';
 }
 
-// Compute cumulative state through history + active step
+// 計算累積狀態與方程式
 const currentTransConfig = computed(() => {
-  // Synthesize all steps into a list
   const steps: StepRecord[] = [...stepHistory.value];
-  if (activeAction.value === 'shiftX' && subtotalShiftX.value !== 0) {
-    steps.push({ id: 0, type: 'shiftX', val: subtotalShiftX.value, label: '' });
-  } else if (activeAction.value === 'shiftY' && subtotalShiftY.value !== 0) {
-    steps.push({ id: 0, type: 'shiftY', val: subtotalShiftY.value, label: '' });
-  } else if (activeAction.value === 'scaleX' && subtotalScaleXIdx.value !== 3) {
-    steps.push({ id: 0, type: 'scaleX', val: subtotalScaleXIdx.value, label: '' });
-  } else if (activeAction.value === 'scaleY' && subtotalScaleYIdx.value !== 3) {
-    steps.push({ id: 0, type: 'scaleY', val: subtotalScaleYIdx.value, label: '' });
+  if (activeActionType.value === 'shift' && (activeShiftH.value !== 0 || activeShiftK.value !== 0)) {
+    steps.push({ id: 0, type: 'shift', h: activeShiftH.value, k: activeShiftK.value, label: '' });
+  } else if (activeActionType.value === 'scaleX' && activeScaleXIdx.value !== 3) {
+    steps.push({ id: 0, type: 'scaleX', val: activeScaleXIdx.value, label: '' });
+  } else if (activeActionType.value === 'scaleY' && activeScaleYIdx.value !== 3) {
+    steps.push({ id: 0, type: 'scaleY', val: activeScaleYIdx.value, label: '' });
   }
 
-  // Model parameters: y = C * f(A * x + B) + D
+  // 函數模型參數：y = C * f(A * x + B) + D
   let fam: 'exp' | 'log' = initialFamily.value;
   let A = 1;
   let B = 0;
   let C = 1;
   let D = 0;
 
-  // Anchor point tracking
+  // 基準錨點追蹤
   let px = fam === 'exp' ? 0 : 1;
   let py = fam === 'exp' ? 1 : 0;
 
-  // Asymptote tracking: isHorizontal, value
+  // 漸近線追蹤
   let asymIsHoriz = fam === 'exp';
   let asymVal = 0;
 
   for (const st of steps) {
     switch (st.type) {
-      case 'shiftX': {
-        const h = st.val || 0;
-        // x -> x - h  =>  u = A(x - h) + B = Ax + (B - Ah)
+      case 'shift': {
+        const h = st.h || 0;
+        const k = st.k || 0;
+        // x -> x - h, y -> y + k
         B = B - A * h;
-        px += h;
-        if (!asymIsHoriz) asymVal += h;
-        break;
-      }
-      case 'shiftY': {
-        const k = st.val || 0;
-        // y -> y + k  =>  y = C*f(u) + D + k
         D = D + k;
+        px += h;
         py += k;
         if (asymIsHoriz) asymVal += k;
+        else asymVal += h;
         break;
       }
       case 'scaleX': {
         const s = scaleValues[st.val ?? 3];
-        // x -> x / s  =>  u = A(x / s) + B = (A / s)x + B
         A = A / s;
         px *= s;
         if (!asymIsHoriz) asymVal *= s;
@@ -263,7 +268,6 @@ const currentTransConfig = computed(() => {
       }
       case 'scaleY': {
         const s = scaleValues[st.val ?? 3];
-        // y -> s * y  =>  y = s*(C*f(u) + D) = (s*C)*f(u) + (s*D)
         C *= s;
         D *= s;
         py *= s;
@@ -271,7 +275,6 @@ const currentTransConfig = computed(() => {
         break;
       }
       case 'reflectX': {
-        // y -> -y  =>  y = -C*f(u) - D
         C = -C;
         D = -D;
         py = -py;
@@ -279,14 +282,12 @@ const currentTransConfig = computed(() => {
         break;
       }
       case 'reflectY': {
-        // x -> -x  =>  u = A(-x) + B = -Ax + B
         A = -A;
         px = -px;
         if (!asymIsHoriz) asymVal = -asymVal;
         break;
       }
       case 'inverse': {
-        // Reflect across y = x: swap parameters
         const oldA = A;
         const oldB = B;
         const oldC = C;
@@ -297,25 +298,19 @@ const currentTransConfig = computed(() => {
         D = -oldB / oldA;
         fam = fam === 'exp' ? 'log' : 'exp';
 
-        // Swap anchor point
         const tmpP = px;
         px = py;
         py = tmpP;
-
-        // Swap asymptote
         asymIsHoriz = !asymIsHoriz;
         break;
       }
     }
   }
 
-  // Format Formula String in KaTeX
-  // u = Ax + B
+  // 格式化自變數 u = Ax + B
   let uStr = '';
   const absA = Math.abs(A);
   const signA = A < 0 ? '-' : '';
-
-  // Check if A is roughly 1, 0.5, 1/3, 0.25, 2, 3, etc.
   const isOne = Math.abs(absA - 1) < 0.001;
   const isHalf = Math.abs(absA - 0.5) < 0.001;
   const isThird = Math.abs(absA - 1 / 3) < 0.001;
@@ -351,7 +346,7 @@ const currentTransConfig = computed(() => {
     }
   }
 
-  // Prefix C:
+  // 格式化係數 C:
   let prefixC = '';
   const absC = Math.abs(C);
   const signC = C < 0 ? '-' : '';
@@ -370,7 +365,7 @@ const currentTransConfig = computed(() => {
     prefixC = `${signC}${cStr} ` + (fam === 'exp' ? '\\cdot ' : '');
   }
 
-  // Suffix D:
+  // 格式化常數項 D:
   let suffixD = '';
   if (Math.abs(D) > 0.001) {
     const dSign = D > 0 ? '+' : '-';
@@ -385,7 +380,6 @@ const currentTransConfig = computed(() => {
     formulaLatex = `y = ${prefixC}\\log_2(${uStr})${suffixD}`;
   }
 
-  // Mathematical functions
   const transformedFn = (x: number) => {
     const u = A * x + B;
     if (fam === 'exp') {
@@ -406,7 +400,6 @@ const currentTransConfig = computed(() => {
     }
   };
 
-  // Viewport bounds centered around origin and anchor point
   const pxClamped = Math.max(-10, Math.min(10, px));
   const pyClamped = Math.max(-10, Math.min(10, py));
   const xMin = Math.min(-6, pxClamped - 4.5);
@@ -414,7 +407,6 @@ const currentTransConfig = computed(() => {
   const yMin = Math.min(-5, pyClamped - 4.5);
   const yMax = Math.max(7.5, pyClamped + 5.5);
 
-  // Points & Lines
   const basePoint: PlotPoint = {
     x: initialFamily.value === 'exp' ? 0 : 1,
     y: initialFamily.value === 'exp' ? 1 : 0,
@@ -1139,148 +1131,157 @@ const currentTransConfig = computed(() => {
     <!-- ========================================================================= -->
     <div 
       v-else-if="type === 'function-transformation'" 
-      class="w-full max-w-5xl flex flex-col md:flex-row items-start justify-center gap-3.5 select-none"
+      class="w-full max-w-5xl flex flex-col md:flex-row items-start justify-center gap-4 select-none"
     >
-      <!-- Left Column: 4組 "+ - " 步進控制面板與對稱動作 -->
-      <div class="w-full md:w-64 lg:w-72 shrink-0 flex flex-col gap-2 p-3 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner">
-        <!-- 基準函數選擇 -->
-        <div class="flex flex-col gap-1.5 pb-2 border-b border-slate-800/80">
-          <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+      <!-- Left Column: 控制面板 (字體加大、左右排列、向量平移) -->
+      <div class="w-full md:w-80 lg:w-84 shrink-0 flex flex-col gap-2.5 p-3.5 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner">
+        <!-- 基準函數切換 -->
+        <div class="flex flex-col gap-1.5 pb-2.5 border-b border-slate-800/80">
+          <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-slate-300">
             <span class="flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
               <span>基準函數參照</span>
             </span>
           </div>
-          <div class="grid grid-cols-2 gap-1 bg-slate-900 p-0.5 rounded-xl border border-slate-800">
+          <div class="grid grid-cols-2 gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
             <button
               type="button"
               @click="setInitialFamily('exp')"
-              class="px-2 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center text-center"
+              class="px-2.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center text-center"
               :class="initialFamily === 'exp' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
               v-html="renderRichMathText('指數 $y = 2^x$')"
             />
             <button
               type="button"
               @click="setInitialFamily('log')"
-              class="px-2 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center text-center"
+              class="px-2.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center text-center"
               :class="initialFamily === 'log' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
               v-html="renderRichMathText('對數 $y = \\log_2 x$')"
             />
           </div>
         </div>
 
-        <!-- 4 組 "+ - " 平移伸縮調整按鈕 -->
-        <div class="flex flex-col gap-1.5">
-          <!-- 1. X 平移 ( - X平移 + ) -->
-          <div class="flex items-center justify-between p-1.5 px-2 rounded-xl bg-slate-900/80 border border-slate-800">
+        <!-- 4 組「左右排列＋大字體」步進按鈕 -->
+        <div class="flex flex-col gap-2">
+          <!-- 1. X 平移 (左右排列) -->
+          <div class="flex items-center justify-between p-2 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
             <button
               type="button"
               @click="handleShiftX(-1)"
-              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
               title="向左平移 1 單位"
             >
               －
             </button>
-            <div class="flex flex-col items-center">
-              <span class="text-xs font-bold text-slate-200">X 平移</span>
+            <div class="flex items-center justify-between flex-1 px-3 sm:px-4">
+              <span class="text-sm sm:text-base font-bold text-slate-100">X 平移</span>
               <span 
-                class="text-[10px] font-mono"
-                :class="activeAction === 'shiftX' && subtotalShiftX !== 0 ? 'text-sky-300 font-bold' : 'text-slate-500'"
+                class="text-sm sm:text-base font-bold font-mono tracking-wide"
+                :class="activeShiftH !== 0 ? 'text-sky-300' : 'text-slate-400'"
               >
-                {{ activeAction === 'shiftX' && subtotalShiftX !== 0 ? (subtotalShiftX > 0 ? `右移 +${subtotalShiftX}` : `左移 ${subtotalShiftX}`) : '位移: 0' }}
+                位移: {{ activeShiftH !== 0 ? (activeShiftH > 0 ? `+${activeShiftH}` : `${activeShiftH}`) : '0' }}
               </span>
             </div>
             <button
               type="button"
               @click="handleShiftX(1)"
-              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
               title="向右平移 1 單位"
             >
               ＋
             </button>
           </div>
 
-          <!-- 2. Y 平移 ( - Y平移 + ) -->
-          <div class="flex items-center justify-between p-1.5 px-2 rounded-xl bg-slate-900/80 border border-slate-800">
+          <!-- 2. Y 平移 (左右排列) -->
+          <div class="flex items-center justify-between p-2 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
             <button
               type="button"
               @click="handleShiftY(-1)"
-              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
               title="向下平移 1 單位"
             >
               －
             </button>
-            <div class="flex flex-col items-center">
-              <span class="text-xs font-bold text-slate-200">Y 平移</span>
+            <div class="flex items-center justify-between flex-1 px-3 sm:px-4">
+              <span class="text-sm sm:text-base font-bold text-slate-100">Y 平移</span>
               <span 
-                class="text-[10px] font-mono"
-                :class="activeAction === 'shiftY' && subtotalShiftY !== 0 ? 'text-emerald-300 font-bold' : 'text-slate-500'"
+                class="text-sm sm:text-base font-bold font-mono tracking-wide"
+                :class="activeShiftK !== 0 ? 'text-emerald-300' : 'text-slate-400'"
               >
-                {{ activeAction === 'shiftY' && subtotalShiftY !== 0 ? (subtotalShiftY > 0 ? `上移 +${subtotalShiftY}` : `下移 ${subtotalShiftY}`) : '位移: 0' }}
+                位移: {{ activeShiftK !== 0 ? (activeShiftK > 0 ? `+${activeShiftK}` : `${activeShiftK}`) : '0' }}
               </span>
             </div>
             <button
               type="button"
               @click="handleShiftY(1)"
-              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
               title="向上平移 1 單位"
             >
               ＋
             </button>
           </div>
 
-          <!-- 3. X 伸縮 ( - X伸縮 + ) -->
-          <div class="flex items-center justify-between p-1.5 px-2 rounded-xl bg-slate-900/80 border border-slate-800">
+          <!-- 平移 (h, k) 同步累積指示標籤 -->
+          <div 
+            v-if="activeShiftH !== 0 || activeShiftK !== 0"
+            class="px-3 py-1.5 rounded-lg bg-sky-950/70 border border-sky-500/50 flex items-center justify-between text-xs text-sky-200 animate-pulse font-mono font-semibold"
+          >
+            <span>累計向量:</span>
+            <span class="text-sky-300 font-bold text-sm">平移 ({{ activeShiftH > 0 ? `+${activeShiftH}` : activeShiftH }}, {{ activeShiftK > 0 ? `+${activeShiftK}` : activeShiftK }})</span>
+          </div>
+
+          <!-- 3. X 伸縮 (左右排列) -->
+          <div class="flex items-center justify-between p-2 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
             <button
               type="button"
               @click="handleScaleX('down')"
-              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
               title="水平壓縮"
             >
               －
             </button>
-            <div class="flex flex-col items-center">
-              <span class="text-xs font-bold text-slate-200">X 伸縮</span>
+            <div class="flex items-center justify-between flex-1 px-3 sm:px-4">
+              <span class="text-sm sm:text-base font-bold text-slate-100">X 伸縮</span>
               <span 
-                class="text-[10px] font-mono"
-                :class="activeAction === 'scaleX' && subtotalScaleXIdx !== 3 ? 'text-amber-300 font-bold' : 'text-slate-500'"
+                class="text-sm sm:text-base font-bold font-mono tracking-wide"
+                :class="activeScaleXIdx !== 3 ? 'text-amber-300' : 'text-slate-400'"
               >
-                {{ activeAction === 'scaleX' && subtotalScaleXIdx !== 3 ? `倍率: × ${scaleLabels[subtotalScaleXIdx]}` : '倍率: × 1' }}
+                倍率: × {{ scaleLabels[activeScaleXIdx] }}
               </span>
             </div>
             <button
               type="button"
               @click="handleScaleX('up')"
-              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
               title="水平伸長"
             >
               ＋
             </button>
           </div>
 
-          <!-- 4. Y 伸縮 ( - Y伸縮 + ) -->
-          <div class="flex items-center justify-between p-1.5 px-2 rounded-xl bg-slate-900/80 border border-slate-800">
+          <!-- 4. Y 伸縮 (左右排列) -->
+          <div class="flex items-center justify-between p-2 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
             <button
               type="button"
               @click="handleScaleY('down')"
-              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
               title="垂直壓縮"
             >
               －
             </button>
-            <div class="flex flex-col items-center">
-              <span class="text-xs font-bold text-slate-200">Y 伸縮</span>
+            <div class="flex items-center justify-between flex-1 px-3 sm:px-4">
+              <span class="text-sm sm:text-base font-bold text-slate-100">Y 伸縮</span>
               <span 
-                class="text-[10px] font-mono"
-                :class="activeAction === 'scaleY' && subtotalScaleYIdx !== 3 ? 'text-purple-300 font-bold' : 'text-slate-500'"
+                class="text-sm sm:text-base font-bold font-mono tracking-wide"
+                :class="activeScaleYIdx !== 3 ? 'text-purple-300' : 'text-slate-400'"
               >
-                {{ activeAction === 'scaleY' && subtotalScaleYIdx !== 3 ? `倍率: × ${scaleLabels[subtotalScaleYIdx]}` : '倍率: × 1' }}
+                倍率: × {{ scaleLabels[activeScaleYIdx] }}
               </span>
             </div>
             <button
               type="button"
               @click="handleScaleY('up')"
-              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
               title="垂直伸長"
             >
               ＋
@@ -1288,22 +1289,22 @@ const currentTransConfig = computed(() => {
           </div>
         </div>
 
-        <!-- 對稱動作（改變目前變動後的函數） -->
-        <div class="flex flex-col gap-1 pt-1.5 border-t border-slate-800/80">
-          <div class="grid grid-cols-2 gap-1">
+        <!-- 對稱動作（連續點擊相同翻轉即取消） -->
+        <div class="flex flex-col gap-1.5 pt-2 border-t border-slate-800/80">
+          <div class="grid grid-cols-2 gap-1.5">
             <button
               type="button"
               @click="applyReflectX"
-              class="py-1.5 px-1.5 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-rose-300 hover:bg-rose-950/60 hover:border-rose-700 transition-all active:scale-95 cursor-pointer text-center"
-              title="對稱於 x 軸翻轉"
+              class="py-2 px-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 border border-slate-800 text-rose-300 hover:bg-rose-950/60 hover:border-rose-700 transition-all active:scale-95 cursor-pointer text-center"
+              title="點擊翻轉，連續點擊則取消翻轉"
             >
               上下翻轉 (x 軸)
             </button>
             <button
               type="button"
               @click="applyReflectY"
-              class="py-1.5 px-1.5 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-indigo-300 hover:bg-indigo-950/60 hover:border-indigo-700 transition-all active:scale-95 cursor-pointer text-center"
-              title="對稱於 y 軸翻轉"
+              class="py-2 px-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 border border-slate-800 text-indigo-300 hover:bg-indigo-950/60 hover:border-indigo-700 transition-all active:scale-95 cursor-pointer text-center"
+              title="點擊翻轉，連續點擊則取消翻轉"
             >
               左右翻轉 (y 軸)
             </button>
@@ -1311,27 +1312,27 @@ const currentTransConfig = computed(() => {
           <button
             type="button"
             @click="applyInverse"
-            class="w-full py-1.5 px-2 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-amber-300 hover:bg-amber-950/60 hover:border-amber-700 transition-all active:scale-95 cursor-pointer text-center"
-            title="對稱於直線 y = x，交換 x 與 y"
+            class="w-full py-2 px-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 border border-slate-800 text-amber-300 hover:bg-amber-950/60 hover:border-amber-700 transition-all active:scale-95 cursor-pointer text-center"
+            title="點擊對稱 y = x，連續點擊則取消"
           >
             反函數對稱 (對稱 y = x)
           </button>
         </div>
 
         <!-- 復原與重置 -->
-        <div class="grid grid-cols-2 gap-1 pt-1.5 border-t border-slate-800/80">
+        <div class="grid grid-cols-2 gap-1.5 pt-2 border-t border-slate-800/80">
           <button
             type="button"
             @click="undoLastStep"
-            :disabled="stepHistory.length === 0 && !activeAction"
-            class="py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all active:scale-95 text-center"
+            :disabled="stepHistory.length === 0 && !activeActionType"
+            class="py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all active:scale-95 text-center"
           >
             ⌫ 復原上步
           </button>
           <button
             type="button"
             @click="resetAll"
-            class="py-1.5 rounded-xl text-xs font-bold bg-rose-950/70 text-rose-300 hover:bg-rose-900 border border-rose-800/80 cursor-pointer transition-all active:scale-95 text-center"
+            class="py-2 rounded-xl text-xs sm:text-sm font-bold bg-rose-950/70 text-rose-300 hover:bg-rose-900 border border-rose-800/80 cursor-pointer transition-all active:scale-95 text-center shadow-sm"
           >
             ↺ 快速重置
           </button>
@@ -1339,38 +1340,38 @@ const currentTransConfig = computed(() => {
       </div>
 
       <!-- Right Column: 動作歷程鏈、函數圖形與即時方程式 -->
-      <div class="flex-1 min-w-0 flex flex-col items-center gap-2.5 w-full">
-        <!-- 做了哪些動作的履歷鏈 (順序感知欄位) -->
-        <div class="w-full p-2.5 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner text-xs">
-          <div class="flex items-center justify-between pb-1.5 border-b border-slate-800/60 mb-2">
-            <div class="flex items-center gap-1.5 font-bold text-slate-300">
-              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-              <span>變換動作歷程（連續動作已合併）</span>
+      <div class="flex-1 min-w-0 flex flex-col items-center gap-3 w-full">
+        <!-- 做了哪些動作的履歷鏈 (連續平移簡化為平移 (h, k)) -->
+        <div class="w-full p-3 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner text-xs sm:text-sm">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-800/60 mb-2.5">
+            <div class="flex items-center gap-1.5 font-bold text-slate-200">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <span>變換動作歷程（連續平移已累計合併）</span>
             </div>
-            <span class="text-[11px] font-mono text-slate-400">
-              已累積 {{ stepHistory.length + (activeAction ? 1 : 0) }} 個步驟
+            <span class="text-xs font-mono text-slate-400">
+              已累計 {{ stepHistory.length + (activeActionType ? 1 : 0) }} 個步驟
             </span>
           </div>
 
-          <div class="flex flex-wrap items-center gap-1.5">
+          <div class="flex flex-wrap items-center gap-2">
             <!-- 基準起點 -->
-            <span class="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-700 text-slate-300 font-mono">
+            <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 font-mono font-semibold">
               基準: {{ initialFamily === 'exp' ? 'y = 2^x' : 'y = \\log_2 x' }}
             </span>
 
             <!-- 歷史步驟清單 -->
             <template v-for="(st, idx) in stepHistory" :key="st.id">
               <span class="text-slate-500 font-bold">→</span>
-              <span class="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-slate-200">
-                <span class="text-sky-300 font-semibold">{{ idx + 1 }}.</span> {{ st.label }}
+              <span class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 font-medium">
+                <span class="text-sky-300 font-bold">{{ idx + 1 }}.</span> {{ st.label }}
               </span>
             </template>
 
             <!-- 進行中動作提示 -->
-            <template v-if="activeAction">
+            <template v-if="activeActionType">
               <span class="text-slate-500 font-bold">→</span>
-              <span class="px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/70 text-sky-200 animate-pulse">
-                <span class="text-amber-300 font-semibold">{{ stepHistory.length + 1 }}.</span> {{ getActiveStepLabel() }} (調整中)
+              <span class="px-2.5 py-1 rounded-lg bg-sky-950/80 border border-sky-500/70 text-sky-200 animate-pulse font-medium">
+                <span class="text-amber-300 font-bold">{{ stepHistory.length + 1 }}.</span> {{ getActiveStepLabel() }} (調整中)
               </span>
             </template>
           </div>
@@ -1391,7 +1392,7 @@ const currentTransConfig = computed(() => {
 
         <!-- Dynamic description badge: 精簡動態描述變換公式與效果 -->
         <div 
-          class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-slate-800 text-xs sm:text-sm text-slate-200 text-left font-sans shadow-inner leading-relaxed"
+          class="w-full px-4 py-3 rounded-xl bg-slate-950/90 border border-slate-800 text-xs sm:text-sm text-slate-200 text-left font-sans shadow-inner leading-relaxed"
           v-html="renderRichMathText(currentTransConfig.description)"
         />
       </div>
