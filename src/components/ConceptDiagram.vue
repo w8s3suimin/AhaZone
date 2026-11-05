@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import OpticsSimulator from './OpticsSimulator.vue';
+import FunctionGraph from './FunctionGraph.vue';
 
 const props = defineProps<{
   type: string;
@@ -911,80 +912,62 @@ const props = defineProps<{
     <!-- ========================================================================= -->
     <!-- 16. 觀念辨析題多圖形交點分析 (transcendental-multi-roots) -->
     <!-- ========================================================================= -->
-    <svg 
+    <div 
       v-else-if="type === 'transcendental-multi-roots'" 
-      viewBox="0 0 460 220" 
-      class="w-full max-w-xl h-auto drop-shadow-md select-none"
+      class="w-full max-w-xl flex flex-col items-center gap-2.5 select-none"
     >
-      <rect width="460" height="220" rx="16" fill="#090d16" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+        <!-- Subpanel 1: 2^x = -x -->
+        <FunctionGraph
+          title="(1) 2^x + x = 0 ⟹ 2^x = -x"
+          titleColor="#38bdf8"
+          :width="230"
+          :height="175"
+          :xRange="[-3.5, 2.5]"
+          :yRange="[-1.5, 4.5]"
+          :padding="{ top: 26, right: 18, bottom: 20, left: 20 }"
+          :functions="[
+            { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.4 },
+            { fn: (x: number) => -x, color: '#f43f5e', strokeWidth: 2.2 }
+          ]"
+          :points="[
+            { x: -0.641, y: 0.641, color: '#f59e0b', label: '恰 1 交點', labelPos: 'top-left' }
+          ]"
+          :badges="[
+            { x: -0.5, y: -0.8, text: '恰有 1 個相異實根', color: '#e0f2fe', bgColor: '#0369a1' }
+          ]"
+        />
 
-      <!-- Left Subpanel: 2^x = -x -->
-      <g transform="translate(10, 10)">
-        <rect width="210" height="165" rx="12" fill="#0f172a" stroke="#1e293b" />
-        <!-- KaTeX styled subpanel header -->
-        <text x="14" y="24" fill="#38bdf8" font-size="11" font-weight="bold" font-family="'KaTeX_Math', 'KaTeX_Main', serif">
-          (1) 2<tspan font-style="italic" font-size="8" dy="-4">x</tspan><tspan dy="4"> + </tspan><tspan font-style="italic">x</tspan> = 0 &#10230; 2<tspan font-style="italic" font-size="8" dy="-4">x</tspan><tspan dy="4"> = &#8722;</tspan><tspan font-style="italic">x</tspan>
-        </text>
-
-        <!-- Axes: Origin (100, 110) -->
-        <line x1="20" y1="110" x2="190" y2="110" stroke="#475569" stroke-width="1.2" />
-        <line x1="100" y1="145" x2="100" y2="35" stroke="#475569" stroke-width="1.2" />
-
-        <!-- y = 2^x (Sky) -->
-        <path d="M 25,108 C 60,107 85,100 100,80 C 115,60 125,40 135,35" fill="none" stroke="#38bdf8" stroke-width="2.2" />
-
-        <!-- y = -x (Rose line passing through (100, 110)) -->
-        <line x1="30" y1="40" x2="170" y2="145" stroke="#f43f5e" stroke-width="2.2" />
-
-        <!-- Intersection point at Quadrant II (-0.64, 0.64) -> (80, 90) -->
-        <circle cx="80" cy="90" r="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" />
-        <text x="35" y="85" fill="#fef3c7" font-size="10" font-weight="bold" font-family="sans-serif">恰 1 交點</text>
-
-        <!-- Bottom badge -->
-        <rect x="45" y="132" width="115" height="22" rx="6" fill="#0369a1" fill-opacity="0.6" />
-        <text x="56" y="147" fill="#e0f2fe" font-size="11" font-weight="bold" font-family="sans-serif">恰有 1 個相異實根</text>
-      </g>
-
-      <!-- Right Subpanel: 2^x = x^2 -->
-      <g transform="translate(240, 10)">
-        <rect width="210" height="165" rx="12" fill="#0f172a" stroke="#1e293b" />
-        <!-- KaTeX styled subpanel header -->
-        <text x="14" y="24" fill="#a78bfa" font-size="11" font-weight="bold" font-family="'KaTeX_Math', 'KaTeX_Main', serif">
-          (2) 2<tspan font-style="italic" font-size="8" dy="-4">x</tspan><tspan dy="4"> &#8722; </tspan><tspan font-style="italic">x</tspan><tspan font-size="8" dy="-4">2</tspan><tspan dy="4"> = 0 &#10230; 2</tspan><tspan font-style="italic" font-size="8" dy="-4">x</tspan><tspan dy="4"> = </tspan><tspan font-style="italic">x</tspan><tspan font-size="8" dy="-4">2</tspan>
-        </text>
-
-        <!-- Axes: Origin (100, 110) -->
-        <line x1="20" y1="110" x2="190" y2="110" stroke="#475569" stroke-width="1.2" />
-        <line x1="100" y1="145" x2="100" y2="35" stroke="#475569" stroke-width="1.2" />
-
-        <!-- y = x^2 Parabola (Amber) -->
-        <path d="M 55,35 Q 100,145 145,35" fill="none" stroke="#f59e0b" stroke-width="2.2" />
-
-        <!-- y = 2^x (Sky) -->
-        <path d="M 25,108 C 60,107 85,100 100,80 C 115,65 130,55 155,35" fill="none" stroke="#38bdf8" stroke-width="2.2" />
-
-        <!-- 3 Intersections: -->
-        <circle cx="78" cy="92" r="3.5" fill="#f43f5e" stroke="#ffffff" stroke-width="1" />
-        <circle cx="125" cy="68" r="3.5" fill="#f43f5e" stroke="#ffffff" stroke-width="1" />
-        <circle cx="150" cy="38" r="3.5" fill="#f43f5e" stroke="#ffffff" stroke-width="1" />
-
-        <text x="14" y="70" fill="#f43f5e" font-size="9" font-family="'KaTeX_Math', 'KaTeX_Main', serif"><tspan font-style="italic">x</tspan>&#8712;(-1,0)</text>
-        <text x="110" y="85" fill="#f43f5e" font-size="9" font-family="'KaTeX_Math', 'KaTeX_Main', serif"><tspan font-style="italic">x</tspan>=2</text>
-        <text x="156" y="45" fill="#f43f5e" font-size="9" font-family="'KaTeX_Math', 'KaTeX_Main', serif"><tspan font-style="italic">x</tspan>=4</text>
-
-        <!-- Bottom badge -->
-        <rect x="45" y="132" width="115" height="22" rx="6" fill="#6d28d9" fill-opacity="0.6" />
-        <text x="56" y="147" fill="#ede9fe" font-size="11" font-weight="bold" font-family="sans-serif">共有 3 個相異實根！</text>
-      </g>
+        <!-- Subpanel 2: 2^x = x^2 -->
+        <FunctionGraph
+          title="(2) 2^x - x² = 0 ⟹ 2^x = x²"
+          titleColor="#a78bfa"
+          :width="230"
+          :height="175"
+          :xRange="[-2.2, 4.5]"
+          :yRange="[-1.5, 18]"
+          :yStep="3"
+          :padding="{ top: 26, right: 18, bottom: 20, left: 20 }"
+          :functions="[
+            { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.4 },
+            { fn: (x: number) => x * x, color: '#f59e0b', strokeWidth: 2.2 }
+          ]"
+          :points="[
+            { x: -0.767, y: 0.588, color: '#f43f5e', label: 'x ∈ (-1, 0)', labelPos: 'top-left' },
+            { x: 2, y: 4, color: '#f43f5e', label: 'x = 2', labelPos: 'bottom-right' },
+            { x: 4, y: 16, color: '#f43f5e', label: 'x = 4', labelPos: 'top-left' }
+          ]"
+          :badges="[
+            { x: 1.15, y: -0.8, text: '共有 3 個相異實根！', color: '#ede9fe', bgColor: '#6d28d9' }
+          ]"
+        />
+      </div>
 
       <!-- Bottom Insight Legend -->
-      <g transform="translate(10, 185)">
-        <rect width="440" height="26" rx="8" fill="#090d16" stroke="#334155" />
-        <text x="12" y="17" fill="#cbd5e1" font-size="10" font-family="sans-serif">
-          直覺化移項本質：不用盲目運算，<tspan fill="#38bdf8" font-weight="bold">將方程式拆成能畫的兩圖形</tspan>，由交點位置與曲線走勢一目了然！
-        </text>
-      </g>
-    </svg>
+      <div class="w-full px-3 py-2 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-center font-sans">
+        直覺化移項本質：不用盲目運算，<span class="text-sky-400 font-bold">將方程式拆成能畫的兩圖形</span>，由交點位置與曲線走勢一目了然！
+      </div>
+    </div>
 
   </div>
 </template>
