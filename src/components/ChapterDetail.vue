@@ -59,6 +59,7 @@ watch(() => props.chapterName, () => {
 // Check if current chapter has Math A / B differences
 const hasTrackVariants = computed(() => {
   return summary.value.coreConcepts?.some(c => c.track === 'mathA' || c.track === 'mathB') ||
+    summary.value.sopModules?.some(m => m.track === 'mathA' || m.track === 'mathB') ||
     !!(summary.value.trackVariants && (summary.value.trackVariants.mathA || summary.value.trackVariants.mathB));
 });
 
@@ -174,7 +175,18 @@ const displayedSopModules = computed<SopModule[]>(() => {
     steps: (ex.solutionSteps || []).map(st => ({ label: st.step, text: st.content })),
     answer: ex.answer
   }));
-  return [...sop, ...fromClassic];
+  const merged = [...sop, ...fromClassic];
+
+  if (!hasTrackVariants.value || activeTrackTab.value === 'all') {
+    return merged;
+  }
+  if (activeTrackTab.value === 'mathA') {
+    return merged.filter(m => !m.track || m.track === 'common' || m.track === 'mathA');
+  }
+  if (activeTrackTab.value === 'mathB') {
+    return merged.filter(m => !m.track || m.track === 'common' || m.track === 'mathB');
+  }
+  return merged;
 });
 
 // Dynamically displayed quiz questions
@@ -528,6 +540,24 @@ const chapterResources = computed(() => {
                 {{ mod.moduleName }}
               </h4>
             </div>
+            <span 
+              v-if="mod.track === 'mathA'"
+              class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-950 text-indigo-300 border border-indigo-700/60 shrink-0"
+            >
+              數A專屬
+            </span>
+            <span 
+              v-else-if="mod.track === 'mathB'"
+              class="px-2 py-0.5 rounded text-xs font-bold bg-amber-950 text-amber-300 border border-amber-700/60 shrink-0"
+            >
+              數B專屬
+            </span>
+            <span 
+              v-else-if="mod.track === 'common'"
+              class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-700/60 shrink-0"
+            >
+              共同核心
+            </span>
           </div>
 
           <!-- 先有題目：具體範例題目置頂 -->
@@ -535,7 +565,6 @@ const chapterResources = computed(() => {
             v-if="mod.question"
             class="p-4 rounded-xl bg-slate-950/90 border border-amber-500/30 text-xs sm:text-sm text-slate-100 leading-relaxed shadow-inner"
           >
-            <span class="font-bold text-amber-400 mr-2 shrink-0">【典型範例題目】：</span>
             <span v-html="renderRichMathText(mod.question)"></span>
           </div>
 
