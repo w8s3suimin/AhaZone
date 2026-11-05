@@ -1648,32 +1648,20 @@ const currentFeatureDisplay = computed(() => {
           { x1: 0, y1: 1, x2: 1, y2: 0, color: '#64748b', strokeWidth: 1, dashArray: '2 2' }
         ]"
         :points="[
-          { x: 3, y: 8, color: '#38bdf8', radius: 4.5, label: 'P(a, b+2)', labelPos: 'top-left' },
-          { x: 8, y: 3, color: '#34d399', radius: 4.5, label: 'Q(3a−1, b−3)', labelPos: 'bottom-right' },
-          { x: 5.5, y: 5.5, color: '#f59e0b', radius: 4, label: '中點 M((4a−1)/2, (2b−1)/2)', labelPos: 'right' },
-          { x: 0, y: 1, color: '#94a3b8', radius: 2.5, label: '(0, 1)', labelPos: 'left' },
-          { x: 1, y: 0, color: '#94a3b8', radius: 2.5, label: '(1, 0)', labelPos: 'bottom' }
+          { x: 3, y: 8, color: '#38bdf8', radius: 4.5, latex: 'P(a,\\ b+2)', labelPos: 'top-left' },
+          { x: 8, y: 3, color: '#34d399', radius: 4.5, latex: 'Q(3a-1,\\ b-3)', labelPos: 'bottom-right' },
+          { x: 5.5, y: 5.5, color: '#f59e0b', radius: 4, latex: '\\text{中點 } M\\left(\\dfrac{P_x+Q_x}{2},\\ \\dfrac{P_y+Q_y}{2}\\right)', labelPos: 'right' },
+          { x: 4.95, y: 5.3, color: '#fda4af', hideMarker: true, latex: 'L \\perp (y = x)', labelPos: 'left' },
+          { x: 0, y: 1, color: '#94a3b8', radius: 2.5, latex: '(0,\\ 1)', labelPos: 'left' },
+          { x: 1, y: 0, color: '#94a3b8', radius: 2.5, latex: '(1,\\ 0)', labelPos: 'bottom' }
         ]"
-      >
-        <template #default="{ toScreenX, toScreenY }">
-          <text 
-            :x="toScreenX(4.75)" 
-            :y="toScreenY(5.35)" 
-            fill="#fda4af" 
-            font-size="9.5" 
-            font-family="sans-serif"
-            text-anchor="end"
-            class="chart-halo font-bold"
-          >
-            L ⊥ (y = x)
-          </text>
-        </template>
-      </FunctionGraph>
+      />
 
       <!-- Bottom Insight Legend -->
-      <div class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-center font-sans">
-        幾何割線核心：<span class="text-rose-400 font-bold">L: x + y = k 斜率為 −1，垂直於對稱軸 y = x</span> ⟹ P、Q 互為對稱點：中點 M 必在 y = x 上，且直線 PQ 斜率為 −1！
-      </div>
+      <div
+        class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-center font-sans"
+        v-html="renderRichMathText('幾何割線核心：**$L: x + y = k$ 斜率為 $-1$，垂直於對稱軸 $y = x$** $\\implies$ $P$、$Q$ 互為對稱點：中點 $M$ 必在 $y = x$ 上，且直線 $PQ$ 斜率為 $-1$！')"
+      ></div>
     </div>
 
   </div>

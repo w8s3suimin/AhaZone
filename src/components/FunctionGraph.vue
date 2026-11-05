@@ -2,6 +2,19 @@
 import { ref, computed, watch } from 'vue';
 import { ZoomIn, ZoomOut, RotateCcw, Move } from 'lucide-vue-next';
 import { renderRichMathText, renderFunctionMathLabel } from '../utils/mathRenderer';
+import katex from 'katex';
+
+// KaTeX 點標籤的 foreignObject 尺寸
+const TEX_LABEL_W = 280;
+const TEX_LABEL_H = 56;
+
+function renderPointTex(tex: string): string {
+  try {
+    return katex.renderToString(tex, { throwOnError: false, displayMode: false });
+  } catch {
+    return tex;
+  }
+}
 
 export interface PlotFunction {
   id?: string;
@@ -27,6 +40,8 @@ export interface PlotPoint {
   color?: string;
   radius?: number;
   labelPos?: 'top' | 'bottom' | 'left' | 'right' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+  latex?: string; // 以 KaTeX 渲染的數學標籤（優先於 label）
+  hideMarker?: boolean; // 僅顯示標籤、不畫點（用於圖上數學註記）
   pulse?: boolean;
   showPill?: boolean;
 }
@@ -284,6 +299,22 @@ function getPointLabelOffset(pos?: string): { dx: number; dy: number; anchor: 's
     default:
       return { dx: 8, dy: -8, anchor: 'start' };
   }
+}
+
+// KaTeX 標籤框的水平定位：依錨點（start / middle / end）對齊
+function getTexLabelBoxX(pt: PlotPoint): number {
+  const off = getPointLabelOffset(pt.labelPos);
+  const ax = toScreenX(pt.x) + off.dx;
+  if (off.anchor === 'end') return ax - TEX_LABEL_W;
+  if (off.anchor === 'middle') return ax - TEX_LABEL_W / 2;
+  return ax;
+}
+
+function getTexLabelJustify(pt: PlotPoint): string {
+  const anchor = getPointLabelOffset(pt.labelPos).anchor;
+  if (anchor === 'end') return 'flex-end';
+  if (anchor === 'middle') return 'center';
+  return 'flex-start';
 }
 
 // ==========================================
@@ -680,6 +711,7 @@ function onTouchEnd() {
           >
             <!-- Outer subtle glow -->
             <circle 
+              v-if="!pt.hideMarker"
               :cx="toScreenX(pt.x)" 
               :cy="toScreenY(pt.y)" 
               :r="(pt.radius || 4) + 1.2" 
@@ -687,9 +719,26 @@ function onTouchEnd() {
               stroke="#ffffff" 
               stroke-width="1.4" 
             />
+            <!-- KaTeX 數學標籤（以 foreignObject 嵌入，確保分數、下標等以 KaTeX 正確排版） -->
+            <foreignObject
+              v-if="pt.latex"
+              :x="getTexLabelBoxX(pt)"
+              :y="toScreenY(pt.y) + getPointLabelOffset(pt.labelPos).dy - 4 - TEX_LABEL_H / 2"
+              :width="TEX_LABEL_W"
+              :height="TEX_LABEL_H"
+              class="pointer-events-none"
+              style="overflow: visible"
+            >
+              <div
+                xmlns="http://www.w3.org/1999/xhtml"
+                class="tex-point-label"
+                :style="{ color: pt.color || '#cbd5e1', justifyContent: getTexLabelJustify(pt) }"
+                v-html="renderPointTex(pt.latex)"
+              ></div>
+            </foreignObject>
             <!-- Point Text Label with Protective Text Halo -->
             <text 
-              v-if="pt.label"
+              v-else-if="pt.label"
               :x="toScreenX(pt.x) + getPointLabelOffset(pt.labelPos).dx" 
               :y="toScreenY(pt.y) + getPointLabelOffset(pt.labelPos).dy" 
               :fill="pt.color || '#cbd5e1'" 
@@ -761,5 +810,17 @@ function onTouchEnd() {
   stroke-width: 4px;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/* KaTeX 點標籤：深色光暈避免與曲線重疊時難以辨識 */
+.tex-point-label {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+  text-shadow: 0 0 3px #090d16, 0 0 3px #090d16, 0 0 4px #090d16;
 }
 </style>
