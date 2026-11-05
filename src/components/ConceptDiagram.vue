@@ -8,203 +8,456 @@ const props = defineProps<{
   type: string;
 }>();
 
-// 函數圖形平移伸縮與對稱動態操作狀態（累加型實驗室）
-const transFamily = ref<'exp' | 'log'>('exp');
-const transShiftX = ref(0);
-const transShiftY = ref(0);
-const transScaleIndex = ref(3); // 預設索引 3 為 1 倍
-const scaleFactors = [0.25, 1 / 3, 0.5, 1, 2, 3, 4, 5, 6];
+// 函數圖形平移伸縮與對稱動態操作狀態（順序感知步驟鏈模型）
+const initialFamily = ref<'exp' | 'log'>('exp');
+
+export interface StepRecord {
+  id: number;
+  type: 'shiftX' | 'shiftY' | 'scaleX' | 'scaleY' | 'reflectX' | 'reflectY' | 'inverse';
+  val?: number; // shift offset or scale index
+  label: string;
+}
+
+const stepHistory = ref<StepRecord[]>([]);
+let nextStepId = 1;
+
+// Active in-progress stepper state
+const activeAction = ref<'shiftX' | 'shiftY' | 'scaleX' | 'scaleY' | null>(null);
+const subtotalShiftX = ref(0);
+const subtotalShiftY = ref(0);
+
+const scaleValues = [0.25, 1 / 3, 0.5, 1, 2, 3, 4, 5, 6];
 const scaleLabels = ['1/4', '1/3', '1/2', '1', '2', '3', '4', '5', '6'];
+const subtotalScaleXIdx = ref(3); // default index 3 is 1x
+const subtotalScaleYIdx = ref(3); // default index 3 is 1x
 
-const transReflectX = ref(false); // 上下翻轉 (y -> -y)
-const transReflectY = ref(false); // 左右翻轉 (x -> -x)
-const transShowInverse = ref(false); // 反函數對稱 (y = x)
+// Helper to commit current in-progress action if switching
+function commitActiveAction() {
+  if (!activeAction.value) return;
 
-function shiftLeft() {
-  if (transShiftX.value > -5) transShiftX.value--;
-}
-function shiftRight() {
-  if (transShiftX.value < 5) transShiftX.value++;
-}
-function shiftUp() {
-  if (transShiftY.value < 5) transShiftY.value++;
-}
-function shiftDown() {
-  if (transShiftY.value > -5) transShiftY.value--;
-}
-function scaleDown() {
-  if (transScaleIndex.value > 0) transScaleIndex.value--;
-}
-function scaleUp() {
-  if (transScaleIndex.value < scaleFactors.length - 1) transScaleIndex.value++;
-}
-function toggleReflectX() {
-  transReflectX.value = !transReflectX.value;
-}
-function toggleReflectY() {
-  transReflectY.value = !transReflectY.value;
-}
-function toggleInverse() {
-  transShowInverse.value = !transShowInverse.value;
-}
-function resetTrans() {
-  transShiftX.value = 0;
-  transShiftY.value = 0;
-  transScaleIndex.value = 3;
-  transReflectX.value = false;
-  transReflectY.value = false;
-  transShowInverse.value = false;
-}
-
-const currentTransConfig = computed(() => {
-  const isExp = transFamily.value === 'exp';
-  const h = transShiftX.value;
-  const k = transShiftY.value;
-  const scale = scaleFactors[transScaleIndex.value];
-  const scaleLabel = scaleLabels[transScaleIndex.value];
-  const refX = transReflectX.value;
-  const refY = transReflectY.value;
-  const showInv = transShowInverse.value;
-
-  const sy = scale * (refX ? -1 : 1);
-  const sxSign = refY ? -1 : 1;
-
-  // Viewport bounds
-  const xMin = Math.min(-5.5, h - 4.5);
-  const xMax = Math.max(5.5, h + 4.5);
-  const yMin = Math.min(-4.5, k - 4.5);
-  const yMax = Math.max(6.5, k + 5.5);
-
-  let transformedFn: (x: number) => number;
-  let baseFn: (x: number) => number;
-  let basePoints: PlotPoint[] = [];
-  let transPoints: PlotPoint[] = [];
-  let guideLines: PlotLine[] = [];
-  let transformedLabel = '';
-  let anchorDesc = '';
-  let asymptoteText = '';
-  let asymptoteLine: PlotLine;
-
-  if (isExp) {
-    baseFn = (x: number) => Math.pow(2, x);
-    transformedFn = (x: number) => {
-      const u = (x - h) * sxSign;
-      if (u > 10) return NaN;
-      if (u < -10) return k;
-      return sy * Math.pow(2, u) + k;
-    };
-
-    // Label formatting
-    let prefix = '';
-    if (scaleLabel === '1') {
-      prefix = refX ? '-' : '';
-    } else {
-      const frac = scaleLabel.includes('/') ? `\\frac{1}{${scaleLabel.split('/')[1]}}` : scaleLabel;
-      prefix = (refX ? '-' : '') + frac + ' \\cdot ';
-    }
-
-    let expTerm = '';
-    if (refY) {
-      if (h === 0) expTerm = '2^{-x}';
-      else if (h > 0) expTerm = `2^{-(x - ${h})}`;
-      else expTerm = `2^{-(x + ${-h})}`;
-    } else {
-      if (h === 0) expTerm = '2^x';
-      else if (h > 0) expTerm = `2^{x - ${h}}`;
-      else expTerm = `2^{x + ${-h}}`;
-    }
-
-    let kTerm = '';
-    if (k > 0) kTerm = ` + ${k}`;
-    else if (k < 0) kTerm = ` - ${-k}`;
-
-    transformedLabel = `y = ${prefix}${expTerm}${kTerm}`;
-
-    const targetY = Number((sy + k).toFixed(2));
-    basePoints = [
-      { x: 0, y: 1, color: '#94a3b8', radius: 3.5, label: '(0, 1)', labelPos: 'left' }
-    ];
-    transPoints = [
-      { x: h, y: targetY, color: '#38bdf8', radius: 5, label: `(${h}, ${targetY}) 基準點`, labelPos: targetY >= 1 ? 'top-left' : 'bottom-left' }
-    ];
-    guideLines = [
-      { x1: 0, y1: 1, x2: h, y2: targetY, color: '#38bdf8', strokeWidth: 1.2, dashArray: '2 2' }
-    ];
-
-    asymptoteLine = {
-      x1: xMin, y1: k, x2: xMax, y2: k,
-      color: '#f59e0b', strokeWidth: 1.2, dashArray: '3 3',
-      label: `y = ${k}`
-    };
-    asymptoteText = `水平漸近線 $y = ${k}$`;
-    anchorDesc = `基準點移至 $(${h}, ${targetY})$`;
-  } else {
-    // Logarithm family
-    baseFn = (x: number) => x > 0.03 ? Math.log2(x) : NaN;
-    transformedFn = (x: number) => {
-      const u = (x - h) * sxSign;
-      if (u <= 0.03) return NaN;
-      return sy * Math.log2(u) + k;
-    };
-
-    let prefix = '';
-    if (scaleLabel === '1') {
-      prefix = refX ? '-' : '';
-    } else {
-      const frac = scaleLabel.includes('/') ? `\\frac{1}{${scaleLabel.split('/')[1]}}` : scaleLabel;
-      prefix = (refX ? '-' : '') + frac;
-    }
-
-    let insideLog = '';
-    if (refY) {
-      if (h === 0) insideLog = '(-x)';
-      else if (h > 0) insideLog = `(-(x - ${h}))`;
-      else insideLog = `(-(x + ${-h}))`;
-    } else {
-      if (h === 0) insideLog = 'x';
-      else if (h > 0) insideLog = `(x - ${h})`;
-      else insideLog = `(x + ${-h})`;
-    }
-
-    let kTerm = '';
-    if (k > 0) kTerm = ` + ${k}`;
-    else if (k < 0) kTerm = ` - ${-k}`;
-
-    transformedLabel = `y = ${prefix}\\log_2${insideLog.startsWith('(') ? insideLog : ` ${insideLog}`}${kTerm}`;
-
-    const targetX = h + sxSign;
-    basePoints = [
-      { x: 1, y: 0, color: '#94a3b8', radius: 3.5, label: '(1, 0)', labelPos: 'bottom' }
-    ];
-    transPoints = [
-      { x: targetX, y: k, color: '#34d399', radius: 5, label: `(${targetX}, ${k}) 基準點`, labelPos: k >= 0 ? 'top-right' : 'bottom-right' }
-    ];
-    guideLines = [
-      { x1: 1, y1: 0, x2: targetX, y2: k, color: '#34d399', strokeWidth: 1.2, dashArray: '2 2' }
-    ];
-
-    asymptoteLine = {
-      x1: h, y1: yMin, x2: h, y2: yMax,
-      color: '#f59e0b', strokeWidth: 1.2, dashArray: '3 3',
-      label: `x = ${h}`
-    };
-    asymptoteText = `垂直漸近線 $x = ${h}$`;
-    anchorDesc = `基準點移至 $(${targetX}, ${k})$`;
+  if (activeAction.value === 'shiftX' && subtotalShiftX.value !== 0) {
+    const h = subtotalShiftX.value;
+    stepHistory.value.push({
+      id: nextStepId++,
+      type: 'shiftX',
+      val: h,
+      label: `X 平移 ${h > 0 ? `向右 ${h}` : `向左 ${-h}`} 單位`
+    });
+  } else if (activeAction.value === 'shiftY' && subtotalShiftY.value !== 0) {
+    const k = subtotalShiftY.value;
+    stepHistory.value.push({
+      id: nextStepId++,
+      type: 'shiftY',
+      val: k,
+      label: `Y 平移 ${k > 0 ? `向上 ${k}` : `向下 ${-k}`} 單位`
+    });
+  } else if (activeAction.value === 'scaleX' && subtotalScaleXIdx.value !== 3) {
+    const sIdx = subtotalScaleXIdx.value;
+    stepHistory.value.push({
+      id: nextStepId++,
+      type: 'scaleX',
+      val: sIdx,
+      label: `X 伸縮 ${scaleLabels[sIdx]} 倍`
+    });
+  } else if (activeAction.value === 'scaleY' && subtotalScaleYIdx.value !== 3) {
+    const sIdx = subtotalScaleYIdx.value;
+    stepHistory.value.push({
+      id: nextStepId++,
+      type: 'scaleY',
+      val: sIdx,
+      label: `Y 伸縮 ${scaleLabels[sIdx]} 倍`
+    });
   }
 
-  // Compose active operations summary
-  const ops: string[] = [];
-  if (h !== 0) ops.push(`水平${h > 0 ? `向右平移 ${h}` : `向左平移 ${-h}`} 單位`);
-  if (k !== 0) ops.push(`垂直${k > 0 ? `向上平移 ${k}` : `向下平移 ${-k}`} 單位`);
-  if (scaleLabel !== '1') ops.push(`縱向放大 ${scaleLabel} 倍`);
-  if (refX) ops.push('上下翻轉（對稱於 $x$ 軸）');
-  if (refY) ops.push('左右翻轉（對稱於 $y$ 軸）');
-  if (showInv) ops.push('反函數對稱（對稱於直線 $y = x$）');
-  if (ops.length === 0) ops.push('基準狀態（無額外平移伸縮）');
+  // Reset subtotals
+  subtotalShiftX.value = 0;
+  subtotalShiftY.value = 0;
+  subtotalScaleXIdx.value = 3;
+  subtotalScaleYIdx.value = 3;
+  activeAction.value = null;
+}
 
-  const desc = `**目前函數**：$${transformedLabel}$。<br/>` +
-    `**動作累計**：${ops.join('，')}。<br/>` +
-    `**特徵錨點**：${anchorDesc}，${asymptoteText}。`;
+// Stepper click handlers
+function handleShiftX(delta: number) {
+  if (activeAction.value !== 'shiftX') {
+    commitActiveAction();
+    activeAction.value = 'shiftX';
+    subtotalShiftX.value = 0;
+  }
+  subtotalShiftX.value += delta;
+  if (subtotalShiftX.value === 0) {
+    activeAction.value = null;
+  }
+}
+
+function handleShiftY(delta: number) {
+  if (activeAction.value !== 'shiftY') {
+    commitActiveAction();
+    activeAction.value = 'shiftY';
+    subtotalShiftY.value = 0;
+  }
+  subtotalShiftY.value += delta;
+  if (subtotalShiftY.value === 0) {
+    activeAction.value = null;
+  }
+}
+
+function handleScaleX(direction: 'up' | 'down') {
+  if (activeAction.value !== 'scaleX') {
+    commitActiveAction();
+    activeAction.value = 'scaleX';
+    subtotalScaleXIdx.value = 3; // 1x
+  }
+  if (direction === 'up' && subtotalScaleXIdx.value < scaleValues.length - 1) {
+    subtotalScaleXIdx.value++;
+  } else if (direction === 'down' && subtotalScaleXIdx.value > 0) {
+    subtotalScaleXIdx.value--;
+  }
+  if (subtotalScaleXIdx.value === 3) {
+    activeAction.value = null;
+  }
+}
+
+function handleScaleY(direction: 'up' | 'down') {
+  if (activeAction.value !== 'scaleY') {
+    commitActiveAction();
+    activeAction.value = 'scaleY';
+    subtotalScaleYIdx.value = 3; // 1x
+  }
+  if (direction === 'up' && subtotalScaleYIdx.value < scaleValues.length - 1) {
+    subtotalScaleYIdx.value++;
+  } else if (direction === 'down' && subtotalScaleYIdx.value > 0) {
+    subtotalScaleYIdx.value--;
+  }
+  if (subtotalScaleYIdx.value === 3) {
+    activeAction.value = null;
+  }
+}
+
+// Immediate Symmetries on the currently accumulated state
+function applyReflectX() {
+  commitActiveAction();
+  stepHistory.value.push({
+    id: nextStepId++,
+    type: 'reflectX',
+    label: '上下翻轉（對稱 x 軸）'
+  });
+}
+
+function applyReflectY() {
+  commitActiveAction();
+  stepHistory.value.push({
+    id: nextStepId++,
+    type: 'reflectY',
+    label: '左右翻轉（對稱 y 軸）'
+  });
+}
+
+function applyInverse() {
+  commitActiveAction();
+  stepHistory.value.push({
+    id: nextStepId++,
+    type: 'inverse',
+    label: '反函數對稱（對稱 y = x）'
+  });
+}
+
+function undoLastStep() {
+  if (activeAction.value) {
+    subtotalShiftX.value = 0;
+    subtotalShiftY.value = 0;
+    subtotalScaleXIdx.value = 3;
+    subtotalScaleYIdx.value = 3;
+    activeAction.value = null;
+  } else if (stepHistory.value.length > 0) {
+    stepHistory.value.pop();
+  }
+}
+
+function resetAll() {
+  stepHistory.value = [];
+  activeAction.value = null;
+  subtotalShiftX.value = 0;
+  subtotalShiftY.value = 0;
+  subtotalScaleXIdx.value = 3;
+  subtotalScaleYIdx.value = 3;
+}
+
+function setInitialFamily(fam: 'exp' | 'log') {
+  initialFamily.value = fam;
+  resetAll();
+}
+
+function getActiveStepLabel(): string {
+  if (activeAction.value === 'shiftX') {
+    const h = subtotalShiftX.value;
+    return `X 平移 ${h > 0 ? `向右 ${h}` : `向左 ${-h}`} 單位`;
+  }
+  if (activeAction.value === 'shiftY') {
+    const k = subtotalShiftY.value;
+    return `Y 平移 ${k > 0 ? `向上 ${k}` : `向下 ${-k}`} 單位`;
+  }
+  if (activeAction.value === 'scaleX') {
+    return `X 伸縮 ${scaleLabels[subtotalScaleXIdx.value]} 倍`;
+  }
+  if (activeAction.value === 'scaleY') {
+    return `Y 伸縮 ${scaleLabels[subtotalScaleYIdx.value]} 倍`;
+  }
+  return '';
+}
+
+// Compute cumulative state through history + active step
+const currentTransConfig = computed(() => {
+  // Synthesize all steps into a list
+  const steps: StepRecord[] = [...stepHistory.value];
+  if (activeAction.value === 'shiftX' && subtotalShiftX.value !== 0) {
+    steps.push({ id: 0, type: 'shiftX', val: subtotalShiftX.value, label: '' });
+  } else if (activeAction.value === 'shiftY' && subtotalShiftY.value !== 0) {
+    steps.push({ id: 0, type: 'shiftY', val: subtotalShiftY.value, label: '' });
+  } else if (activeAction.value === 'scaleX' && subtotalScaleXIdx.value !== 3) {
+    steps.push({ id: 0, type: 'scaleX', val: subtotalScaleXIdx.value, label: '' });
+  } else if (activeAction.value === 'scaleY' && subtotalScaleYIdx.value !== 3) {
+    steps.push({ id: 0, type: 'scaleY', val: subtotalScaleYIdx.value, label: '' });
+  }
+
+  // Model parameters: y = C * f(A * x + B) + D
+  let fam: 'exp' | 'log' = initialFamily.value;
+  let A = 1;
+  let B = 0;
+  let C = 1;
+  let D = 0;
+
+  // Anchor point tracking
+  let px = fam === 'exp' ? 0 : 1;
+  let py = fam === 'exp' ? 1 : 0;
+
+  // Asymptote tracking: isHorizontal, value
+  let asymIsHoriz = fam === 'exp';
+  let asymVal = 0;
+
+  for (const st of steps) {
+    switch (st.type) {
+      case 'shiftX': {
+        const h = st.val || 0;
+        // x -> x - h  =>  u = A(x - h) + B = Ax + (B - Ah)
+        B = B - A * h;
+        px += h;
+        if (!asymIsHoriz) asymVal += h;
+        break;
+      }
+      case 'shiftY': {
+        const k = st.val || 0;
+        // y -> y + k  =>  y = C*f(u) + D + k
+        D = D + k;
+        py += k;
+        if (asymIsHoriz) asymVal += k;
+        break;
+      }
+      case 'scaleX': {
+        const s = scaleValues[st.val ?? 3];
+        // x -> x / s  =>  u = A(x / s) + B = (A / s)x + B
+        A = A / s;
+        px *= s;
+        if (!asymIsHoriz) asymVal *= s;
+        break;
+      }
+      case 'scaleY': {
+        const s = scaleValues[st.val ?? 3];
+        // y -> s * y  =>  y = s*(C*f(u) + D) = (s*C)*f(u) + (s*D)
+        C *= s;
+        D *= s;
+        py *= s;
+        if (asymIsHoriz) asymVal *= s;
+        break;
+      }
+      case 'reflectX': {
+        // y -> -y  =>  y = -C*f(u) - D
+        C = -C;
+        D = -D;
+        py = -py;
+        if (asymIsHoriz) asymVal = -asymVal;
+        break;
+      }
+      case 'reflectY': {
+        // x -> -x  =>  u = A(-x) + B = -Ax + B
+        A = -A;
+        px = -px;
+        if (!asymIsHoriz) asymVal = -asymVal;
+        break;
+      }
+      case 'inverse': {
+        // Reflect across y = x: swap parameters
+        const oldA = A;
+        const oldB = B;
+        const oldC = C;
+        const oldD = D;
+        A = 1 / oldC;
+        B = -oldD / oldC;
+        C = 1 / oldA;
+        D = -oldB / oldA;
+        fam = fam === 'exp' ? 'log' : 'exp';
+
+        // Swap anchor point
+        const tmpP = px;
+        px = py;
+        py = tmpP;
+
+        // Swap asymptote
+        asymIsHoriz = !asymIsHoriz;
+        break;
+      }
+    }
+  }
+
+  // Format Formula String in KaTeX
+  // u = Ax + B
+  let uStr = '';
+  const absA = Math.abs(A);
+  const signA = A < 0 ? '-' : '';
+
+  // Check if A is roughly 1, 0.5, 1/3, 0.25, 2, 3, etc.
+  const isOne = Math.abs(absA - 1) < 0.001;
+  const isHalf = Math.abs(absA - 0.5) < 0.001;
+  const isThird = Math.abs(absA - 1 / 3) < 0.001;
+  const isQuarter = Math.abs(absA - 0.25) < 0.001;
+
+  if (isOne) {
+    if (Math.abs(B) < 0.001) {
+      uStr = signA === '-' ? '-x' : 'x';
+    } else {
+      const bSign = B > 0 ? '+' : '-';
+      const absB = Math.abs(B);
+      const bStr = Number.isInteger(absB) ? `${absB}` : absB.toFixed(1);
+      uStr = signA === '-' ? `-(x ${B > 0 ? '-' : '+'} ${bStr})` : `x ${bSign} ${bStr}`;
+    }
+  } else if (isHalf || isThird || isQuarter) {
+    const denom = isHalf ? 2 : isThird ? 3 : 4;
+    const bTimesDenom = Math.round(B * denom * 10) / 10;
+    if (Math.abs(bTimesDenom) < 0.001) {
+      uStr = `${signA}\\frac{x}{${denom}}`;
+    } else {
+      const bSign = bTimesDenom > 0 ? '+' : '-';
+      const absVal = Math.abs(bTimesDenom);
+      uStr = `${signA}\\frac{x ${bSign} ${absVal}}{${denom}}`;
+    }
+  } else {
+    const aStr = Number.isInteger(absA) ? `${absA}` : absA.toFixed(2);
+    if (Math.abs(B) < 0.001) {
+      uStr = `${signA}${aStr}x`;
+    } else {
+      const bSign = B > 0 ? '+' : '-';
+      const bStr = Number.isInteger(Math.abs(B)) ? `${Math.abs(B)}` : Math.abs(B).toFixed(2);
+      uStr = `${signA}${aStr}x ${bSign} ${bStr}`;
+    }
+  }
+
+  // Prefix C:
+  let prefixC = '';
+  const absC = Math.abs(C);
+  const signC = C < 0 ? '-' : '';
+  const cIsOne = Math.abs(absC - 1) < 0.001;
+  const cIsHalf = Math.abs(absC - 0.5) < 0.001;
+  const cIsThird = Math.abs(absC - 1 / 3) < 0.001;
+  const cIsQuarter = Math.abs(absC - 0.25) < 0.001;
+
+  if (cIsOne) {
+    prefixC = signC === '-' ? '-' : '';
+  } else if (cIsHalf || cIsThird || cIsQuarter) {
+    const denom = cIsHalf ? 2 : cIsThird ? 3 : 4;
+    prefixC = `${signC}\\frac{1}{${denom}} ` + (fam === 'exp' ? '\\cdot ' : '');
+  } else {
+    const cStr = Number.isInteger(absC) ? `${absC}` : absC.toFixed(2);
+    prefixC = `${signC}${cStr} ` + (fam === 'exp' ? '\\cdot ' : '');
+  }
+
+  // Suffix D:
+  let suffixD = '';
+  if (Math.abs(D) > 0.001) {
+    const dSign = D > 0 ? '+' : '-';
+    const dStr = Number.isInteger(Math.abs(D)) ? `${Math.abs(D)}` : Math.abs(D).toFixed(2);
+    suffixD = ` ${dSign} ${dStr}`;
+  }
+
+  let formulaLatex = '';
+  if (fam === 'exp') {
+    formulaLatex = `y = ${prefixC}2^{${uStr}}${suffixD}`;
+  } else {
+    formulaLatex = `y = ${prefixC}\\log_2(${uStr})${suffixD}`;
+  }
+
+  // Mathematical functions
+  const transformedFn = (x: number) => {
+    const u = A * x + B;
+    if (fam === 'exp') {
+      if (u > 14) return NaN;
+      if (u < -14) return D;
+      return C * Math.pow(2, u) + D;
+    } else {
+      if (u <= 0.02) return NaN;
+      return C * Math.log2(u) + D;
+    }
+  };
+
+  const baseFn = (x: number) => {
+    if (initialFamily.value === 'exp') {
+      return Math.pow(2, x);
+    } else {
+      return x > 0.03 ? Math.log2(x) : NaN;
+    }
+  };
+
+  // Viewport bounds centered around origin and anchor point
+  const pxClamped = Math.max(-10, Math.min(10, px));
+  const pyClamped = Math.max(-10, Math.min(10, py));
+  const xMin = Math.min(-6, pxClamped - 4.5);
+  const xMax = Math.max(6.5, pxClamped + 4.5);
+  const yMin = Math.min(-5, pyClamped - 4.5);
+  const yMax = Math.max(7.5, pyClamped + 5.5);
+
+  // Points & Lines
+  const basePoint: PlotPoint = {
+    x: initialFamily.value === 'exp' ? 0 : 1,
+    y: initialFamily.value === 'exp' ? 1 : 0,
+    color: '#64748b',
+    radius: 3.5,
+    label: initialFamily.value === 'exp' ? '(0, 1)' : '(1, 0)',
+    labelPos: initialFamily.value === 'exp' ? 'left' : 'bottom'
+  };
+
+  const pxR = Number(px.toFixed(2));
+  const pyR = Number(py.toFixed(2));
+  const transPoint: PlotPoint = {
+    x: pxR,
+    y: pyR,
+    color: '#38bdf8',
+    radius: 5,
+    label: `(${pxR}, ${pyR}) 基準點`,
+    labelPos: pyR >= 0 ? 'top-left' : 'bottom-left'
+  };
+
+  const asymptoteValR = Number(asymVal.toFixed(2));
+  let asymptoteLine: PlotLine;
+  let asymText = '';
+  if (asymIsHoriz) {
+    asymptoteLine = {
+      x1: xMin, y1: asymptoteValR, x2: xMax, y2: asymptoteValR,
+      color: '#f59e0b', strokeWidth: 1.2, dashArray: '3 3',
+      label: `y = ${asymptoteValR}`
+    };
+    asymText = `水平漸近線 $y = ${asymptoteValR}$`;
+  } else {
+    asymptoteLine = {
+      x1: asymptoteValR, y1: yMin, x2: asymptoteValR, y2: yMax,
+      color: '#f59e0b', strokeWidth: 1.2, dashArray: '3 3',
+      label: `x = ${asymptoteValR}`
+    };
+    asymText = `垂直漸近線 $x = ${asymptoteValR}$`;
+  }
+
+  const guideLine: PlotLine = {
+    x1: basePoint.x, y1: basePoint.y, x2: pxR, y2: pyR,
+    color: '#38bdf8', strokeWidth: 1.2, dashArray: '2 2'
+  };
 
   const funcs: PlotFunction[] = [
     {
@@ -212,60 +465,33 @@ const currentTransConfig = computed(() => {
       color: '#64748b',
       strokeWidth: 1.5,
       dashArray: '3 3',
-      label: isExp ? 'y = 2^x' : 'y = \\log_2 x',
+      label: initialFamily.value === 'exp' ? 'y = 2^x' : 'y = \\log_2 x',
       description: '原基準'
     },
     {
       fn: transformedFn,
-      color: isExp ? '#38bdf8' : '#34d399',
+      color: '#38bdf8',
       strokeWidth: 2.6,
-      label: transformedLabel,
+      label: formulaLatex,
       description: '變換後'
     }
   ];
 
-  if (showInv) {
-    funcs.push({
-      fn: (x: number) => x,
-      color: '#f59e0b',
-      strokeWidth: 1.4,
-      dashArray: '4 4',
-      label: 'y = x',
-      description: '對稱軸'
-    });
-    if (isExp) {
-      funcs.push({
-        fn: (x: number) => x > 0.03 ? Math.log2(x) : NaN,
-        color: '#34d399',
-        strokeWidth: 2,
-        dashArray: '4 2',
-        label: 'y = \\log_2 x',
-        description: '反函數'
-      });
-      basePoints.push({ x: 1, y: 0, color: '#34d399', radius: 3.5, label: '(1, 0)' });
-    } else {
-      funcs.push({
-        fn: (x: number) => Math.pow(2, x),
-        color: '#38bdf8',
-        strokeWidth: 2,
-        dashArray: '4 2',
-        label: 'y = 2^x',
-        description: '反函數'
-      });
-      basePoints.push({ x: 0, y: 1, color: '#38bdf8', radius: 3.5, label: '(0, 1)' });
-    }
-  }
+  const desc = `**目前方程式**：$${formulaLatex}$。<br/>` +
+    `**幾何特徵**：基準錨點移至 $(${pxR}, ${pyR})$，${asymText}。<br/>` +
+    `<span class="text-amber-400 font-semibold">💡 順序心法</span>：先平移後伸縮 $\\neq$ 先伸縮後平移！觀察上方歷程鏈與各項係數變化。`;
 
   return {
     xRange: [xMin, xMax] as [number, number],
     yRange: [yMin, yMax] as [number, number],
     functions: funcs,
-    points: [...basePoints, ...transPoints],
-    lines: [asymptoteLine, ...guideLines],
+    points: [basePoint, transPoint],
+    lines: [asymptoteLine, guideLine],
     description: desc,
-    formula: transformedLabel
+    formula: formulaLatex
   };
 });
+
 </script>
 
 <template>
@@ -913,14 +1139,14 @@ const currentTransConfig = computed(() => {
     <!-- ========================================================================= -->
     <div 
       v-else-if="type === 'function-transformation'" 
-      class="w-full max-w-4xl flex flex-col md:flex-row items-start justify-center gap-3.5 select-none"
+      class="w-full max-w-5xl flex flex-col md:flex-row items-start justify-center gap-3.5 select-none"
     >
-      <!-- Left Column: Action Control Console (變化鈕置於圖左側) -->
-      <div class="w-full md:w-64 lg:w-72 shrink-0 flex flex-col gap-2.5 p-3 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner">
-        <!-- Section 1: Base family picker -->
+      <!-- Left Column: 4組 "+ - " 步進控制面板與對稱動作 -->
+      <div class="w-full md:w-64 lg:w-72 shrink-0 flex flex-col gap-2 p-3 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner">
+        <!-- 基準函數選擇 -->
         <div class="flex flex-col gap-1.5 pb-2 border-b border-slate-800/80">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+            <span class="flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-sky-400"></span>
               <span>基準函數參照</span>
             </span>
@@ -928,146 +1154,234 @@ const currentTransConfig = computed(() => {
           <div class="grid grid-cols-2 gap-1 bg-slate-900 p-0.5 rounded-xl border border-slate-800">
             <button
               type="button"
-              @click="transFamily = 'exp'"
+              @click="setInitialFamily('exp')"
               class="px-2 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center text-center"
-              :class="transFamily === 'exp' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
+              :class="initialFamily === 'exp' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
               v-html="renderRichMathText('指數 $y = 2^x$')"
             />
             <button
               type="button"
-              @click="transFamily = 'log'"
+              @click="setInitialFamily('log')"
               class="px-2 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center text-center"
-              :class="transFamily === 'log' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
+              :class="initialFamily === 'log' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
               v-html="renderRichMathText('對數 $y = \\log_2 x$')"
             />
           </div>
         </div>
 
-        <!-- Section 2: Shift Actions (平移動作) -->
-        <div class="flex flex-col gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
-          <div class="flex items-center justify-between text-[11px] text-slate-400 font-semibold px-0.5">
-            <span>平移動作（累加）</span>
-            <span class="text-sky-300 font-mono font-bold">(h, k) = ({{ transShiftX }}, {{ transShiftY }})</span>
-          </div>
-          <div class="grid grid-cols-2 gap-1.5">
+        <!-- 4 組 "+ - " 平移伸縮調整按鈕 -->
+        <div class="flex flex-col gap-1.5">
+          <!-- 1. X 平移 ( - X平移 + ) -->
+          <div class="flex items-center justify-between p-1.5 px-2 rounded-xl bg-slate-900/80 border border-slate-800">
             <button
               type="button"
-              @click="shiftLeft"
-              class="py-1.5 px-2 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer"
+              @click="handleShiftX(-1)"
+              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
               title="向左平移 1 單位"
             >
-              ← 左移 1
+              －
             </button>
+            <div class="flex flex-col items-center">
+              <span class="text-xs font-bold text-slate-200">X 平移</span>
+              <span 
+                class="text-[10px] font-mono"
+                :class="activeAction === 'shiftX' && subtotalShiftX !== 0 ? 'text-sky-300 font-bold' : 'text-slate-500'"
+              >
+                {{ activeAction === 'shiftX' && subtotalShiftX !== 0 ? (subtotalShiftX > 0 ? `右移 +${subtotalShiftX}` : `左移 ${subtotalShiftX}`) : '位移: 0' }}
+              </span>
+            </div>
             <button
               type="button"
-              @click="shiftRight"
-              class="py-1.5 px-2 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer"
+              @click="handleShiftX(1)"
+              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
               title="向右平移 1 單位"
             >
-              右移 1 →
+              ＋
             </button>
+          </div>
+
+          <!-- 2. Y 平移 ( - Y平移 + ) -->
+          <div class="flex items-center justify-between p-1.5 px-2 rounded-xl bg-slate-900/80 border border-slate-800">
             <button
               type="button"
-              @click="shiftUp"
-              class="py-1.5 px-2 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer"
-              title="向上平移 1 單位"
-            >
-              上移 1 ↑
-            </button>
-            <button
-              type="button"
-              @click="shiftDown"
-              class="py-1.5 px-2 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer"
+              @click="handleShiftY(-1)"
+              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
               title="向下平移 1 單位"
             >
-              下移 1 ↓
+              －
+            </button>
+            <div class="flex flex-col items-center">
+              <span class="text-xs font-bold text-slate-200">Y 平移</span>
+              <span 
+                class="text-[10px] font-mono"
+                :class="activeAction === 'shiftY' && subtotalShiftY !== 0 ? 'text-emerald-300 font-bold' : 'text-slate-500'"
+              >
+                {{ activeAction === 'shiftY' && subtotalShiftY !== 0 ? (subtotalShiftY > 0 ? `上移 +${subtotalShiftY}` : `下移 ${subtotalShiftY}`) : '位移: 0' }}
+              </span>
+            </div>
+            <button
+              type="button"
+              @click="handleShiftY(1)"
+              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              title="向上平移 1 單位"
+            >
+              ＋
+            </button>
+          </div>
+
+          <!-- 3. X 伸縮 ( - X伸縮 + ) -->
+          <div class="flex items-center justify-between p-1.5 px-2 rounded-xl bg-slate-900/80 border border-slate-800">
+            <button
+              type="button"
+              @click="handleScaleX('down')"
+              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              title="水平壓縮"
+            >
+              －
+            </button>
+            <div class="flex flex-col items-center">
+              <span class="text-xs font-bold text-slate-200">X 伸縮</span>
+              <span 
+                class="text-[10px] font-mono"
+                :class="activeAction === 'scaleX' && subtotalScaleXIdx !== 3 ? 'text-amber-300 font-bold' : 'text-slate-500'"
+              >
+                {{ activeAction === 'scaleX' && subtotalScaleXIdx !== 3 ? `倍率: × ${scaleLabels[subtotalScaleXIdx]}` : '倍率: × 1' }}
+              </span>
+            </div>
+            <button
+              type="button"
+              @click="handleScaleX('up')"
+              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              title="水平伸長"
+            >
+              ＋
+            </button>
+          </div>
+
+          <!-- 4. Y 伸縮 ( - Y伸縮 + ) -->
+          <div class="flex items-center justify-between p-1.5 px-2 rounded-xl bg-slate-900/80 border border-slate-800">
+            <button
+              type="button"
+              @click="handleScaleY('down')"
+              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              title="垂直壓縮"
+            >
+              －
+            </button>
+            <div class="flex flex-col items-center">
+              <span class="text-xs font-bold text-slate-200">Y 伸縮</span>
+              <span 
+                class="text-[10px] font-mono"
+                :class="activeAction === 'scaleY' && subtotalScaleYIdx !== 3 ? 'text-purple-300 font-bold' : 'text-slate-500'"
+              >
+                {{ activeAction === 'scaleY' && subtotalScaleYIdx !== 3 ? `倍率: × ${scaleLabels[subtotalScaleYIdx]}` : '倍率: × 1' }}
+              </span>
+            </div>
+            <button
+              type="button"
+              @click="handleScaleY('up')"
+              class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold text-sm cursor-pointer active:scale-95 transition-all shadow-sm"
+              title="垂直伸長"
+            >
+              ＋
             </button>
           </div>
         </div>
 
-        <!-- Section 3: Scale Actions (伸縮動作) -->
-        <div class="flex flex-col gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
-          <div class="flex items-center justify-between text-[11px] text-slate-400 font-semibold px-0.5">
-            <span>伸縮動作</span>
-            <span class="text-purple-300 font-mono font-bold">縱向: × {{ scaleLabels[transScaleIndex] }}</span>
-          </div>
-          <div class="grid grid-cols-2 gap-1.5">
+        <!-- 對稱動作（改變目前變動後的函數） -->
+        <div class="flex flex-col gap-1 pt-1.5 border-t border-slate-800/80">
+          <div class="grid grid-cols-2 gap-1">
             <button
               type="button"
-              @click="scaleDown"
-              :disabled="transScaleIndex === 0"
-              class="py-1.5 px-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-              title="縮小 (1/2, 1/3, 1/4...)"
+              @click="applyReflectX"
+              class="py-1.5 px-1.5 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-rose-300 hover:bg-rose-950/60 hover:border-rose-700 transition-all active:scale-95 cursor-pointer text-center"
+              title="對稱於 x 軸翻轉"
             >
-              － 原圖縮小
+              上下翻轉 (x 軸)
             </button>
             <button
               type="button"
-              @click="scaleUp"
-              :disabled="transScaleIndex === scaleFactors.length - 1"
-              class="py-1.5 px-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-              title="放大 (2, 3, 4, 5, 6...)"
+              @click="applyReflectY"
+              class="py-1.5 px-1.5 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-indigo-300 hover:bg-indigo-950/60 hover:border-indigo-700 transition-all active:scale-95 cursor-pointer text-center"
+              title="對稱於 y 軸翻轉"
             >
-              ＋ 原圖放大
+              左右翻轉 (y 軸)
             </button>
           </div>
+          <button
+            type="button"
+            @click="applyInverse"
+            class="w-full py-1.5 px-2 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-amber-300 hover:bg-amber-950/60 hover:border-amber-700 transition-all active:scale-95 cursor-pointer text-center"
+            title="對稱於直線 y = x，交換 x 與 y"
+          >
+            反函數對稱 (對稱 y = x)
+          </button>
         </div>
 
-        <!-- Section 4: Reflections & Symmetry (翻轉與對稱) -->
-        <div class="flex flex-col gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
-          <div class="text-[11px] text-slate-400 font-semibold px-0.5">
-            翻轉與對稱
-          </div>
-          <div class="flex flex-col gap-1">
-            <button
-              type="button"
-              @click="toggleReflectX"
-              class="py-1.5 px-2.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95 flex items-center justify-between"
-              :class="transReflectX ? 'bg-rose-950 text-rose-300 border-rose-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-            >
-              <span>上下翻轉 (x 軸)</span>
-              <span class="text-xs font-mono font-bold">{{ transReflectX ? '✓' : '' }}</span>
-            </button>
-            <button
-              type="button"
-              @click="toggleReflectY"
-              class="py-1.5 px-2.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95 flex items-center justify-between"
-              :class="transReflectY ? 'bg-indigo-950 text-indigo-300 border-indigo-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-            >
-              <span>左右翻轉 (y 軸)</span>
-              <span class="text-xs font-mono font-bold">{{ transReflectY ? '✓' : '' }}</span>
-            </button>
-            <button
-              type="button"
-              @click="toggleInverse"
-              class="py-1.5 px-2.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95 flex items-center justify-between"
-              :class="transShowInverse ? 'bg-amber-950 text-amber-300 border-amber-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-            >
-              <span>反函數對稱 (y = x)</span>
-              <span class="text-xs font-mono font-bold">{{ transShowInverse ? '✓' : '' }}</span>
-            </button>
-          </div>
+        <!-- 復原與重置 -->
+        <div class="grid grid-cols-2 gap-1 pt-1.5 border-t border-slate-800/80">
+          <button
+            type="button"
+            @click="undoLastStep"
+            :disabled="stepHistory.length === 0 && !activeAction"
+            class="py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all active:scale-95 text-center"
+          >
+            ⌫ 復原上步
+          </button>
+          <button
+            type="button"
+            @click="resetAll"
+            class="py-1.5 rounded-xl text-xs font-bold bg-rose-950/70 text-rose-300 hover:bg-rose-900 border border-rose-800/80 cursor-pointer transition-all active:scale-95 text-center"
+          >
+            ↺ 快速重置
+          </button>
         </div>
-
-        <!-- Section 5: Fast Reset Button (重置鈕快速還原) -->
-        <button
-          type="button"
-          @click="resetTrans"
-          class="w-full py-2 rounded-xl text-xs font-bold transition-all bg-rose-950/70 text-rose-300 hover:bg-rose-900 border border-rose-800/80 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-sm"
-          title="快速還原至基準函數原圖"
-        >
-          <span>↺ 快速重置原圖</span>
-        </button>
       </div>
 
-      <!-- Right Column: Graph & Live Formula Insight (圖形與動態說明) -->
+      <!-- Right Column: 動作歷程鏈、函數圖形與即時方程式 -->
       <div class="flex-1 min-w-0 flex flex-col items-center gap-2.5 w-full">
-        <!-- FunctionGraph: 名稱統一改為「函數圖形」，精簡無多餘標語 -->
+        <!-- 做了哪些動作的履歷鏈 (順序感知欄位) -->
+        <div class="w-full p-2.5 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner text-xs">
+          <div class="flex items-center justify-between pb-1.5 border-b border-slate-800/60 mb-2">
+            <div class="flex items-center gap-1.5 font-bold text-slate-300">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span>變換動作歷程（連續動作已合併）</span>
+            </div>
+            <span class="text-[11px] font-mono text-slate-400">
+              已累積 {{ stepHistory.length + (activeAction ? 1 : 0) }} 個步驟
+            </span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            <!-- 基準起點 -->
+            <span class="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-700 text-slate-300 font-mono">
+              基準: {{ initialFamily === 'exp' ? 'y = 2^x' : 'y = \\log_2 x' }}
+            </span>
+
+            <!-- 歷史步驟清單 -->
+            <template v-for="(st, idx) in stepHistory" :key="st.id">
+              <span class="text-slate-500 font-bold">→</span>
+              <span class="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-slate-200">
+                <span class="text-sky-300 font-semibold">{{ idx + 1 }}.</span> {{ st.label }}
+              </span>
+            </template>
+
+            <!-- 進行中動作提示 -->
+            <template v-if="activeAction">
+              <span class="text-slate-500 font-bold">→</span>
+              <span class="px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/70 text-sky-200 animate-pulse">
+                <span class="text-amber-300 font-semibold">{{ stepHistory.length + 1 }}.</span> {{ getActiveStepLabel() }} (調整中)
+              </span>
+            </template>
+          </div>
+        </div>
+
+        <!-- FunctionGraph 函數圖形 -->
         <FunctionGraph
           title="函數圖形"
           titleColor="#38bdf8"
           :width="460"
-          :height="280"
+          :height="270"
           :xRange="currentTransConfig.xRange"
           :yRange="currentTransConfig.yRange"
           :functions="currentTransConfig.functions"
