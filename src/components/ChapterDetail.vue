@@ -304,17 +304,17 @@ const chapterResources = computed(() => {
         </span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- 由上而下 1 2 3 4 單欄卡片整齊排列 -->
+      <div class="space-y-4">
         <div 
           v-for="(concept, idx) in displayedConcepts" 
           :key="idx"
-          class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700/80 transition-colors flex flex-col justify-between"
-          :class="concept.diagramType === 'lens-optics' ? 'md:col-span-2' : ''"
+          class="p-5 sm:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700/80 transition-colors flex flex-col justify-between"
         >
           <div>
-            <div class="flex items-center justify-between gap-2 mb-1.5">
-              <h4 class="text-sm font-bold text-sky-300 flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <h4 class="text-sm sm:text-base font-bold text-sky-300 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
                 <span>{{ concept.title }}</span>
               </h4>
               <span 
@@ -336,9 +336,7 @@ const chapterResources = computed(() => {
                 共同核心
               </span>
             </div>
-            <p class="text-xs text-slate-300 leading-relaxed mb-2">
-              {{ concept.description }}
-            </p>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3" v-html="renderRichMathText(concept.description)"></p>
           </div>
 
           <!-- Visual Illustration Diagram (若單元具幾何圖解則動態呈現) -->
@@ -353,12 +351,12 @@ const chapterResources = computed(() => {
           <!-- Formulas list: 以 KaTeX 數學排版引擎渲染真實分數、上下標與希臘字母 -->
           <div 
             v-if="concept.formulas && concept.formulas.length > 0"
-            class="mt-2 space-y-2"
+            class="mt-2 space-y-2.5"
           >
             <div 
               v-for="(fItem, fIdx) in concept.formulas"
               :key="fIdx"
-              class="px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-slate-800/90 text-slate-100 text-sm tracking-wide flex flex-wrap items-center gap-2 overflow-x-auto shadow-inner"
+              class="px-4 py-3 rounded-xl bg-slate-950/90 border border-slate-800/90 text-slate-100 text-sm tracking-wide flex flex-wrap items-center gap-2 overflow-x-auto shadow-inner"
             >
               <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
               <!-- 前置中文名稱標籤 -->
@@ -386,15 +384,15 @@ const chapterResources = computed(() => {
       </div>
     </div>
 
-    <!-- SOP Problem Solving Section -->
+    <!-- Problem Solving Mindset Section -->
     <div v-if="displayedSopModules && displayedSopModules.length > 0" class="space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
           <Compass class="w-4 h-4 text-amber-400" />
-          <span>老師獨家破題思維（解題 SOP）</span>
+          <span>核心破題思維</span>
         </h3>
         <span class="text-[11px] text-amber-400/90 font-semibold px-2 py-0.5 rounded-full bg-amber-950/60 border border-amber-800/50">
-          高頻解題模組
+          解題關鍵
         </span>
       </div>
 
@@ -464,7 +462,7 @@ const chapterResources = computed(() => {
           <span>經典範例與步驟化詳解</span>
         </h3>
         <span class="text-[11px] text-emerald-400/90 font-semibold px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-800/50">
-          名師步驟示範
+          實戰範例詳解
         </span>
       </div>
 
@@ -524,7 +522,7 @@ const chapterResources = computed(() => {
           <span>課後微檢測（觀念思考題）</span>
         </h3>
         <span class="text-[11px] text-purple-400/90 font-semibold px-2 py-0.5 rounded-full bg-purple-950/60 border border-purple-800/50">
-          即時自我檢驗
+          觀念微檢測
         </span>
       </div>
 
@@ -551,7 +549,7 @@ const chapterResources = computed(() => {
               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-purple-950/50 hover:bg-purple-900/60 text-purple-300 border border-purple-700/50"
             >
               <Lightbulb class="w-3.5 h-3.5 text-purple-400" />
-              <span>{{ openHints[qIdx] ? '收起名師思考提示' : '展開名師思考提示' }}</span>
+              <span>{{ openHints[qIdx] ? '收起思考提示' : '查看思考提示' }}</span>
               <component :is="openHints[qIdx] ? ChevronUp : ChevronDown" class="w-3.5 h-3.5" />
             </button>
 

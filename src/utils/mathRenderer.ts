@@ -124,8 +124,8 @@ export function renderFormulaItem(raw: string): FormattedFormula {
   let label: string | undefined = undefined;
   let note: string | undefined = undefined;
 
-  // 1. 提取前置中文標籤（如「向心加速度：」或「向心力：」或「末速度公式：」）
-  const colonMatch = text.match(/^([^：:]{1,18}[：:])\s*(.*)$/);
+  // 1. 提取前置中文標籤（如「向心加速度：」或「向心力：」或「底真對調公式：」）
+  const colonMatch = text.match(/^([^：:\n]{1,35}[：:])\s*(.*)$/);
   if (colonMatch) {
     label = colonMatch[1];
     text = colonMatch[2].trim();
