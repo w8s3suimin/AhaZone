@@ -54,7 +54,7 @@ const activeTrackTab = ref<'all' | 'mathA' | 'mathB'>('all');
 watch(() => props.chapterName, () => {
   activeTrackTab.value = 'all';
   openSolutions.value = {};
-  openSopSteps.value = { 0: true, 1: true, 2: true, 3: true };
+  openSopSteps.value = {};
 });
 
 // Check if current chapter has Math A / B differences
@@ -138,8 +138,8 @@ const toggleHint = (idx: number) => {
   openHints.value[idx] = !openHints.value[idx];
 };
 
-// SOP steps folding state (破題思維步驟折疊控制，預設展開前幾項方便閱讀)
-const openSopSteps = ref<Record<number, boolean>>({ 0: true, 1: true, 2: true, 3: true });
+// SOP steps folding state (破題思維步驟折疊控制，預設全部折疊以供先思考破題)
+const openSopSteps = ref<Record<number, boolean>>({});
 const toggleSopSteps = (idx: number) => {
   openSopSteps.value[idx] = !openSopSteps.value[idx];
 };
@@ -519,15 +519,7 @@ const chapterResources = computed(() => {
             v-html="renderRichMathText(mod.mindset)"
           />
 
-          <!-- 若有幾何圖形視覺化，採由上而下上下垂直排列（保留完整 1:1 視野） -->
-          <div 
-            v-if="mod.diagramType"
-            class="my-3 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
-          >
-            <ConceptDiagram :type="mod.diagramType" />
-          </div>
-
-          <!-- 折疊步驟開關按鈕 -->
+          <!-- 折疊步驟開關按鈕（預設折疊圖形與解題步驟，讓學生先看題目自主思考） -->
           <button 
             type="button"
             @click="toggleSopSteps(mIdx)"
@@ -535,11 +527,11 @@ const chapterResources = computed(() => {
           >
             <span class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-amber-400 group-hover:text-amber-300">
               <Target class="w-4 h-4" />
-              <span>{{ openSopSteps[mIdx] ? '收合步驟化破題解析' : '展開步驟化破題解析' }}</span>
-              <span class="text-xs text-slate-400 font-normal">（共 {{ mod.steps.length }} 步）</span>
+              <span>{{ openSopSteps[mIdx] ? '收合步驟解析與圖形' : '展開步驟解析與圖形' }}</span>
+              <span class="text-xs text-slate-400 font-normal">（共 {{ mod.steps.length }} 步{{ mod.diagramType ? '，含圖形判定' : '' }}）</span>
             </span>
             <span class="flex items-center gap-1.5 text-xs text-slate-400 group-hover:text-amber-400 font-medium">
-              <span>{{ openSopSteps[mIdx] ? '點擊收合' : '點擊查看解析' }}</span>
+              <span>{{ openSopSteps[mIdx] ? '點擊收合' : '點擊查看詳解' }}</span>
               <ChevronDown 
                 class="w-4 h-4 text-slate-400 group-hover:text-amber-400 transition-transform duration-200" 
                 :class="{ 'rotate-180': openSopSteps[mIdx] }" 
@@ -547,8 +539,16 @@ const chapterResources = computed(() => {
             </span>
           </button>
 
-          <!-- 折疊區域：步驟 1, 2, 3 垂直單欄排列（由上而下） + 結論答案 -->
-          <div v-if="openSopSteps[mIdx]" class="space-y-3 pt-1 transition-all duration-300">
+          <!-- 折疊區域：圖形視覺化 + 步驟 1, 2, 3 垂直單欄排列（由上而下） + 結論答案 -->
+          <div v-if="openSopSteps[mIdx]" class="space-y-4 pt-1 transition-all duration-300">
+            <!-- 函數圖形視覺化（作為解題關鍵步驟呈現） -->
+            <div 
+              v-if="mod.diagramType"
+              class="my-2 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
+            >
+              <ConceptDiagram :type="mod.diagramType" />
+            </div>
+
             <div class="flex flex-col space-y-3">
               <div 
                 v-for="(step, sIdx) in mod.steps"
