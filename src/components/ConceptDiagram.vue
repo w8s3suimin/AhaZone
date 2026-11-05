@@ -1640,28 +1640,29 @@ const currentFeatureDisplay = computed(() => {
           { fn: (x: number) => Math.pow(2, x), domain: [-1.5, 3.25], color: '#38bdf8', strokeWidth: 2.5, label: 'y = 2^x', description: '指數曲線' },
           { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 10.2], color: '#34d399', strokeWidth: 2.5, label: 'y = \\log_2 x', description: '對數曲線' },
           { fn: (x: number) => x, color: '#f59e0b', strokeWidth: 1.5, dashArray: '4 4', label: 'y = x', description: '反函數對稱軸' },
-          { fn: (x: number) => -x + 11, domain: [1.5, 9.5], color: '#f43f5e', strokeWidth: 2, label: 'L: x + y = 11', description: '垂直割線 (m = -1)' }
+          { fn: (x: number) => -x + 11, domain: [1.5, 9.5], color: '#f43f5e', strokeWidth: 2, label: 'L: x + y = k', description: '垂直割線 (m = -1)' }
         ]"
         :lines="[
-          { x1: 5.75, y1: 5.75, x2: 5.5, y2: 6.0, color: '#f59e0b', strokeWidth: 1.4 },
-          { x1: 5.5, y1: 6.0, x2: 5.25, y2: 5.75, color: '#f59e0b', strokeWidth: 1.4 },
+          { x1: 5.25, y1: 5.25, x2: 5.0, y2: 5.5, color: '#f59e0b', strokeWidth: 1.4 },
+          { x1: 5.0, y1: 5.5, x2: 5.25, y2: 5.75, color: '#f59e0b', strokeWidth: 1.4 },
           { x1: 0, y1: 1, x2: 1, y2: 0, color: '#64748b', strokeWidth: 1, dashArray: '2 2' }
         ]"
         :points="[
-          { x: 3, y: 8, color: '#38bdf8', radius: 4.5, label: 'P(3, 8)', labelPos: 'top-left' },
-          { x: 8, y: 3, color: '#34d399', radius: 4.5, label: 'Q(8, 3)', labelPos: 'bottom-right' },
-          { x: 5.5, y: 5.5, color: '#f59e0b', radius: 4, label: '中點 M(5.5, 5.5)', labelPos: 'top-right' },
+          { x: 3, y: 8, color: '#38bdf8', radius: 4.5, label: 'P(a, b+2)', labelPos: 'top-left' },
+          { x: 8, y: 3, color: '#34d399', radius: 4.5, label: 'Q(3a−1, b−3)', labelPos: 'bottom-right' },
+          { x: 5.5, y: 5.5, color: '#f59e0b', radius: 4, label: '中點 M((4a−1)/2, (2b−1)/2)', labelPos: 'right' },
           { x: 0, y: 1, color: '#94a3b8', radius: 2.5, label: '(0, 1)', labelPos: 'left' },
           { x: 1, y: 0, color: '#94a3b8', radius: 2.5, label: '(1, 0)', labelPos: 'bottom' }
         ]"
       >
         <template #default="{ toScreenX, toScreenY }">
           <text 
-            :x="toScreenX(5.5) - 10" 
-            :y="toScreenY(6.6)" 
+            :x="toScreenX(4.75)" 
+            :y="toScreenY(5.35)" 
             fill="#fda4af" 
             font-size="9.5" 
             font-family="sans-serif"
+            text-anchor="end"
             class="chart-halo font-bold"
           >
             L ⊥ (y = x)
@@ -1671,7 +1672,7 @@ const currentFeatureDisplay = computed(() => {
 
       <!-- Bottom Insight Legend -->
       <div class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-center font-sans">
-        幾何割線核心：<span class="text-rose-400 font-bold">L: x + y = k 斜率為 -1 垂直於對稱軸 y = x</span> $\implies$ P、Q 必互為對稱點，中點必在 y = x 上，斜率為 -1！
+        幾何割線核心：<span class="text-rose-400 font-bold">L: x + y = k 斜率為 −1，垂直於對稱軸 y = x</span> ⟹ P、Q 互為對稱點：中點 M 必在 y = x 上，且直線 PQ 斜率為 −1！
       </div>
     </div>
 
