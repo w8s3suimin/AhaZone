@@ -299,7 +299,7 @@ const chapterResources = computed(() => {
           <Sparkles class="w-4 h-4 text-sky-400" />
           <span>核心觀念與公式精要</span>
         </h3>
-        <span v-if="hasTrackVariants" class="text-[11px] text-slate-400">
+        <span v-if="hasTrackVariants" class="text-xs text-slate-400">
           目前顯示：<strong class="text-sky-300 font-semibold">{{ activeTrackTab === 'all' ? '全部 (共同 + 數A + 數B)' : activeTrackTab === 'mathA' ? '數A (共同 + 數A專屬)' : '數B (共同 + 數B專屬)' }}</strong>
         </span>
       </div>
@@ -319,19 +319,19 @@ const chapterResources = computed(() => {
               </h4>
               <span 
                 v-if="concept.track === 'mathA'"
-                class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-950 text-indigo-300 border border-indigo-700/60 shrink-0"
+                class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-950 text-indigo-300 border border-indigo-700/60 shrink-0"
               >
                 數A專屬
               </span>
               <span 
                 v-else-if="concept.track === 'mathB'"
-                class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-700/60 shrink-0"
+                class="px-2 py-0.5 rounded text-xs font-bold bg-amber-950 text-amber-300 border border-amber-700/60 shrink-0"
               >
                 數B專屬
               </span>
               <span 
                 v-else-if="concept.track === 'common'"
-                class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700/60 shrink-0"
+                class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-700/60 shrink-0"
               >
                 共同核心
               </span>
@@ -391,7 +391,7 @@ const chapterResources = computed(() => {
           <Compass class="w-4 h-4 text-amber-400" />
           <span>核心破題思維</span>
         </h3>
-        <span class="text-[11px] text-amber-400/90 font-semibold px-2 py-0.5 rounded-full bg-amber-950/60 border border-amber-800/50">
+        <span class="text-xs text-amber-400/90 font-semibold px-2.5 py-0.5 rounded-full bg-amber-950/60 border border-amber-800/50">
           解題關鍵
         </span>
       </div>
@@ -454,7 +454,7 @@ const chapterResources = computed(() => {
           :key="idx"
           class="p-3.5 rounded-xl bg-rose-950/20 border border-rose-500/20 text-xs text-rose-200/90 flex items-start gap-2.5"
         >
-          <span class="w-4 h-4 rounded-full bg-rose-900/60 text-rose-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+          <span class="w-4 h-4 rounded-full bg-rose-900/60 text-rose-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
             {{ idx + 1 }}
           </span>
           <span class="leading-relaxed">{{ pitfall }}</span>
@@ -469,7 +469,7 @@ const chapterResources = computed(() => {
           <CheckCircle2 class="w-4 h-4 text-emerald-400" />
           <span>經典範例與步驟化詳解</span>
         </h3>
-        <span class="text-[11px] text-emerald-400/90 font-semibold px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-800/50">
+        <span class="text-xs text-emerald-400/90 font-semibold px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-800/50">
           實戰範例詳解
         </span>
       </div>
@@ -537,7 +537,7 @@ const chapterResources = computed(() => {
           <HelpCircle class="w-4 h-4 text-purple-400" />
           <span>課後微檢測（觀念思考題）</span>
         </h3>
-        <span class="text-[11px] text-purple-400/90 font-semibold px-2 py-0.5 rounded-full bg-purple-950/60 border border-purple-800/50">
+        <span class="text-xs text-purple-400/90 font-semibold px-2.5 py-0.5 rounded-full bg-purple-950/60 border border-purple-800/50">
           觀念微檢測
         </span>
       </div>
