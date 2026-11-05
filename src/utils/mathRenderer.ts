@@ -164,17 +164,57 @@ export function renderFormulaItem(raw: string): FormattedFormula {
 }
 
 /**
- * 渲染包含 $...$ LaTeX 語法的富文字字串
+ * 渲染包含 $...$ 或 $$...$$ LaTeX 語法的富文字字串
  */
 export function renderRichMathText(text: string): string {
   if (!text) return '';
-  // 若未包含 $ 符號，直接回傳
-  if (!text.includes('$')) return text;
 
-  return text.replace(/\$([^$]+)\$/g, (_, math) => {
+  // 1. 若字串完全不含 $，但含有明顯的 LaTeX 標籤或運算式，直接進行智慧 KaTeX 渲染
+  if (!text.includes('$')) {
+    if (text.includes('\\frac') || text.includes('\\sqrt') || text.includes('\\implies') || text.includes('\\log') || text.includes('\\cdot')) {
+      try {
+        const latex = formulaToLatex(text);
+        return katex.renderToString(`\\displaystyle ${latex}`, {
+          throwOnError: false,
+          displayMode: false
+        });
+      } catch {
+        return text;
+      }
+    }
+    return text;
+  }
+
+  // 2. 自動容錯：若 $ 符號為奇數個（代表末端有未關閉的 $），自動補上閉合 $
+  let sanitized = text;
+  const dollarCount = (sanitized.match(/\$/g) || []).length;
+  if (dollarCount % 2 !== 0) {
+    sanitized = sanitized + '$';
+  }
+
+  // 3. 處理 $$...$$ 獨立區塊數學式（Display Math）
+  sanitized = sanitized.replace(/\$\$([\s\S]+?)\$\$/g, (_, math) => {
     try {
       const latex = formulaToLatex(math);
-      return katex.renderToString(`\\textstyle ${latex}`, {
+      const mathHtml = katex.renderToString(`\\displaystyle ${latex}`, {
+        throwOnError: false,
+        displayMode: true
+      });
+      return `<div class="my-2.5 py-1.5 overflow-x-auto text-center">${mathHtml}</div>`;
+    } catch {
+      return math;
+    }
+  });
+
+  // 4. 處理 $...$ 行內數學式（Inline Math）
+  return sanitized.replace(/\$([^$]+)\$/g, (_, math) => {
+    try {
+      const latex = formulaToLatex(math);
+      // 若包含分數、求和等，以 \displaystyle 渲染，確保分子分母與指數清晰好讀，避免字體過小縮水
+      const stylePrefix = (latex.includes('\\frac') || latex.includes('\\sum') || latex.includes('\\large'))
+        ? '\\displaystyle '
+        : '\\textstyle ';
+      return katex.renderToString(`${stylePrefix}${latex}`, {
         throwOnError: false,
         displayMode: false
       });

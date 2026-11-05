@@ -476,11 +476,11 @@ const chapterResources = computed(() => {
               :key="sIdx"
               class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 hover:border-amber-500/40 transition-colors flex flex-col justify-start space-y-2"
             >
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 text-amber-300 font-bold text-xs border border-amber-600/50 self-start">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 text-amber-300 font-bold text-xs sm:text-sm border border-amber-600/50 self-start">
                 <Target class="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>{{ step.label }}</span>
+                <span v-html="renderRichMathText(step.label)"></span>
               </div>
-              <p class="text-xs text-slate-300 leading-relaxed font-sans" v-html="renderRichMathText(step.text)"></p>
+              <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans" v-html="renderRichMathText(step.text)"></p>
             </div>
           </div>
         </div>
@@ -549,28 +549,28 @@ const chapterResources = computed(() => {
           </div>
 
           <!-- 步驟解析 -->
-          <div class="space-y-2.5">
+          <div class="space-y-3">
             <div 
               v-for="(st, stIdx) in ex.solutionSteps"
               :key="stIdx"
-              class="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/70 text-xs text-slate-300 leading-relaxed space-y-1.5"
+              class="p-4 sm:p-5 rounded-xl bg-slate-950/70 border border-slate-800/80 text-sm sm:text-base text-slate-200 leading-relaxed space-y-2.5 shadow-inner"
             >
-              <div class="font-bold text-sky-300 flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-                <span>{{ st.step }}</span>
+              <div class="font-bold text-sky-300 flex items-center gap-2 text-sm sm:text-base">
+                <span class="w-2 h-2 rounded-full bg-sky-400 shrink-0"></span>
+                <span v-html="renderRichMathText(st.step)"></span>
               </div>
-              <div class="text-slate-300 pl-3 border-l-2 border-slate-800 whitespace-pre-line" v-html="renderRichMathText(st.content)"></div>
+              <div class="text-slate-200 pl-3.5 border-l-2 border-slate-700/80 whitespace-pre-line text-sm sm:text-base leading-relaxed overflow-x-auto py-0.5" v-html="renderRichMathText(st.content)"></div>
             </div>
           </div>
 
           <!-- 最終答案 -->
           <div 
             v-if="ex.answer"
-            class="px-4 py-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-xs font-bold text-emerald-300 flex items-center gap-2"
+            class="px-4 py-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-sm sm:text-base font-bold text-emerald-300 flex items-center gap-2 shadow-inner"
           >
-            <Check class="w-4 h-4 text-emerald-400" />
-            <span>結論答案：</span>
-            <span class="text-emerald-200" v-html="renderRichMathText(ex.answer)"></span>
+            <Check class="w-4 h-4 text-emerald-400 shrink-0" />
+            <span class="shrink-0">結論答案：</span>
+            <span class="text-emerald-200 overflow-x-auto" v-html="renderRichMathText(ex.answer)"></span>
           </div>
         </div>
       </div>

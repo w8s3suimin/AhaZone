@@ -1947,18 +1947,18 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         solutionSteps: [
           {
             step: '步驟一【消去負指數，整理基本型態】',
-            content: '將分母與分子同乘以 $3^x$：\n$f(x) = \\frac{(3^x + 3^{-x}) \\cdot 3^x}{(3^x - 3^{-x}) \\cdot 3^x} = \\frac{3^{2x} + 1}{3^{2x} - 1}$'
+            content: '將分母與分子同乘以 $3^x$：\n$$f(x) = \\frac{(3^x + 3^{-x}) \\cdot 3^x}{(3^x - 3^{-x}) \\cdot 3^x} = \\frac{3^{2x} + 1}{3^{2x} - 1}$$'
           },
           {
             step: '步驟二【令新變數求出 $3^{2a}$ 與 $3^{2b}$】',
-            content: '設 $A = 3^{2a}, B = 3^{2b}$：\n代入 $f(a) = 2 \\implies \\frac{A + 1}{A - 1} = 2 \\implies A + 1 = 2A - 2 \\implies A = 3^{2a} = 3$\n代入 $f(b) = 4 \\implies \\frac{B + 1}{B - 1} = 4 \\implies B + 1 = 4B - 4 \\implies 3B = 5 \\implies B = 3^{2b} = \\frac{5}{3}'
+            content: '設 $A = 3^{2a}, B = 3^{2b}$：\n代入 $f(a) = 2$：\n$$\\frac{A + 1}{A - 1} = 2 \\implies A + 1 = 2A - 2 \\implies A = 3^{2a} = 3$$\n代入 $f(b) = 4$：\n$$\\frac{B + 1}{B - 1} = 4 \\implies B + 1 = 4B - 4 \\implies 3B = 5 \\implies B = 3^{2b} = \\frac{5}{3}$$'
           },
           {
             step: '步驟三【目標導向，求出 $f(a+b)$】',
-            content: '欲求 $f(a+b) = \\frac{3^{2(a+b)} + 1}{3^{2(a+b)} - 1}$，利用指數律先算 $3^{2(a+b)}$：\n$3^{2(a+b)} = 3^{2a} \\cdot 3^{2b} = A \\cdot B = 3 \\cdot \\frac{5}{3} = 5$\n代入分式可得：$f(a+b) = \\frac{5 + 1}{5 - 1} = \\frac{6}{4} = \\frac{3}{2}$。'
+            content: '欲求目標函數值 $f(a+b)$：\n$${\\large f(a+b) = \\frac{3^{\\textstyle 2(a+b)} + 1}{3^{\\textstyle 2(a+b)} - 1}}$$\n利用指數律先算 $3^{2(a+b)}$ 之值：\n$$3^{2(a+b)} = 3^{2a} \\cdot 3^{2b} = A \\cdot B = 3 \\cdot \\frac{5}{3} = 5$$\n代入目標分式可得：\n$$f(a+b) = \\frac{5 + 1}{5 - 1} = \\frac{6}{4} = \\frac{3}{2}$$'
           }
         ],
-        answer: 'f(a+b) = \\frac{3}{2}'
+        answer: '$f(a+b) = \\frac{3}{2}$'
       },
       {
         title: '範例二：圖形交點判定實根個數',
