@@ -628,9 +628,9 @@
         // When false: show authentic KaTeX baseline underline right after =
         let latex = '';
         if (showInlineAnswers) {
-          latex = `${q.questionLatex} \; \mathbf{\textcolor{#0284c7}{${q.ansLatex}}}`;
+          latex = q.questionLatex + ' \\; \\mathbf{\\textcolor{#0284c7}{' + q.ansLatex + '}}';
         } else {
-          latex = `${q.questionLatex} \; \underline{\hspace{2.8cm}}`;
+          latex = q.questionLatex + ' \\; \\underline{\\hspace{2.8cm}}';
         }
         renderMath(mathSpan, latex, false);
         
@@ -653,9 +653,9 @@
 
         let latex = '';
         if (showInlineAnswers) {
-          latex = `${q.questionLatex} \; \mathbf{\textcolor{#4f46e5}{${q.logValStr}}}`;
+          latex = q.questionLatex + ' \\; \\mathbf{\\textcolor{#4f46e5}{' + q.logValStr + '}}';
         } else {
-          latex = `${q.questionLatex} \; \underline{\hspace{2.8cm}}`;
+          latex = q.questionLatex + ' \\; \\underline{\\hspace{2.8cm}}';
         }
         renderMath(mathSpan, latex, false);
 
