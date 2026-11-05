@@ -2029,27 +2029,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     ],
     classicExamples: [
       {
-        title: '反函數垂直割線破題 SOP 經典例題',
-        question: '若直線 $x + y = k$ 與曲線 $y = 2^x$ 交點為 $P(a, b+2)$，與曲線 $y = \\log_2 x$ 交點為 $Q(3a-1, b-3)$，求數對 $(a, b)$ 及常數 $k$ 之值。',
-        diagramType: 'inverse-perpendicular-secant',
-        solutionSteps: [
-          {
-            step: '步驟 1：列線段中點在 $y = x$ 上條件',
-            content: '因曲線 $y = 2^x$ 與 $y = \\log_2 x$ 互為反函數，兩者圖形對稱於直線 $y = x$。\n直線 $L: x + y = k$ 斜率為 $-1$，垂直於對稱軸 $y = x$，因此交點 $P$ 與 $Q$ 互為對稱點。\n線段 $PQ$ 的中點必落在直線 $y = x$ 上：\n$$\\frac{x_P + x_Q}{2} = \\frac{y_P + y_Q}{2} \\iff x_P + x_Q = y_P + y_Q$$\n代入坐標：\n$$a + (3a - 1) = (b + 2) + (b - 3) \\implies 4a - 1 = 2b - 1 \\implies 2a = b$$'
-          },
-          {
-            step: '步驟 2：列割線斜率條件（斜率 $m = -1$）',
-            content: '直線 $PQ$ 的斜率必為 $-1$：\n$$\\frac{y_Q - y_P}{x_Q - x_P} = -1 \\implies \\frac{(b - 3) - (b + 2)}{(3a - 1) - a} = -1 \\implies \\frac{-5}{2a - 1} = -1 \\implies 2a - 1 = 5 \\implies a = 3$$'
-          },
-          {
-            step: '步驟 3：代回求解數對與常數 $k$',
-            content: '由 $b = 2a$ 得 $b = 2(3) = 6$。\n交點 $P$ 坐標為 $(3, 6+2) = (3, 8)$。\n代入直線方程式 $x + y = k$：\n$$k = 3 + 8 = 11$$'
-          }
-        ],
-        answer: '$(a, b) = (3, 6), \\quad k = 11$'
-      },
-      {
-        title: '【數B素養示範題】連續複利與七二法則估算本金翻倍期數',
+        title: '題型六：【數B素養示範題】連續複利與七二法則估算本金翻倍期數',
         question: '年利率為 $4.5\\%$，每年複利計息一次，若依七二法則（72 Rule）估算，本金翻倍約需多少年？並請說明其背後取自然對數 $\\ln$ 的原理依據。',
         solutionSteps: [
           {
