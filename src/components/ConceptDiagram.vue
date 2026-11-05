@@ -825,6 +825,57 @@ const props = defineProps<{
     </div>
 
     <!-- ========================================================================= -->
+    <!-- 15-C. 對數方程圖形判定：x - log_2|x| = 1 (log-absolute-roots) -->
+    <!-- ========================================================================= -->
+    <div 
+      v-else-if="type === 'log-absolute-roots'" 
+      class="w-full max-w-xl flex flex-col items-center gap-2 select-none"
+    >
+      <FunctionGraph
+        title="對數方程圖形判定"
+        titleColor="#38bdf8"
+        :width="460"
+        :height="260"
+        :xRange="[-3.5, 4.5]"
+        :yRange="[-3.2, 3.5]"
+        :functions="[
+          { fn: (x: number) => x - 1, color: '#f43f5e', strokeWidth: 2.4, label: 'y_1 = x - 1', description: '斜率 1 直線' },
+          { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 4.5], color: '#38bdf8', strokeWidth: 2.6, label: 'y_2 = \\log_2 |x|', description: '對稱對數 (x>0)' },
+          { fn: (x: number) => x < -0.04 ? Math.log2(-x) : NaN, domain: [-3.5, -0.04], color: '#38bdf8', strokeWidth: 2.6, showInLegend: false }
+        ]"
+        :points="[
+          { x: 1, y: 0, color: '#f59e0b', radius: 4.5, label: '整數解 (1, 0)', labelPos: 'bottom-right' },
+          { x: 2, y: 1, color: '#f59e0b', radius: 4.5, label: '整數解 (2, 1)', labelPos: 'top-left' },
+          { x: -0.366, y: -1.366, color: '#f59e0b', radius: 4.5, label: '交點: x ∈ (-1, 0)', labelPos: 'left' },
+          { x: 0, y: -1, color: '#f43f5e', radius: 3, label: '(0, -1)', labelPos: 'right' },
+          { x: -1, y: 0, color: '#38bdf8', radius: 3, label: '(-1, 0)', labelPos: 'top' }
+        ]"
+        :lines="[
+          { x1: 0, y1: -3.2, x2: 0, y2: 3.5, color: '#64748b', strokeWidth: 1, dashArray: '2 2' }
+        ]"
+      >
+        <template #default="{ toScreenX, toScreenY }">
+          <text 
+            :x="toScreenX(1.5)" 
+            :y="toScreenY(-2)" 
+            fill="#38bdf8" 
+            font-size="9" 
+            font-family="sans-serif"
+            text-anchor="middle"
+            class="chart-halo"
+          >
+            漸近線 x = 0 (真數 |x| > 0)
+          </text>
+        </template>
+      </FunctionGraph>
+
+      <!-- Bottom Insight Legend -->
+      <div class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-center font-sans">
+        幾何破題本質：偶函數左右雙臂與直線恰交於 <span class="text-amber-400 font-bold">3 個交點</span>；其中整數解為 <span class="text-emerald-400 font-bold">x = 1 或 2</span>，負向於 <span class="text-sky-400 font-bold">x ∈ (-1, 0)</span> 必有一根！
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
     <!-- 16. 觀念辨析題多圖形交點分析 (transcendental-multi-roots) -->
     <!-- ========================================================================= -->
     <div 
