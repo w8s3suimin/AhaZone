@@ -125,8 +125,14 @@
     }
 
     /* Enforce at least 12pt (16px) font size for math symbols and text */
-    .katex {
+        .katex {
       font-size: 1.25em !important;
+    }
+
+    /* Crisp baseline underline for answers */
+    .underline-line {
+      border-bottom-width: 1.5px !important;
+      border-bottom-color: #334155 !important;
     }
 
     .question-row {
@@ -609,76 +615,52 @@
       // Render Type 1 (指數律 15 題)
       currentQuestions.type1.forEach((q, idx) => {
         const item = document.createElement('div');
-        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center justify-between text-base';
-        
-        const leftWrap = document.createElement('div');
-        leftWrap.className = 'flex items-center gap-2';
+        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center text-base';
         
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base shrink-0 mr-1.5';
         numSpan.textContent = `(${idx + 1})`;
         
         const mathSpan = document.createElement('span');
-        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg';
-        renderMath(mathSpan, q.questionLatex, false);
+        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg flex items-center';
         
-        leftWrap.appendChild(numSpan);
-        leftWrap.appendChild(mathSpan);
-
-        // Answer area on question sheet
-        const rightWrap = document.createElement('div');
-        rightWrap.className = 'flex items-center gap-1 text-right';
-
-        const answerSpan = document.createElement('span');
-        answerSpan.className = `inline-answer font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-300 text-base ${showInlineAnswers ? '' : 'hidden'}`;
-        renderMath(answerSpan, q.ansLatex, false);
-
-        const blankLine = document.createElement('span');
-        blankLine.className = `answer-placeholder border-b-2 border-slate-400 w-20 sm:w-24 inline-block ${showInlineAnswers ? 'hidden' : ''}`;
-
-        rightWrap.appendChild(answerSpan);
-        rightWrap.appendChild(blankLine);
-
-        item.appendChild(leftWrap);
-        item.appendChild(rightWrap);
+        // When showInlineAnswers is true: show bold colored answer
+        // When false: show authentic KaTeX baseline underline right after =
+        let latex = '';
+        if (showInlineAnswers) {
+          latex = `${q.questionLatex} \; \mathbf{\textcolor{#0284c7}{${q.ansLatex}}}`;
+        } else {
+          latex = `${q.questionLatex} \; \underline{\hspace{2.8cm}}`;
+        }
+        renderMath(mathSpan, latex, false);
+        
+        item.appendChild(numSpan);
+        item.appendChild(mathSpan);
         t1Container.appendChild(item);
       });
 
       // Render Type 2 (對數律 15 題)
       currentQuestions.type2.forEach((q, idx) => {
         const item = document.createElement('div');
-        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center justify-between text-base';
-
-        const leftWrap = document.createElement('div');
-        leftWrap.className = 'flex items-center gap-2';
+        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center text-base';
 
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base shrink-0 mr-1.5';
         numSpan.textContent = `(${idx + 1})`;
 
         const mathSpan = document.createElement('span');
-        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg';
-        renderMath(mathSpan, q.questionLatex, false);
+        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg flex items-center';
 
-        leftWrap.appendChild(numSpan);
-        leftWrap.appendChild(mathSpan);
+        let latex = '';
+        if (showInlineAnswers) {
+          latex = `${q.questionLatex} \; \mathbf{\textcolor{#4f46e5}{${q.logValStr}}}`;
+        } else {
+          latex = `${q.questionLatex} \; \underline{\hspace{2.8cm}}`;
+        }
+        renderMath(mathSpan, latex, false);
 
-        // Answer area
-        const rightWrap = document.createElement('div');
-        rightWrap.className = 'flex items-center gap-1 text-right';
-
-        const answerSpan = document.createElement('span');
-        answerSpan.className = `inline-answer font-bold font-mono text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-300 text-base ${showInlineAnswers ? '' : 'hidden'}`;
-        answerSpan.textContent = q.logValStr;
-
-        const blankLine = document.createElement('span');
-        blankLine.className = `answer-placeholder border-b-2 border-slate-400 w-20 sm:w-24 inline-block ${showInlineAnswers ? 'hidden' : ''}`;
-
-        rightWrap.appendChild(answerSpan);
-        rightWrap.appendChild(blankLine);
-
-        item.appendChild(leftWrap);
-        item.appendChild(rightWrap);
+        item.appendChild(numSpan);
+        item.appendChild(mathSpan);
         t2Container.appendChild(item);
       });
     }
@@ -753,19 +735,7 @@
     function toggleAnswers() {
       showInlineAnswers = !showInlineAnswers;
       document.getElementById('toggleAnswerText').textContent = showInlineAnswers ? '隱藏答案' : '顯示答案';
-      
-      const inlines = document.querySelectorAll('.inline-answer');
-      const blanks = document.querySelectorAll('.answer-placeholder');
-
-      inlines.forEach(el => {
-        if (showInlineAnswers) el.classList.remove('hidden');
-        else el.classList.add('hidden');
-      });
-
-      blanks.forEach(el => {
-        if (showInlineAnswers) el.classList.add('hidden');
-        else el.classList.remove('hidden');
-      });
+      renderPage1();
     }
 
     // Toggle Answer Sheet Page
