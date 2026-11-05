@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { ZoomIn, ZoomOut, RotateCcw, Move } from 'lucide-vue-next';
-import { renderRichMathText } from '../utils/mathRenderer';
+import { renderRichMathText, renderFunctionMathLabel } from '../utils/mathRenderer';
 
 export interface PlotFunction {
   id?: string;
@@ -491,7 +491,7 @@ function onTouchEnd() {
                 :stroke-dasharray="fnItem.dashArray" 
               />
             </svg>
-            <span class="font-bold text-slate-100" v-html="renderRichMathText(fnItem.label || '')"></span>
+            <span class="font-bold text-slate-100 flex items-center" v-html="renderFunctionMathLabel(fnItem.label || '')"></span>
             <span v-if="fnItem.description" class="text-[10px] text-slate-400 font-normal">
               {{ fnItem.description }}
             </span>

@@ -169,8 +169,20 @@ export function renderFormulaItem(raw: string): FormattedFormula {
 export function renderRichMathText(text: string): string {
   if (!text) return '';
 
-  // 1. 若字串完全不含 $，但含有明顯的 LaTeX 標籤或運算式，直接進行智慧 KaTeX 渲染
+  // 1. 若字串完全不含 $，且不含中文但包含數學運算符（如 y = 2^x、y = 2^{x - 2}、y = x 等），直接進行智慧 KaTeX 渲染
   if (!text.includes('$')) {
+    const hasChinese = /[\u4e00-\u9fa5]/.test(text);
+    if (!hasChinese && (text.includes('^') || text.includes('_') || text.includes('=') || text.includes('\\') || text.includes('/') || text.includes('+') || text.includes('-'))) {
+      try {
+        const latex = formulaToLatex(text);
+        return katex.renderToString(`\\textstyle ${latex}`, {
+          throwOnError: false,
+          displayMode: false
+        });
+      } catch {
+        return text;
+      }
+    }
     if (text.includes('\\frac') || text.includes('\\sqrt') || text.includes('\\implies') || text.includes('\\log') || text.includes('\\cdot')) {
       try {
         const latex = formulaToLatex(text);
@@ -230,4 +242,24 @@ export function renderRichMathText(text: string): string {
   sanitized = sanitized.replace(/^•\s*/gm, '<span class="text-amber-400 font-bold mr-1 shrink-0">•</span>');
 
   return sanitized;
+}
+
+/**
+ * 專門渲染函數標籤（例如圖例中的 y = 2^x, y = \log_2 x, y = 2^{x-2}, y_1 = 2^x 等）
+ */
+export function renderFunctionMathLabel(raw: string): string {
+  if (!raw) return '';
+  const text = raw.trim();
+  if (text.includes('$')) {
+    return renderRichMathText(text);
+  }
+  try {
+    const latex = formulaToLatex(text);
+    return katex.renderToString(`\\textstyle ${latex}`, {
+      throwOnError: false,
+      displayMode: false
+    });
+  } catch {
+    return text;
+  }
 }
