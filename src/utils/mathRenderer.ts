@@ -222,8 +222,8 @@ export function renderRichMathText(text: string): string {
   sanitized = sanitized.replace(/\$([^$]+)\$/g, (_, math) => {
     try {
       const latex = formulaToLatex(math);
-      // 若包含分數、求和等，以 \displaystyle 渲染，確保分子分母與指數清晰好讀，避免字體過小縮水
-      const stylePrefix = (latex.includes('\\frac') || latex.includes('\\sum') || latex.includes('\\large'))
+      // 若包含分數、求和或大小修飾詞等，以 \displaystyle 渲染，確保分子分母與指數清晰好讀，避免字體過小縮水
+      const stylePrefix = (latex.includes('\\frac') || latex.includes('\\sum') || /\\(large|Large|LARGE|Huge)/i.test(latex))
         ? '\\displaystyle '
         : '\\textstyle ';
       return katex.renderToString(`${stylePrefix}${latex}`, {

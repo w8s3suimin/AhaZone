@@ -480,8 +480,18 @@ const currentTransConfig = computed(() => {
     points: [basePoint, transPoint],
     lines: [asymptoteLine, guideLine],
     description: desc,
-    formula: formulaLatex
+    formula: formulaLatex,
+    pointText: `${pxR}, ${pyR}`,
+    asymText: asymText
   };
+});
+
+const currentFormulaDisplay = computed(() => {
+  return renderRichMathText(`$\\Large ${currentTransConfig.value.formula}$`);
+});
+
+const currentFeatureDisplay = computed(() => {
+  return renderRichMathText(`**幾何特徵**：基準錨點移至 $(${currentTransConfig.value.pointText})$，${currentTransConfig.value.asymText}。`);
 });
 
 </script>
@@ -1161,23 +1171,23 @@ const currentTransConfig = computed(() => {
           </div>
         </div>
 
-        <!-- 4 組「左右排列＋大字體」步進按鈕 -->
+        <!-- 4 組「左右排列＋微調字體」步進按鈕 -->
         <div class="flex flex-col gap-2">
-          <!-- 1. X 平移 (左右排列) -->
-          <div class="flex items-center justify-between p-2 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
+          <!-- 1. X 平移 (標題小1pt，補充說明使用最小字體 text-[11px]) -->
+          <div class="flex items-center justify-between p-1.5 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
             <button
               type="button"
               @click="handleShiftX(-1)"
-              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
+              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-bold text-base cursor-pointer active:scale-95 transition-all shadow-sm shrink-0"
               title="向左平移 1 單位"
             >
               －
             </button>
-            <div class="flex items-center justify-between flex-1 px-3 sm:px-4">
-              <span class="text-sm sm:text-base font-bold text-slate-100">X 平移</span>
+            <div class="flex items-center justify-between flex-1 px-3">
+              <span class="text-[13px] sm:text-sm font-bold text-slate-200">X 平移</span>
               <span 
-                class="text-sm sm:text-base font-bold font-mono tracking-wide"
-                :class="activeShiftH !== 0 ? 'text-sky-300' : 'text-slate-400'"
+                class="text-[11px] font-mono tracking-tight"
+                :class="activeShiftH !== 0 ? 'text-sky-300 font-bold' : 'text-slate-400'"
               >
                 位移: {{ activeShiftH !== 0 ? (activeShiftH > 0 ? `+${activeShiftH}` : `${activeShiftH}`) : '0' }}
               </span>
@@ -1185,28 +1195,28 @@ const currentTransConfig = computed(() => {
             <button
               type="button"
               @click="handleShiftX(1)"
-              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
+              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-bold text-base cursor-pointer active:scale-95 transition-all shadow-sm shrink-0"
               title="向右平移 1 單位"
             >
               ＋
             </button>
           </div>
 
-          <!-- 2. Y 平移 (左右排列) -->
-          <div class="flex items-center justify-between p-2 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
+          <!-- 2. Y 平移 (標題小1pt，補充說明使用最小字體 text-[11px]) -->
+          <div class="flex items-center justify-between p-1.5 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
             <button
               type="button"
               @click="handleShiftY(-1)"
-              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
+              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-bold text-base cursor-pointer active:scale-95 transition-all shadow-sm shrink-0"
               title="向下平移 1 單位"
             >
               －
             </button>
-            <div class="flex items-center justify-between flex-1 px-3 sm:px-4">
-              <span class="text-sm sm:text-base font-bold text-slate-100">Y 平移</span>
+            <div class="flex items-center justify-between flex-1 px-3">
+              <span class="text-[13px] sm:text-sm font-bold text-slate-200">Y 平移</span>
               <span 
-                class="text-sm sm:text-base font-bold font-mono tracking-wide"
-                :class="activeShiftK !== 0 ? 'text-emerald-300' : 'text-slate-400'"
+                class="text-[11px] font-mono tracking-tight"
+                :class="activeShiftK !== 0 ? 'text-emerald-300 font-bold' : 'text-slate-400'"
               >
                 位移: {{ activeShiftK !== 0 ? (activeShiftK > 0 ? `+${activeShiftK}` : `${activeShiftK}`) : '0' }}
               </span>
@@ -1214,7 +1224,7 @@ const currentTransConfig = computed(() => {
             <button
               type="button"
               @click="handleShiftY(1)"
-              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
+              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-bold text-base cursor-pointer active:scale-95 transition-all shadow-sm shrink-0"
               title="向上平移 1 單位"
             >
               ＋
@@ -1224,27 +1234,27 @@ const currentTransConfig = computed(() => {
           <!-- 平移 (h, k) 同步累積指示標籤 -->
           <div 
             v-if="activeShiftH !== 0 || activeShiftK !== 0"
-            class="px-3 py-1.5 rounded-lg bg-sky-950/70 border border-sky-500/50 flex items-center justify-between text-xs text-sky-200 animate-pulse font-mono font-semibold"
+            class="px-3 py-1 rounded-lg bg-sky-950/70 border border-sky-500/50 flex items-center justify-between text-[11px] text-sky-200 animate-pulse font-mono font-semibold"
           >
             <span>累計向量:</span>
-            <span class="text-sky-300 font-bold text-sm">平移 ({{ activeShiftH > 0 ? `+${activeShiftH}` : activeShiftH }}, {{ activeShiftK > 0 ? `+${activeShiftK}` : activeShiftK }})</span>
+            <span class="text-sky-300 font-bold text-xs">平移 ({{ activeShiftH > 0 ? `+${activeShiftH}` : activeShiftH }}, {{ activeShiftK > 0 ? `+${activeShiftK}` : activeShiftK }})</span>
           </div>
 
-          <!-- 3. X 伸縮 (左右排列) -->
-          <div class="flex items-center justify-between p-2 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
+          <!-- 3. X 伸縮 (標題小1pt，補充說明使用最小字體 text-[11px]) -->
+          <div class="flex items-center justify-between p-1.5 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
             <button
               type="button"
               @click="handleScaleX('down')"
-              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
+              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-base cursor-pointer active:scale-95 transition-all shadow-sm shrink-0"
               title="水平壓縮"
             >
               －
             </button>
-            <div class="flex items-center justify-between flex-1 px-3 sm:px-4">
-              <span class="text-sm sm:text-base font-bold text-slate-100">X 伸縮</span>
+            <div class="flex items-center justify-between flex-1 px-3">
+              <span class="text-[13px] sm:text-sm font-bold text-slate-200">X 伸縮</span>
               <span 
-                class="text-sm sm:text-base font-bold font-mono tracking-wide"
-                :class="activeScaleXIdx !== 3 ? 'text-amber-300' : 'text-slate-400'"
+                class="text-[11px] font-mono tracking-tight"
+                :class="activeScaleXIdx !== 3 ? 'text-amber-300 font-bold' : 'text-slate-400'"
               >
                 倍率: × {{ scaleLabels[activeScaleXIdx] }}
               </span>
@@ -1252,28 +1262,28 @@ const currentTransConfig = computed(() => {
             <button
               type="button"
               @click="handleScaleX('up')"
-              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
+              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-base cursor-pointer active:scale-95 transition-all shadow-sm shrink-0"
               title="水平伸長"
             >
               ＋
             </button>
           </div>
 
-          <!-- 4. Y 伸縮 (左右排列) -->
-          <div class="flex items-center justify-between p-2 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
+          <!-- 4. Y 伸縮 (標題小1pt，補充說明使用最小字體 text-[11px]) -->
+          <div class="flex items-center justify-between p-1.5 px-3 rounded-xl bg-slate-900/90 border border-slate-800 shadow-sm">
             <button
               type="button"
               @click="handleScaleY('down')"
-              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
+              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold text-base cursor-pointer active:scale-95 transition-all shadow-sm shrink-0"
               title="垂直壓縮"
             >
               －
             </button>
-            <div class="flex items-center justify-between flex-1 px-3 sm:px-4">
-              <span class="text-sm sm:text-base font-bold text-slate-100">Y 伸縮</span>
+            <div class="flex items-center justify-between flex-1 px-3">
+              <span class="text-[13px] sm:text-sm font-bold text-slate-200">Y 伸縮</span>
               <span 
-                class="text-sm sm:text-base font-bold font-mono tracking-wide"
-                :class="activeScaleYIdx !== 3 ? 'text-purple-300' : 'text-slate-400'"
+                class="text-[11px] font-mono tracking-tight"
+                :class="activeScaleYIdx !== 3 ? 'text-purple-300 font-bold' : 'text-slate-400'"
               >
                 倍率: × {{ scaleLabels[activeScaleYIdx] }}
               </span>
@@ -1281,7 +1291,7 @@ const currentTransConfig = computed(() => {
             <button
               type="button"
               @click="handleScaleY('up')"
-              class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-extrabold text-lg cursor-pointer active:scale-95 transition-all shadow-md shrink-0"
+              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold text-base cursor-pointer active:scale-95 transition-all shadow-sm shrink-0"
               title="垂直伸長"
             >
               ＋
@@ -1390,11 +1400,19 @@ const currentTransConfig = computed(() => {
           :lines="currentTransConfig.lines"
         />
 
-        <!-- Dynamic description badge: 精簡動態描述變換公式與效果 -->
-        <div 
-          class="w-full px-4 py-3 rounded-xl bg-slate-950/90 border border-slate-800 text-xs sm:text-sm text-slate-200 text-left font-sans shadow-inner leading-relaxed"
-          v-html="renderRichMathText(currentTransConfig.description)"
-        />
+        <!-- Dynamic description badge: 目前方程式突出放大，指數清晰好讀 -->
+        <div class="w-full px-4 py-3 rounded-2xl bg-slate-950/90 border border-slate-800 text-xs sm:text-sm text-slate-200 text-left font-sans shadow-inner leading-relaxed space-y-2">
+          <div class="flex items-center gap-2.5 pb-2 border-b border-slate-800/80 flex-wrap">
+            <span class="font-bold text-amber-300 text-xs sm:text-sm shrink-0">目前方程式：</span>
+            <span class="text-sky-300 font-bold tracking-wide" v-html="currentFormulaDisplay"></span>
+          </div>
+          <div class="text-xs sm:text-sm text-slate-300 space-y-1">
+            <div v-html="currentFeatureDisplay"></div>
+            <div class="text-slate-400 text-[11px] sm:text-xs pt-0.5">
+              <span class="text-amber-400 font-semibold">💡 順序心法</span>：先平移後伸縮 $\\neq$ 先伸縮後平移！觀察上方歷程鏈與各項係數變化。
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div 
