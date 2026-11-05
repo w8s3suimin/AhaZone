@@ -913,168 +913,175 @@ const currentTransConfig = computed(() => {
     <!-- ========================================================================= -->
     <div 
       v-else-if="type === 'function-transformation'" 
-      class="w-full max-w-xl flex flex-col items-center gap-3 select-none"
+      class="w-full max-w-4xl flex flex-col md:flex-row items-start justify-center gap-3.5 select-none"
     >
-      <!-- Action Control Console -->
-      <div class="w-full flex flex-col gap-2.5 p-3.5 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner">
-        <!-- Row 1: Base family picker & Fast Reset -->
-        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5 shrink-0">
+      <!-- Left Column: Action Control Console (變化鈕置於圖左側) -->
+      <div class="w-full md:w-64 lg:w-72 shrink-0 flex flex-col gap-2.5 p-3 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner">
+        <!-- Section 1: Base family picker -->
+        <div class="flex flex-col gap-1.5 pb-2 border-b border-slate-800/80">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-sky-400"></span>
-              <span>基準函數參照：</span>
+              <span>基準函數參照</span>
             </span>
-            <div class="flex bg-slate-900 p-0.5 rounded-xl border border-slate-800 gap-1">
-              <button
-                type="button"
-                @click="transFamily = 'exp'"
-                class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center"
-                :class="transFamily === 'exp' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
-                v-html="renderRichMathText('指數函數 $y = 2^x$')"
-              />
-              <button
-                type="button"
-                @click="transFamily = 'log'"
-                class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center"
-                :class="transFamily === 'log' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
-                v-html="renderRichMathText('對數函數 $y = \\log_2 x$')"
-              />
-            </div>
           </div>
-
-          <!-- Reset Button (重置鈕快速還原) -->
-          <button
-            type="button"
-            @click="resetTrans"
-            class="px-3 py-1 rounded-lg text-xs font-bold transition-all bg-rose-950/70 text-rose-300 hover:bg-rose-900 border border-rose-800/80 cursor-pointer flex items-center gap-1 active:scale-95 shadow-sm"
-            title="快速還原至基準函數原圖"
-          >
-            <span>↺ 快速重置原圖</span>
-          </button>
-        </div>
-
-        <!-- Row 2: Dynamic Action Buttons -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-          <!-- Column A: 平移累加動作 (Shift) -->
-          <div class="flex flex-col gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div class="flex items-center justify-between text-[11px] text-slate-400 font-semibold px-0.5">
-              <span>平移動作（可多次點擊累加）</span>
-              <span class="text-sky-300 font-mono font-bold">(h, k) = ({{ transShiftX }}, {{ transShiftY }})</span>
-            </div>
-            <div class="grid grid-cols-4 gap-1">
-              <button
-                type="button"
-                @click="shiftLeft"
-                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer"
-                title="向左平移 1 單位 (x -> x + 1)"
-              >
-                ← 左移 1
-              </button>
-              <button
-                type="button"
-                @click="shiftRight"
-                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer"
-                title="向右平移 1 單位 (x -> x - 1)"
-              >
-                右移 1 →
-              </button>
-              <button
-                type="button"
-                @click="shiftUp"
-                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer"
-                title="向上平移 1 單位 (y -> y - 1)"
-              >
-                上移 1 ↑
-              </button>
-              <button
-                type="button"
-                @click="shiftDown"
-                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer"
-                title="向下平移 1 單位 (y -> y + 1)"
-              >
-                下移 1 ↓
-              </button>
-            </div>
-          </div>
-
-          <!-- Column B: 伸縮倍率動作 (Scale) -->
-          <div class="flex flex-col gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div class="flex items-center justify-between text-[11px] text-slate-400 font-semibold px-0.5">
-              <span>伸縮動作（放大 2~6 / 縮小 1/2~1/4）</span>
-              <span class="text-purple-300 font-mono font-bold">縱向倍率: × {{ scaleLabels[transScaleIndex] }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-1.5">
-              <button
-                type="button"
-                @click="scaleDown"
-                :disabled="transScaleIndex === 0"
-                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                title="縮小 (1/2, 1/3, 1/4...)"
-              >
-                － 原圖縮小 ({{ scaleLabels[Math.max(0, transScaleIndex - 1)] }})
-              </button>
-              <button
-                type="button"
-                @click="scaleUp"
-                :disabled="transScaleIndex === scaleFactors.length - 1"
-                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                title="放大 (2, 3, 4, 5, 6...)"
-              >
-                ＋ 原圖放大 ({{ scaleLabels[Math.min(scaleFactors.length - 1, transScaleIndex + 1)] }})
-              </button>
-            </div>
+          <div class="grid grid-cols-2 gap-1 bg-slate-900 p-0.5 rounded-xl border border-slate-800">
+            <button
+              type="button"
+              @click="transFamily = 'exp'"
+              class="px-2 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center text-center"
+              :class="transFamily === 'exp' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
+              v-html="renderRichMathText('指數 $y = 2^x$')"
+            />
+            <button
+              type="button"
+              @click="transFamily = 'log'"
+              class="px-2 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center text-center"
+              :class="transFamily === 'log' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
+              v-html="renderRichMathText('對數 $y = \\log_2 x$')"
+            />
           </div>
         </div>
 
-        <!-- Row 3: 翻轉與對稱開關 (Symmetry & Reflections) -->
-        <div class="flex flex-wrap items-center gap-1.5 pt-0.5 justify-center">
-          <button
-            type="button"
-            @click="toggleReflectX"
-            class="px-3 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95"
-            :class="transReflectX ? 'bg-rose-950 text-rose-300 border-rose-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-          >
-            上下翻轉 (x 軸) {{ transReflectX ? '✓' : '' }}
-          </button>
-          <button
-            type="button"
-            @click="toggleReflectY"
-            class="px-3 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95"
-            :class="transReflectY ? 'bg-indigo-950 text-indigo-300 border-indigo-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-          >
-            左右翻轉 (y 軸) {{ transReflectY ? '✓' : '' }}
-          </button>
-          <button
-            type="button"
-            @click="toggleInverse"
-            class="px-3 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95"
-            :class="transShowInverse ? 'bg-amber-950 text-amber-300 border-amber-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-          >
-            反函數對稱 (y = x) {{ transShowInverse ? '✓' : '' }}
-          </button>
+        <!-- Section 2: Shift Actions (平移動作) -->
+        <div class="flex flex-col gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
+          <div class="flex items-center justify-between text-[11px] text-slate-400 font-semibold px-0.5">
+            <span>平移動作（累加）</span>
+            <span class="text-sky-300 font-mono font-bold">(h, k) = ({{ transShiftX }}, {{ transShiftY }})</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button
+              type="button"
+              @click="shiftLeft"
+              class="py-1.5 px-2 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer"
+              title="向左平移 1 單位"
+            >
+              ← 左移 1
+            </button>
+            <button
+              type="button"
+              @click="shiftRight"
+              class="py-1.5 px-2 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer"
+              title="向右平移 1 單位"
+            >
+              右移 1 →
+            </button>
+            <button
+              type="button"
+              @click="shiftUp"
+              class="py-1.5 px-2 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer"
+              title="向上平移 1 單位"
+            >
+              上移 1 ↑
+            </button>
+            <button
+              type="button"
+              @click="shiftDown"
+              class="py-1.5 px-2 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer"
+              title="向下平移 1 單位"
+            >
+              下移 1 ↓
+            </button>
+          </div>
         </div>
+
+        <!-- Section 3: Scale Actions (伸縮動作) -->
+        <div class="flex flex-col gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
+          <div class="flex items-center justify-between text-[11px] text-slate-400 font-semibold px-0.5">
+            <span>伸縮動作</span>
+            <span class="text-purple-300 font-mono font-bold">縱向: × {{ scaleLabels[transScaleIndex] }}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button
+              type="button"
+              @click="scaleDown"
+              :disabled="transScaleIndex === 0"
+              class="py-1.5 px-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              title="縮小 (1/2, 1/3, 1/4...)"
+            >
+              － 原圖縮小
+            </button>
+            <button
+              type="button"
+              @click="scaleUp"
+              :disabled="transScaleIndex === scaleFactors.length - 1"
+              class="py-1.5 px-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all text-xs font-medium text-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              title="放大 (2, 3, 4, 5, 6...)"
+            >
+              ＋ 原圖放大
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 4: Reflections & Symmetry (翻轉與對稱) -->
+        <div class="flex flex-col gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
+          <div class="text-[11px] text-slate-400 font-semibold px-0.5">
+            翻轉與對稱
+          </div>
+          <div class="flex flex-col gap-1">
+            <button
+              type="button"
+              @click="toggleReflectX"
+              class="py-1.5 px-2.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95 flex items-center justify-between"
+              :class="transReflectX ? 'bg-rose-950 text-rose-300 border-rose-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
+            >
+              <span>上下翻轉 (x 軸)</span>
+              <span class="text-xs font-mono font-bold">{{ transReflectX ? '✓' : '' }}</span>
+            </button>
+            <button
+              type="button"
+              @click="toggleReflectY"
+              class="py-1.5 px-2.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95 flex items-center justify-between"
+              :class="transReflectY ? 'bg-indigo-950 text-indigo-300 border-indigo-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
+            >
+              <span>左右翻轉 (y 軸)</span>
+              <span class="text-xs font-mono font-bold">{{ transReflectY ? '✓' : '' }}</span>
+            </button>
+            <button
+              type="button"
+              @click="toggleInverse"
+              class="py-1.5 px-2.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95 flex items-center justify-between"
+              :class="transShowInverse ? 'bg-amber-950 text-amber-300 border-amber-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
+            >
+              <span>反函數對稱 (y = x)</span>
+              <span class="text-xs font-mono font-bold">{{ transShowInverse ? '✓' : '' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 5: Fast Reset Button (重置鈕快速還原) -->
+        <button
+          type="button"
+          @click="resetTrans"
+          class="w-full py-2 rounded-xl text-xs font-bold transition-all bg-rose-950/70 text-rose-300 hover:bg-rose-900 border border-rose-800/80 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-sm"
+          title="快速還原至基準函數原圖"
+        >
+          <span>↺ 快速重置原圖</span>
+        </button>
       </div>
 
-      <!-- FunctionGraph: 名稱統一改為「函數圖形」，精簡無多餘標語 -->
-      <FunctionGraph
-        title="函數圖形"
-        titleColor="#38bdf8"
-        :width="460"
-        :height="260"
-        :xRange="currentTransConfig.xRange"
-        :yRange="currentTransConfig.yRange"
-        :functions="currentTransConfig.functions"
-        :points="currentTransConfig.points"
-        :lines="currentTransConfig.lines"
-      />
+      <!-- Right Column: Graph & Live Formula Insight (圖形與動態說明) -->
+      <div class="flex-1 min-w-0 flex flex-col items-center gap-2.5 w-full">
+        <!-- FunctionGraph: 名稱統一改為「函數圖形」，精簡無多餘標語 -->
+        <FunctionGraph
+          title="函數圖形"
+          titleColor="#38bdf8"
+          :width="460"
+          :height="280"
+          :xRange="currentTransConfig.xRange"
+          :yRange="currentTransConfig.yRange"
+          :functions="currentTransConfig.functions"
+          :points="currentTransConfig.points"
+          :lines="currentTransConfig.lines"
+        />
 
-      <!-- Dynamic description badge: 精簡動態描述變換公式與效果 -->
-      <div 
-        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-slate-800 text-xs sm:text-sm text-slate-200 text-left font-sans shadow-inner leading-relaxed"
-        v-html="renderRichMathText(currentTransConfig.description)"
-      />
+        <!-- Dynamic description badge: 精簡動態描述變換公式與效果 -->
+        <div 
+          class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-slate-800 text-xs sm:text-sm text-slate-200 text-left font-sans shadow-inner leading-relaxed"
+          v-html="renderRichMathText(currentTransConfig.description)"
+        />
+      </div>
     </div>
-    <!-- ========================================================================= -->
     <div 
       v-else-if="type === 'transcendental-roots-2x'" 
       class="w-full max-w-xl flex flex-col items-center gap-2 select-none"
