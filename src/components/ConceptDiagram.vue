@@ -8,327 +8,263 @@ const props = defineProps<{
   type: string;
 }>();
 
-// 函數圖形平移伸縮與對稱動態操作狀態
+// 函數圖形平移伸縮與對稱動態操作狀態（累加型實驗室）
 const transFamily = ref<'exp' | 'log'>('exp');
-const transAction = ref<'base' | 'shiftY' | 'scaleY' | 'shiftX' | 'scaleX' | 'reflectX' | 'reflectY' | 'inverse'>('base');
+const transShiftX = ref(0);
+const transShiftY = ref(0);
+const transScaleIndex = ref(3); // 預設索引 3 為 1 倍
+const scaleFactors = [0.25, 1 / 3, 0.5, 1, 2, 3, 4, 5, 6];
+const scaleLabels = ['1/4', '1/3', '1/2', '1', '2', '3', '4', '5', '6'];
+
+const transReflectX = ref(false); // 上下翻轉 (y -> -y)
+const transReflectY = ref(false); // 左右翻轉 (x -> -x)
+const transShowInverse = ref(false); // 反函數對稱 (y = x)
+
+function shiftLeft() {
+  if (transShiftX.value > -5) transShiftX.value--;
+}
+function shiftRight() {
+  if (transShiftX.value < 5) transShiftX.value++;
+}
+function shiftUp() {
+  if (transShiftY.value < 5) transShiftY.value++;
+}
+function shiftDown() {
+  if (transShiftY.value > -5) transShiftY.value--;
+}
+function scaleDown() {
+  if (transScaleIndex.value > 0) transScaleIndex.value--;
+}
+function scaleUp() {
+  if (transScaleIndex.value < scaleFactors.length - 1) transScaleIndex.value++;
+}
+function toggleReflectX() {
+  transReflectX.value = !transReflectX.value;
+}
+function toggleReflectY() {
+  transReflectY.value = !transReflectY.value;
+}
+function toggleInverse() {
+  transShowInverse.value = !transShowInverse.value;
+}
+function resetTrans() {
+  transShiftX.value = 0;
+  transShiftY.value = 0;
+  transScaleIndex.value = 3;
+  transReflectX.value = false;
+  transReflectY.value = false;
+  transShowInverse.value = false;
+}
 
 const currentTransConfig = computed(() => {
   const isExp = transFamily.value === 'exp';
-  const action = transAction.value;
+  const h = transShiftX.value;
+  const k = transShiftY.value;
+  const scale = scaleFactors[transScaleIndex.value];
+  const scaleLabel = scaleLabels[transScaleIndex.value];
+  const refX = transReflectX.value;
+  const refY = transReflectY.value;
+  const showInv = transShowInverse.value;
+
+  const sy = scale * (refX ? -1 : 1);
+  const sxSign = refY ? -1 : 1;
+
+  // Viewport bounds
+  const xMin = Math.min(-5.5, h - 4.5);
+  const xMax = Math.max(5.5, h + 4.5);
+  const yMin = Math.min(-4.5, k - 4.5);
+  const yMax = Math.max(6.5, k + 5.5);
+
+  let transformedFn: (x: number) => number;
+  let baseFn: (x: number) => number;
+  let basePoints: PlotPoint[] = [];
+  let transPoints: PlotPoint[] = [];
+  let guideLines: PlotLine[] = [];
+  let transformedLabel = '';
+  let anchorDesc = '';
+  let asymptoteText = '';
+  let asymptoteLine: PlotLine;
 
   if (isExp) {
-    switch (action) {
-      case 'shiftY':
-        return {
-          xRange: [-4, 4] as [number, number],
-          yRange: [-1.5, 7] as [number, number],
-          functions: [
-            { fn: (x: number) => Math.pow(2, x), color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = 2^x (原基準)' },
-            { fn: (x: number) => Math.pow(2, x) + 2, color: '#34d399', strokeWidth: 2.5, label: 'y = 2^x + 2' }
-          ] as PlotFunction[],
-          points: [
-            { x: 0, y: 1, color: '#94a3b8', radius: 3, label: '(0, 1)', labelPos: 'left' },
-            { x: 0, y: 3, color: '#34d399', radius: 4.5, label: '(0, 3) 向上平移 2', labelPos: 'top-left' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 0, y1: 1, x2: 0, y2: 3, color: '#34d399', strokeWidth: 1.6 },
-            { x1: -4, y1: 2, x2: 4, y2: 2, color: '#34d399', strokeWidth: 1.2, dashArray: '3 3', label: 'y = 2 (新漸近線)' }
-          ] as PlotLine[],
-          description: '**Y 平移（$y \\to y - 2$）**：$y = 2^x + 2$，圖形整體向上平移 2 單位，基準點 $(0, 1) \\to (0, 3)$，水平漸近線移至 $y = 2$。'
-        };
+    baseFn = (x: number) => Math.pow(2, x);
+    transformedFn = (x: number) => {
+      const u = (x - h) * sxSign;
+      if (u > 10) return NaN;
+      if (u < -10) return k;
+      return sy * Math.pow(2, u) + k;
+    };
 
-      case 'scaleY':
-        return {
-          xRange: [-4, 4] as [number, number],
-          yRange: [-1.5, 8] as [number, number],
-          functions: [
-            { fn: (x: number) => Math.pow(2, x), color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = 2^x (原基準)' },
-            { fn: (x: number) => 2 * Math.pow(2, x), color: '#a855f7', strokeWidth: 2.5, label: 'y = 2 \\cdot 2^x = 2^{x+1}' }
-          ] as PlotFunction[],
-          points: [
-            { x: 0, y: 1, color: '#94a3b8', radius: 3, label: '(0, 1)', labelPos: 'left' },
-            { x: 0, y: 2, color: '#a855f7', radius: 4.5, label: '(0, 2) 縱向伸長 2 倍', labelPos: 'top-left' },
-            { x: 1, y: 4, color: '#a855f7', radius: 3.5, label: '(1, 4)', labelPos: 'right' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 0, y1: 1, x2: 0, y2: 2, color: '#a855f7', strokeWidth: 1.6 }
-          ] as PlotLine[],
-          description: '**Y 伸縮（$y \\to \\frac{y}{2}$）**：$y = 2 \\cdot 2^x = 2^{x+1}$，以 $x$ 軸為基準垂直伸長 2 倍，基準點 $(0, 1) \\to (0, 2)$。'
-        };
-
-      case 'shiftX':
-        return {
-          xRange: [-3.5, 5.5] as [number, number],
-          yRange: [-1.5, 6.5] as [number, number],
-          functions: [
-            { fn: (x: number) => Math.pow(2, x), color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = 2^x (原基準)' },
-            { fn: (x: number) => Math.pow(2, x - 2), color: '#38bdf8', strokeWidth: 2.5, label: 'y = 2^{x - 2}' }
-          ] as PlotFunction[],
-          points: [
-            { x: 0, y: 1, color: '#94a3b8', radius: 3, label: '(0, 1)', labelPos: 'left' },
-            { x: 2, y: 1, color: '#38bdf8', radius: 4.5, label: '(2, 1) 向右平移 2', labelPos: 'bottom-right' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 0, y1: 1, x2: 2, y2: 1, color: '#38bdf8', strokeWidth: 1.6 }
-          ] as PlotLine[],
-          description: '**X 平移（$x \\to x - 2$）**：$y = 2^{x - 2}$，圖形整體向右平移 2 單位，基準點 $(0, 1) \\to (2, 1)$，水平漸近線 $y = 0$ 不變。'
-        };
-
-      case 'scaleX':
-        return {
-          xRange: [-4, 5.5] as [number, number],
-          yRange: [-1.5, 6.5] as [number, number],
-          functions: [
-            { fn: (x: number) => Math.pow(2, x), color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = 2^x (原基準)' },
-            { fn: (x: number) => Math.pow(2, x / 2), color: '#f59e0b', strokeWidth: 2.5, label: 'y = 2^{x/2} = (\\sqrt{2})^x' }
-          ] as PlotFunction[],
-          points: [
-            { x: 0, y: 1, color: '#f59e0b', radius: 4, label: '(0, 1) 不動', labelPos: 'top-left' },
-            { x: 1, y: 2, color: '#94a3b8', radius: 3, label: '(1, 2)', labelPos: 'left' },
-            { x: 2, y: 2, color: '#f59e0b', radius: 4.5, label: '(2, 2) 橫向伸長 2 倍', labelPos: 'right' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 1, y1: 2, x2: 2, y2: 2, color: '#f59e0b', strokeWidth: 1.8 }
-          ] as PlotLine[],
-          description: '**X 伸縮（$x \\to \\frac{x}{2}$）**：$y = 2^{x/2} = (\\sqrt{2})^x$，以 $y$ 軸為基準水平伸長 2 倍，圖形增長趨向平緩。'
-        };
-
-      case 'reflectX':
-        return {
-          xRange: [-4, 4] as [number, number],
-          yRange: [-5.5, 5.5] as [number, number],
-          functions: [
-            { fn: (x: number) => Math.pow(2, x), color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = 2^x (原基準)' },
-            { fn: (x: number) => -Math.pow(2, x), color: '#f43f5e', strokeWidth: 2.5, label: 'y = -2^x' }
-          ] as PlotFunction[],
-          points: [
-            { x: 0, y: 1, color: '#94a3b8', radius: 3, label: '(0, 1)', labelPos: 'left' },
-            { x: 0, y: -1, color: '#f43f5e', radius: 4.5, label: '(0, -1) 上下翻轉', labelPos: 'left' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 0, y1: 1, x2: 0, y2: -1, color: '#f43f5e', strokeWidth: 1.5, dashArray: '2 2' },
-            { x1: -4, y1: 0, x2: 4, y2: 0, color: '#f59e0b', strokeWidth: 1.5, label: 'x 軸 (對稱軸)' }
-          ] as PlotLine[],
-          description: '**上下翻轉（$y \\to -y$）**：$y = -2^x$，圖形對稱於 $x$ 軸翻轉，值域變為 $y < 0$，嚴格遞減。'
-        };
-
-      case 'reflectY':
-        return {
-          xRange: [-4, 4] as [number, number],
-          yRange: [-1.5, 5.5] as [number, number],
-          functions: [
-            { fn: (x: number) => Math.pow(2, x), color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = 2^x (原基準)' },
-            { fn: (x: number) => Math.pow(2, -x), color: '#06b6d4', strokeWidth: 2.5, label: 'y = 2^{-x} = (1/2)^x' }
-          ] as PlotFunction[],
-          points: [
-            { x: 0, y: 1, color: '#06b6d4', radius: 4.5, label: '(0, 1) 對稱錨點', labelPos: 'top-right' },
-            { x: 1, y: 2, color: '#94a3b8', radius: 3, label: '(1, 2)', labelPos: 'right' },
-            { x: -1, y: 2, color: '#06b6d4', radius: 4, label: '(-1, 2)', labelPos: 'left' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: -1, y1: 2, x2: 1, y2: 2, color: '#06b6d4', strokeWidth: 1.5, dashArray: '2 2' },
-            { x1: 0, y1: -1, x2: 0, y2: 5.5, color: '#f59e0b', strokeWidth: 1.5, label: 'y 軸 (對稱軸)' }
-          ] as PlotLine[],
-          description: '**左右翻轉（$x \\to -x$）**：$y = 2^{-x} = \\left(\\frac{1}{2}\\right)^x$，圖形對稱於 $y$ 軸翻轉，由遞增變為遞減。'
-        };
-
-      case 'inverse':
-        return {
-          xRange: [-2.5, 5.5] as [number, number],
-          yRange: [-2.5, 5.5] as [number, number],
-          functions: [
-            { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.4, label: 'y = 2^x' },
-            { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 5.5], color: '#34d399', strokeWidth: 2.4, label: 'y = \\log_2 x' },
-            { fn: (x: number) => x, color: '#f59e0b', strokeWidth: 1.5, dashArray: '4 4', label: 'y = x (對稱軸)' }
-          ] as PlotFunction[],
-          points: [
-            { x: 0, y: 1, color: '#38bdf8', radius: 4, label: '(0, 1)', labelPos: 'left' },
-            { x: 1, y: 0, color: '#34d399', radius: 4, label: '(1, 0)', labelPos: 'bottom' },
-            { x: 1, y: 2, color: '#38bdf8', radius: 3.5, label: '(1, 2)', labelPos: 'top-left' },
-            { x: 2, y: 1, color: '#34d399', radius: 3.5, label: '(2, 1)', labelPos: 'bottom-right' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 0, y1: 1, x2: 1, y2: 0, color: '#64748b', strokeWidth: 1, dashArray: '2 2' },
-            { x1: 1, y1: 2, x2: 2, y2: 1, color: '#64748b', strokeWidth: 1, dashArray: '2 2' }
-          ] as PlotLine[],
-          description: '**反函數對稱（交換 $x, y$）**：$y = 2^x \\longleftrightarrow y = \\log_2 x$，兩圖形對稱於直線 $y = x$，對稱點 $(a, b) \\leftrightarrow (b, a)$。'
-        };
-
-      case 'base':
-      default:
-        return {
-          xRange: [-4, 4] as [number, number],
-          yRange: [-1.5, 6.5] as [number, number],
-          functions: [
-            { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.6, label: 'y = 2^x' }
-          ] as PlotFunction[],
-          points: [
-            { x: 0, y: 1, color: '#38bdf8', radius: 4.5, label: '(0, 1) 基準點', labelPos: 'left' },
-            { x: 1, y: 2, color: '#38bdf8', radius: 3.5, label: '(1, 2)', labelPos: 'right' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: -4, y1: 0, x2: 4, y2: 0, color: '#475569', strokeWidth: 1, dashArray: '2 2', label: 'y = 0 (漸近線)' }
-          ] as PlotLine[],
-          description: '基準指數函數：$y = 2^x$ 恆過基準點 $(0, 1)$，水平漸近線為 $x$ 軸（$y = 0$）。'
-        };
+    // Label formatting
+    let prefix = '';
+    if (scaleLabel === '1') {
+      prefix = refX ? '-' : '';
+    } else {
+      const frac = scaleLabel.includes('/') ? `\\frac{1}{${scaleLabel.split('/')[1]}}` : scaleLabel;
+      prefix = (refX ? '-' : '') + frac + ' \\cdot ';
     }
+
+    let expTerm = '';
+    if (refY) {
+      if (h === 0) expTerm = '2^{-x}';
+      else if (h > 0) expTerm = `2^{-(x - ${h})}`;
+      else expTerm = `2^{-(x + ${-h})}`;
+    } else {
+      if (h === 0) expTerm = '2^x';
+      else if (h > 0) expTerm = `2^{x - ${h}}`;
+      else expTerm = `2^{x + ${-h}}`;
+    }
+
+    let kTerm = '';
+    if (k > 0) kTerm = ` + ${k}`;
+    else if (k < 0) kTerm = ` - ${-k}`;
+
+    transformedLabel = `y = ${prefix}${expTerm}${kTerm}`;
+
+    const targetY = Number((sy + k).toFixed(2));
+    basePoints = [
+      { x: 0, y: 1, color: '#94a3b8', radius: 3.5, label: '(0, 1)', labelPos: 'left' }
+    ];
+    transPoints = [
+      { x: h, y: targetY, color: '#38bdf8', radius: 5, label: `(${h}, ${targetY}) 基準點`, labelPos: targetY >= 1 ? 'top-left' : 'bottom-left' }
+    ];
+    guideLines = [
+      { x1: 0, y1: 1, x2: h, y2: targetY, color: '#38bdf8', strokeWidth: 1.2, dashArray: '2 2' }
+    ];
+
+    asymptoteLine = {
+      x1: xMin, y1: k, x2: xMax, y2: k,
+      color: '#f59e0b', strokeWidth: 1.2, dashArray: '3 3',
+      label: `y = ${k}`
+    };
+    asymptoteText = `水平漸近線 $y = ${k}$`;
+    anchorDesc = `基準點移至 $(${h}, ${targetY})$`;
   } else {
-    // Logarithmic family (log_2 x)
-    switch (action) {
-      case 'shiftY':
-        return {
-          xRange: [-1.5, 6.5] as [number, number],
-          yRange: [-2.5, 5.5] as [number, number],
-          functions: [
-            { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 6.5], color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = \\log_2 x (原基準)' },
-            { fn: (x: number) => x > 0.04 ? Math.log2(x) + 2 : NaN, domain: [0.04, 6.5], color: '#38bdf8', strokeWidth: 2.5, label: 'y = \\log_2 x + 2' }
-          ] as PlotFunction[],
-          points: [
-            { x: 1, y: 0, color: '#94a3b8', radius: 3, label: '(1, 0)', labelPos: 'bottom' },
-            { x: 1, y: 2, color: '#38bdf8', radius: 4.5, label: '(1, 2) 向上平移 2', labelPos: 'top-left' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 1, y1: 0, x2: 1, y2: 2, color: '#38bdf8', strokeWidth: 1.6 }
-          ] as PlotLine[],
-          description: '**Y 平移（$y \\to y - 2$）**：$y = \\log_2 x + 2$，圖形整體向上平移 2 單位，基準點 $(1, 0) \\to (1, 2)$，垂直漸近線 $x = 0$ 不變。'
-        };
+    // Logarithm family
+    baseFn = (x: number) => x > 0.03 ? Math.log2(x) : NaN;
+    transformedFn = (x: number) => {
+      const u = (x - h) * sxSign;
+      if (u <= 0.03) return NaN;
+      return sy * Math.log2(u) + k;
+    };
 
-      case 'scaleY':
-        return {
-          xRange: [-1.5, 6.5] as [number, number],
-          yRange: [-3.5, 5.5] as [number, number],
-          functions: [
-            { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 6.5], color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = \\log_2 x (原基準)' },
-            { fn: (x: number) => x > 0.04 ? 2 * Math.log2(x) : NaN, domain: [0.04, 6.5], color: '#a855f7', strokeWidth: 2.5, label: 'y = 2\\log_2 x' }
-          ] as PlotFunction[],
-          points: [
-            { x: 1, y: 0, color: '#a855f7', radius: 4, label: '(1, 0) 不動', labelPos: 'bottom-right' },
-            { x: 2, y: 1, color: '#64748b', radius: 3, label: '(2, 1)', labelPos: 'bottom' },
-            { x: 2, y: 2, color: '#a855f7', radius: 4.5, label: '(2, 2) 縱向伸長 2 倍', labelPos: 'top-left' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 2, y1: 1, x2: 2, y2: 2, color: '#a855f7', strokeWidth: 1.6 }
-          ] as PlotLine[],
-          description: '**Y 伸縮（$y \\to \\frac{y}{2}$）**：$y = 2\\log_2 x = \\log_{\\sqrt{2}} x$，圖形以 $x$ 軸為基準垂直伸長 2 倍，爬升更陡峭。'
-        };
+    let prefix = '';
+    if (scaleLabel === '1') {
+      prefix = refX ? '-' : '';
+    } else {
+      const frac = scaleLabel.includes('/') ? `\\frac{1}{${scaleLabel.split('/')[1]}}` : scaleLabel;
+      prefix = (refX ? '-' : '') + frac;
+    }
 
-      case 'shiftX':
-        return {
-          xRange: [-1.5, 7.5] as [number, number],
-          yRange: [-3.5, 4.5] as [number, number],
-          functions: [
-            { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 7.5], color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = \\log_2 x (原基準)' },
-            { fn: (x: number) => x > 2.04 ? Math.log2(x - 2) : NaN, domain: [2.04, 7.5], color: '#f59e0b', strokeWidth: 2.5, label: 'y = \\log_2(x - 2)' }
-          ] as PlotFunction[],
-          points: [
-            { x: 1, y: 0, color: '#94a3b8', radius: 3, label: '(1, 0)', labelPos: 'bottom' },
-            { x: 3, y: 0, color: '#f59e0b', radius: 4.5, label: '(3, 0) 向右平移 2', labelPos: 'bottom-right' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 1, y1: 0, x2: 3, y2: 0, color: '#f59e0b', strokeWidth: 1.6 },
-            { x1: 2, y1: -3.5, x2: 2, y2: 4.5, color: '#f59e0b', strokeWidth: 1.2, dashArray: '3 3', label: 'x = 2 (新漸近線)' }
-          ] as PlotLine[],
-          description: '**X 平移（$x \\to x - 2$）**：$y = \\log_2(x - 2)$，圖形整體向右平移 2 單位，基準點 $(1, 0) \\to (3, 0)$，垂直漸近線移至 $x = 2$。'
-        };
+    let insideLog = '';
+    if (refY) {
+      if (h === 0) insideLog = '(-x)';
+      else if (h > 0) insideLog = `(-(x - ${h}))`;
+      else insideLog = `(-(x + ${-h}))`;
+    } else {
+      if (h === 0) insideLog = 'x';
+      else if (h > 0) insideLog = `(x - ${h})`;
+      else insideLog = `(x + ${-h})`;
+    }
 
-      case 'scaleX':
-        return {
-          xRange: [-1.5, 7.5] as [number, number],
-          yRange: [-3.5, 4.5] as [number, number],
-          functions: [
-            { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 7.5], color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = \\log_2 x (原基準)' },
-            { fn: (x: number) => x > 0.04 ? Math.log2(x / 2) : NaN, domain: [0.04, 7.5], color: '#06b6d4', strokeWidth: 2.5, label: 'y = \\log_2(x/2)' }
-          ] as PlotFunction[],
-          points: [
-            { x: 1, y: 0, color: '#94a3b8', radius: 3, label: '(1, 0)', labelPos: 'top' },
-            { x: 2, y: 0, color: '#06b6d4', radius: 4.5, label: '(2, 0) 橫向伸長 2 倍', labelPos: 'bottom-right' },
-            { x: 2, y: 1, color: '#94a3b8', radius: 3, label: '(2, 1)', labelPos: 'top-left' },
-            { x: 4, y: 1, color: '#06b6d4', radius: 4, label: '(4, 1)', labelPos: 'bottom-right' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 1, y1: 0, x2: 2, y2: 0, color: '#06b6d4', strokeWidth: 1.8 }
-          ] as PlotLine[],
-          description: '**X 伸縮（$x \\to \\frac{x}{2}$）**：$y = \\log_2\\left(\\frac{x}{2}\\right) = \\log_2 x - 1$，以 $y$ 軸為基準水平伸長 2 倍，增長更平緩。'
-        };
+    let kTerm = '';
+    if (k > 0) kTerm = ` + ${k}`;
+    else if (k < 0) kTerm = ` - ${-k}`;
 
-      case 'reflectX':
-        return {
-          xRange: [-1.5, 6.5] as [number, number],
-          yRange: [-4, 4] as [number, number],
-          functions: [
-            { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 6.5], color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = \\log_2 x (原基準)' },
-            { fn: (x: number) => x > 0.04 ? -Math.log2(x) : NaN, domain: [0.04, 6.5], color: '#f43f5e', strokeWidth: 2.5, label: 'y = -\\log_2 x = \\log_{1/2} x' }
-          ] as PlotFunction[],
-          points: [
-            { x: 1, y: 0, color: '#f43f5e', radius: 4.5, label: '(1, 0) 對稱錨點', labelPos: 'bottom-right' },
-            { x: 2, y: 1, color: '#94a3b8', radius: 3, label: '(2, 1)', labelPos: 'top-right' },
-            { x: 2, y: -1, color: '#f43f5e', radius: 4, label: '(2, -1)', labelPos: 'bottom-right' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 2, y1: 1, x2: 2, y2: -1, color: '#f43f5e', strokeWidth: 1.5, dashArray: '2 2' },
-            { x1: -1.5, y1: 0, x2: 6.5, y2: 0, color: '#f59e0b', strokeWidth: 1.5, label: 'x 軸 (對稱軸)' }
-          ] as PlotLine[],
-          description: '**上下翻轉（$y \\to -y$）**：$y = -\\log_2 x = \\log_{\\frac{1}{2}} x$，圖形對稱於 $x$ 軸翻轉，由遞增變為遞減。'
-        };
+    transformedLabel = `y = ${prefix}\\log_2${insideLog.startsWith('(') ? insideLog : ` ${insideLog}`}${kTerm}`;
 
-      case 'reflectY':
-        return {
-          xRange: [-6.5, 2.5] as [number, number],
-          yRange: [-3.5, 4.5] as [number, number],
-          functions: [
-            { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 2.5], color: '#64748b', strokeWidth: 1.5, dashArray: '3 3', label: 'y = \\log_2 x (原基準)' },
-            { fn: (x: number) => x < -0.04 ? Math.log2(-x) : NaN, domain: [-6.5, -0.04], color: '#818cf8', strokeWidth: 2.5, label: 'y = \\log_2(-x)' }
-          ] as PlotFunction[],
-          points: [
-            { x: 1, y: 0, color: '#94a3b8', radius: 3, label: '(1, 0)', labelPos: 'bottom-right' },
-            { x: -1, y: 0, color: '#818cf8', radius: 4.5, label: '(-1, 0) 左右翻轉', labelPos: 'bottom-left' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: -1, y1: 0, x2: 1, y2: 0, color: '#818cf8', strokeWidth: 1.5, dashArray: '2 2' },
-            { x1: 0, y1: -3.5, x2: 0, y2: 4.5, color: '#f59e0b', strokeWidth: 1.5, label: 'y 軸 (對稱軸)' }
-          ] as PlotLine[],
-          description: '**左右翻轉（$x \\to -x$）**：$y = \\log_2(-x)$，圖形對稱於 $y$ 軸翻轉，定義域變為 $x < 0$，圖形完全落在第二、三象限。'
-        };
+    const targetX = h + sxSign;
+    basePoints = [
+      { x: 1, y: 0, color: '#94a3b8', radius: 3.5, label: '(1, 0)', labelPos: 'bottom' }
+    ];
+    transPoints = [
+      { x: targetX, y: k, color: '#34d399', radius: 5, label: `(${targetX}, ${k}) 基準點`, labelPos: k >= 0 ? 'top-right' : 'bottom-right' }
+    ];
+    guideLines = [
+      { x1: 1, y1: 0, x2: targetX, y2: k, color: '#34d399', strokeWidth: 1.2, dashArray: '2 2' }
+    ];
 
-      case 'inverse':
-        return {
-          xRange: [-2.5, 5.5] as [number, number],
-          yRange: [-2.5, 5.5] as [number, number],
-          functions: [
-            { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 5.5], color: '#34d399', strokeWidth: 2.4, label: 'y = \\log_2 x' },
-            { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.4, label: 'y = 2^x' },
-            { fn: (x: number) => x, color: '#f59e0b', strokeWidth: 1.5, dashArray: '4 4', label: 'y = x (對稱軸)' }
-          ] as PlotFunction[],
-          points: [
-            { x: 1, y: 0, color: '#34d399', radius: 4, label: '(1, 0)', labelPos: 'bottom' },
-            { x: 0, y: 1, color: '#38bdf8', radius: 4, label: '(0, 1)', labelPos: 'left' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 1, y1: 0, x2: 0, y2: 1, color: '#64748b', strokeWidth: 1, dashArray: '2 2' }
-          ] as PlotLine[],
-          description: '**反函數對稱（交換 $x, y$）**：$y = \\log_2 x \\longleftrightarrow y = 2^x$，兩圖形對稱於直線 $y = x$，對稱點 $(a, b) \\leftrightarrow (b, a)$。'
-        };
+    asymptoteLine = {
+      x1: h, y1: yMin, x2: h, y2: yMax,
+      color: '#f59e0b', strokeWidth: 1.2, dashArray: '3 3',
+      label: `x = ${h}`
+    };
+    asymptoteText = `垂直漸近線 $x = ${h}$`;
+    anchorDesc = `基準點移至 $(${targetX}, ${k})$`;
+  }
 
-      case 'base':
-      default:
-        return {
-          xRange: [-1.5, 6.5] as [number, number],
-          yRange: [-3.5, 4.5] as [number, number],
-          functions: [
-            { fn: (x: number) => x > 0.04 ? Math.log2(x) : NaN, domain: [0.04, 6.5], color: '#34d399', strokeWidth: 2.6, label: 'y = \\log_2 x' }
-          ] as PlotFunction[],
-          points: [
-            { x: 1, y: 0, color: '#34d399', radius: 4.5, label: '(1, 0) 基準點', labelPos: 'bottom-right' },
-            { x: 2, y: 1, color: '#34d399', radius: 3.5, label: '(2, 1)', labelPos: 'top-left' },
-            { x: 4, y: 2, color: '#34d399', radius: 3.5, label: '(4, 2)', labelPos: 'bottom-right' }
-          ] as PlotPoint[],
-          lines: [
-            { x1: 0, y1: -3.5, x2: 0, y2: 4.5, color: '#475569', strokeWidth: 1, dashArray: '2 2', label: 'x = 0 (漸近線)' }
-          ] as PlotLine[],
-          description: '基準對數函數：$y = \\log_2 x$ 恆過基準點 $(1, 0)$，垂直漸近線為 $y$ 軸（$x = 0$）。'
-        };
+  // Compose active operations summary
+  const ops: string[] = [];
+  if (h !== 0) ops.push(`水平${h > 0 ? `向右平移 ${h}` : `向左平移 ${-h}`} 單位`);
+  if (k !== 0) ops.push(`垂直${k > 0 ? `向上平移 ${k}` : `向下平移 ${-k}`} 單位`);
+  if (scaleLabel !== '1') ops.push(`縱向放大 ${scaleLabel} 倍`);
+  if (refX) ops.push('上下翻轉（對稱於 $x$ 軸）');
+  if (refY) ops.push('左右翻轉（對稱於 $y$ 軸）');
+  if (showInv) ops.push('反函數對稱（對稱於直線 $y = x$）');
+  if (ops.length === 0) ops.push('基準狀態（無額外平移伸縮）');
+
+  const desc = `**目前函數**：$${transformedLabel}$。<br/>` +
+    `**動作累計**：${ops.join('，')}。<br/>` +
+    `**特徵錨點**：${anchorDesc}，${asymptoteText}。`;
+
+  const funcs: PlotFunction[] = [
+    {
+      fn: baseFn,
+      color: '#64748b',
+      strokeWidth: 1.5,
+      dashArray: '3 3',
+      label: isExp ? 'y = 2^x' : 'y = \\log_2 x',
+      description: '原基準'
+    },
+    {
+      fn: transformedFn,
+      color: isExp ? '#38bdf8' : '#34d399',
+      strokeWidth: 2.6,
+      label: transformedLabel,
+      description: '變換後'
+    }
+  ];
+
+  if (showInv) {
+    funcs.push({
+      fn: (x: number) => x,
+      color: '#f59e0b',
+      strokeWidth: 1.4,
+      dashArray: '4 4',
+      label: 'y = x',
+      description: '對稱軸'
+    });
+    if (isExp) {
+      funcs.push({
+        fn: (x: number) => x > 0.03 ? Math.log2(x) : NaN,
+        color: '#34d399',
+        strokeWidth: 2,
+        dashArray: '4 2',
+        label: 'y = \\log_2 x',
+        description: '反函數'
+      });
+      basePoints.push({ x: 1, y: 0, color: '#34d399', radius: 3.5, label: '(1, 0)' });
+    } else {
+      funcs.push({
+        fn: (x: number) => Math.pow(2, x),
+        color: '#38bdf8',
+        strokeWidth: 2,
+        dashArray: '4 2',
+        label: 'y = 2^x',
+        description: '反函數'
+      });
+      basePoints.push({ x: 0, y: 1, color: '#38bdf8', radius: 3.5, label: '(0, 1)' });
     }
   }
+
+  return {
+    xRange: [xMin, xMax] as [number, number],
+    yRange: [yMin, yMax] as [number, number],
+    functions: funcs,
+    points: [...basePoints, ...transPoints],
+    lines: [asymptoteLine, ...guideLines],
+    description: desc,
+    formula: transformedLabel
+  };
 });
 </script>
 
@@ -972,105 +908,149 @@ const currentTransConfig = computed(() => {
     </div>
 
     <!-- ========================================================================= -->
+    <!-- ========================================================================= -->
     <!-- 14. 函數圖形動態變換與對稱 (function-transformation) -->
     <!-- ========================================================================= -->
     <div 
       v-else-if="type === 'function-transformation'" 
-      class="w-full max-w-xl flex flex-col items-center gap-2.5 select-none"
+      class="w-full max-w-xl flex flex-col items-center gap-3 select-none"
     >
-      <!-- Mode selection row: Family toggle & 7 Action buttons -->
-      <div class="w-full flex flex-col gap-2 p-3 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner">
-        <!-- Row 1: Base family picker -->
-        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
-          <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5 shrink-0">
-            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
-            <span>基準函數參照：</span>
-          </span>
-          <div class="flex bg-slate-900 p-0.5 rounded-xl border border-slate-800 gap-1">
-            <button
-              type="button"
-              @click="transFamily = 'exp'"
-              class="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer"
-              :class="transFamily === 'exp' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
-            >
-              指數函數 $y = 2^x$
-            </button>
-            <button
-              type="button"
-              @click="transFamily = 'log'"
-              class="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer"
-              :class="transFamily === 'log' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
-            >
-              對數函數 $y = \log_2 x$
-            </button>
+      <!-- Action Control Console -->
+      <div class="w-full flex flex-col gap-2.5 p-3.5 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner">
+        <!-- Row 1: Base family picker & Fast Reset -->
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5 shrink-0">
+              <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+              <span>基準函數參照：</span>
+            </span>
+            <div class="flex bg-slate-900 p-0.5 rounded-xl border border-slate-800 gap-1">
+              <button
+                type="button"
+                @click="transFamily = 'exp'"
+                class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center"
+                :class="transFamily === 'exp' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
+                v-html="renderRichMathText('指數函數 $y = 2^x$')"
+              />
+              <button
+                type="button"
+                @click="transFamily = 'log'"
+                class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center"
+                :class="transFamily === 'log' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
+                v-html="renderRichMathText('對數函數 $y = \\log_2 x$')"
+              />
+            </div>
+          </div>
+
+          <!-- Reset Button (重置鈕快速還原) -->
+          <button
+            type="button"
+            @click="resetTrans"
+            class="px-3 py-1 rounded-lg text-xs font-bold transition-all bg-rose-950/70 text-rose-300 hover:bg-rose-900 border border-rose-800/80 cursor-pointer flex items-center gap-1 active:scale-95 shadow-sm"
+            title="快速還原至基準函數原圖"
+          >
+            <span>↺ 快速重置原圖</span>
+          </button>
+        </div>
+
+        <!-- Row 2: Dynamic Action Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <!-- Column A: 平移累加動作 (Shift) -->
+          <div class="flex flex-col gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 font-semibold px-0.5">
+              <span>平移動作（可多次點擊累加）</span>
+              <span class="text-sky-300 font-mono font-bold">(h, k) = ({{ transShiftX }}, {{ transShiftY }})</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1">
+              <button
+                type="button"
+                @click="shiftLeft"
+                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer"
+                title="向左平移 1 單位 (x -> x + 1)"
+              >
+                ← 左移 1
+              </button>
+              <button
+                type="button"
+                @click="shiftRight"
+                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer"
+                title="向右平移 1 單位 (x -> x - 1)"
+              >
+                右移 1 →
+              </button>
+              <button
+                type="button"
+                @click="shiftUp"
+                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer"
+                title="向上平移 1 單位 (y -> y - 1)"
+              >
+                上移 1 ↑
+              </button>
+              <button
+                type="button"
+                @click="shiftDown"
+                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer"
+                title="向下平移 1 單位 (y -> y + 1)"
+              >
+                下移 1 ↓
+              </button>
+            </div>
+          </div>
+
+          <!-- Column B: 伸縮倍率動作 (Scale) -->
+          <div class="flex flex-col gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 font-semibold px-0.5">
+              <span>伸縮動作（放大 2~6 / 縮小 1/2~1/4）</span>
+              <span class="text-purple-300 font-mono font-bold">縱向倍率: × {{ scaleLabels[transScaleIndex] }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+              <button
+                type="button"
+                @click="scaleDown"
+                :disabled="transScaleIndex === 0"
+                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                title="縮小 (1/2, 1/3, 1/4...)"
+              >
+                － 原圖縮小 ({{ scaleLabels[Math.max(0, transScaleIndex - 1)] }})
+              </button>
+              <button
+                type="button"
+                @click="scaleUp"
+                :disabled="transScaleIndex === scaleFactors.length - 1"
+                class="py-1 rounded-md bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 active:scale-95 transition-all font-medium text-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                title="放大 (2, 3, 4, 5, 6...)"
+              >
+                ＋ 原圖放大 ({{ scaleLabels[Math.min(scaleFactors.length - 1, transScaleIndex + 1)] }})
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Row 2: 7 Transformations in exact specified order -->
+        <!-- Row 3: 翻轉與對稱開關 (Symmetry & Reflections) -->
         <div class="flex flex-wrap items-center gap-1.5 pt-0.5 justify-center">
           <button
             type="button"
-            @click="transAction = 'base'"
-            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer"
-            :class="transAction === 'base' ? 'bg-slate-800 text-sky-300 border-sky-500/60 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
+            @click="toggleReflectX"
+            class="px-3 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95"
+            :class="transReflectX ? 'bg-rose-950 text-rose-300 border-rose-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
           >
-            原圖基準
+            上下翻轉 (x 軸) {{ transReflectX ? '✓' : '' }}
           </button>
           <button
             type="button"
-            @click="transAction = 'shiftY'"
-            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer"
-            :class="transAction === 'shiftY' ? 'bg-emerald-950 text-emerald-300 border-emerald-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
+            @click="toggleReflectY"
+            class="px-3 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95"
+            :class="transReflectY ? 'bg-indigo-950 text-indigo-300 border-indigo-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
           >
-            Y 平移
+            左右翻轉 (y 軸) {{ transReflectY ? '✓' : '' }}
           </button>
           <button
             type="button"
-            @click="transAction = 'scaleY'"
-            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer"
-            :class="transAction === 'scaleY' ? 'bg-purple-950 text-purple-300 border-purple-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
+            @click="toggleInverse"
+            class="px-3 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer active:scale-95"
+            :class="transShowInverse ? 'bg-amber-950 text-amber-300 border-amber-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
           >
-            Y 伸縮
-          </button>
-          <button
-            type="button"
-            @click="transAction = 'shiftX'"
-            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer"
-            :class="transAction === 'shiftX' ? 'bg-sky-950 text-sky-300 border-sky-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-          >
-            X 平移
-          </button>
-          <button
-            type="button"
-            @click="transAction = 'scaleX'"
-            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer"
-            :class="transAction === 'scaleX' ? 'bg-amber-950 text-amber-300 border-amber-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-          >
-            X 伸縮
-          </button>
-          <button
-            type="button"
-            @click="transAction = 'reflectX'"
-            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer"
-            :class="transAction === 'reflectX' ? 'bg-rose-950 text-rose-300 border-rose-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-          >
-            上下翻轉
-          </button>
-          <button
-            type="button"
-            @click="transAction = 'reflectY'"
-            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer"
-            :class="transAction === 'reflectY' ? 'bg-cyan-950 text-cyan-300 border-cyan-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-          >
-            左右翻轉
-          </button>
-          <button
-            type="button"
-            @click="transAction = 'inverse'"
-            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer"
-            :class="transAction === 'inverse' ? 'bg-amber-950 text-amber-300 border-amber-500 shadow-sm' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'"
-          >
-            反函數對稱
+            反函數對稱 (y = x) {{ transShowInverse ? '✓' : '' }}
           </button>
         </div>
       </div>
@@ -1080,7 +1060,7 @@ const currentTransConfig = computed(() => {
         title="函數圖形"
         titleColor="#38bdf8"
         :width="460"
-        :height="250"
+        :height="260"
         :xRange="currentTransConfig.xRange"
         :yRange="currentTransConfig.yRange"
         :functions="currentTransConfig.functions"
@@ -1090,13 +1070,10 @@ const currentTransConfig = computed(() => {
 
       <!-- Dynamic description badge: 精簡動態描述變換公式與效果 -->
       <div 
-        class="w-full px-3.5 py-2 rounded-xl bg-slate-950/90 border border-slate-800 text-xs sm:text-sm text-slate-200 text-center font-sans shadow-inner"
+        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-slate-800 text-xs sm:text-sm text-slate-200 text-left font-sans shadow-inner leading-relaxed"
         v-html="renderRichMathText(currentTransConfig.description)"
       />
     </div>
-
-    <!-- ========================================================================= -->
-    <!-- 15. 超越方程式圖形交點判定 (transcendental-roots-2x) -->
     <!-- ========================================================================= -->
     <div 
       v-else-if="type === 'transcendental-roots-2x'" 
