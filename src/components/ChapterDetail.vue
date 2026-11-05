@@ -416,6 +416,14 @@ const chapterResources = computed(() => {
             {{ mod.mindset }}
           </div>
 
+          <!-- 若有幾何圖形視覺化則動態呈現 -->
+          <div 
+            v-if="mod.diagramType"
+            class="my-2.5 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
+          >
+            <ConceptDiagram :type="mod.diagramType" />
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
             <div 
               v-for="(step, sIdx) in mod.steps"
@@ -484,6 +492,14 @@ const chapterResources = computed(() => {
           <div class="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800/90 text-xs sm:text-sm text-slate-200 leading-relaxed">
             <span class="font-bold text-emerald-400 mr-1.5">【題目】：</span>
             <span v-html="renderRichMathText(ex.question)"></span>
+          </div>
+
+          <!-- 若範例附有函數圖形解析則動態呈現 -->
+          <div 
+            v-if="ex.diagramType"
+            class="my-2.5 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
+          >
+            <ConceptDiagram :type="ex.diagramType" />
           </div>
 
           <!-- 步驟解析 -->
@@ -555,9 +571,16 @@ const chapterResources = computed(() => {
 
             <div 
               v-if="openHints[qIdx]"
-              class="mt-2.5 p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/30 text-xs text-purple-200/90 leading-relaxed whitespace-pre-line animate-in fade-in duration-150"
-              v-html="renderRichMathText(q.hint)"
+              class="mt-2.5 p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/30 text-xs text-purple-200/90 leading-relaxed whitespace-pre-line animate-in fade-in duration-150 space-y-3"
             >
+              <div v-html="renderRichMathText(q.hint)"></div>
+              <!-- 若提示附有幾何圖形解析則動態呈現 -->
+              <div 
+                v-if="q.diagramType"
+                class="my-2 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
+              >
+                <ConceptDiagram :type="q.diagramType" />
+              </div>
             </div>
           </div>
         </div>

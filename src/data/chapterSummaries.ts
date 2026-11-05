@@ -11,12 +11,14 @@ export interface ChapterConcept {
 export interface SopModule {
   moduleName: string;
   mindset?: string;
+  diagramType?: string;
   steps: { label: string; text: string }[];
 }
 
 export interface ClassicExample {
   title: string;
   question: string;
+  diagramType?: string;
   solutionSteps: { step: string; content: string }[];
   answer?: string;
 }
@@ -25,6 +27,7 @@ export interface QuizQuestion {
   questionNumber: number;
   title: string;
   question: string;
+  diagramType?: string;
   hint?: string;
 }
 
@@ -1867,6 +1870,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       {
         title: '2. 指數函數與對數函數圖形直覺（反函數與凹凸性）',
         description: '指數與對數互為反函數，圖形關於直線 $y = x$ 對稱。以算幾不等式幾何化直觀掌握凹凸性（弦中點高度與曲線高度）：',
+        diagramType: 'exp-log-symmetry',
         formulas: [
           '指數基準點與漸近線：y = a^x \\text{ 恆過 } (0, 1) \\text{，漸近線為 } y = 0',
           '對數基準點與漸近線：y = \\log_a x \\text{ 恆過 } (1, 0) \\text{，漸近線為 } x = 0',
@@ -1878,6 +1882,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       {
         title: '3. 圖形平移與伸縮的「外觀補償法」',
         description: '左右以 $y$ 軸為中心內部補償扣回；上下以 $x$ 軸為中心外部直接縮放疊加：',
+        diagramType: 'function-transformation',
         formulas: [
           '水平向右平移 h 單位：x \\to (x - h) \\implies y = f(x - h)',
           '水平沿 x 軸伸長 k 倍：x \\to \\left(\\frac{x}{k}\\right) \\implies y = f\\left(\\frac{x}{k}\\right)',
@@ -1901,6 +1906,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
     sopModules: [
       {
         moduleName: '題型 A：超越方程式「求相異實根個數」（高頻考點）',
+        diagramType: 'transcendental-roots-2x',
         steps: [
           {
             label: '步驟 1【移項分家】',
@@ -1955,6 +1961,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       {
         title: '範例二：圖形交點判定實根個數',
         question: '試問方程式 $2^x = x + 3$ 共有幾個相異實根？',
+        diagramType: 'transcendental-roots-2x',
         solutionSteps: [
           {
             step: '步驟一【拆解為兩等價函數圖形】',
@@ -1977,6 +1984,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         questionNumber: 1,
         title: '觀念辨析題（圖形與實根個數）',
         question: '方程式 $2^x + x = 0$ 與方程式 $2^x - x^2 = 0$ 分別有幾個相異實根？請嘗試不透過複雜代數運算，僅利用「函數圖形分家（移項）」的幾何概念繪圖說明。',
+        diagramType: 'transcendental-multi-roots',
         hint: '幾何圖形分家解析：\n(1) $2^x = -x$：遞增指數圖形 $y = 2^x$ 與負斜率直線 $y = -x$ 僅在第二象限相交於 1 點，故恰有 1 個相異實根。\n(2) $2^x = x^2$：將指數與拋物線分家。正向在 $x = 2$ 與 $x = 4$ 恰有兩交點；負向 $x < 0$ 時，拋物線遞增而指數趨近 0，在區間 $(-1, 0)$ 必有 1 個交點，故共有 3 個相異實根！'
       },
       {

@@ -588,5 +588,329 @@ const props = defineProps<{
       </g>
     </svg>
 
+    <!-- ========================================================================= -->
+    <!-- 13. 指數函數與對數函數對稱性與凹凸性 (exp-log-symmetry) -->
+    <!-- ========================================================================= -->
+    <svg 
+      v-else-if="type === 'exp-log-symmetry'" 
+      viewBox="0 0 460 250" 
+      class="w-full max-w-xl h-auto drop-shadow-md"
+    >
+      <defs>
+        <marker id="arrow-axis-explog" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#64748b" />
+        </marker>
+      </defs>
+
+      <rect width="460" height="250" rx="16" fill="#090d16" />
+
+      <!-- Coordinate Grid lines -->
+      <g stroke="#1e293b" stroke-width="0.8" stroke-dasharray="2 2">
+        <line x1="60" y1="50" x2="420" y2="50" />
+        <line x1="60" y1="90" x2="420" y2="90" />
+        <line x1="60" y1="130" x2="420" y2="130" />
+        <line x1="60" y1="170" x2="420" y2="170" />
+        <line x1="60" y1="210" x2="420" y2="210" />
+        <line x1="100" y1="20" x2="100" y2="220" />
+        <line x1="140" y1="20" x2="140" y2="220" />
+        <line x1="180" y1="20" x2="180" y2="220" />
+        <line x1="220" y1="20" x2="220" y2="220" />
+        <line x1="260" y1="20" x2="260" y2="220" />
+        <line x1="300" y1="20" x2="300" y2="220" />
+        <line x1="340" y1="20" x2="340" y2="220" />
+        <line x1="380" y1="20" x2="380" y2="220" />
+      </g>
+
+      <!-- Axes: Origin (180, 170) -->
+      <line x1="40" y1="170" x2="430" y2="170" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow-axis-explog)" />
+      <text x="435" y="174" fill="#94a3b8" font-size="11" font-weight="bold" font-family="sans-serif">x</text>
+
+      <line x1="180" y1="230" x2="180" y2="20" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow-axis-explog)" />
+      <text x="175" y="14" fill="#94a3b8" font-size="11" font-weight="bold" font-family="sans-serif">y</text>
+      <text x="168" y="185" fill="#64748b" font-size="10" font-family="sans-serif">O</text>
+
+      <!-- Symmetry line y = x -->
+      <line x1="60" y1="230" x2="350" y2="40" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 4" stroke-opacity="0.7" />
+      <text x="325" y="32" fill="#f59e0b" font-size="11" font-weight="bold" font-family="sans-serif">y = x（對稱軸）</text>
+
+      <!-- Perpendicular reflection lines connecting symmetric points -->
+      <line x1="180" y1="130" x2="220" y2="170" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2 2" stroke-opacity="0.6" />
+      <line x1="220" y1="90" x2="260" y2="130" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2 2" stroke-opacity="0.6" />
+
+      <!-- Curve 1: y = 2^x (Sky Blue) -->
+      <path 
+        d="M 50,168 C 100,167 140,160 180,130 C 200,110 210,85 220,10" 
+        fill="none" 
+        stroke="#38bdf8" 
+        stroke-width="2.8" 
+      />
+      <text x="228" y="25" fill="#38bdf8" font-size="12" font-weight="bold" font-family="sans-serif">y = 2^x</text>
+      <text x="228" y="40" fill="#7dd3fc" font-size="9" font-family="sans-serif">凹向上（弦高於弧）</text>
+
+      <!-- Curve 2: y = log_2(x) (Emerald Green) -->
+      <path 
+        d="M 183,235 C 184,200 195,180 220,170 C 245,155 295,140 410,120" 
+        fill="none" 
+        stroke="#34d399" 
+        stroke-width="2.8" 
+      />
+      <text x="360" y="112" fill="#34d399" font-size="12" font-weight="bold" font-family="sans-serif">y = log_2(x)</text>
+      <text x="360" y="130" fill="#6ee7b7" font-size="9" font-family="sans-serif">凹向下（漸近線 x=0）</text>
+
+      <!-- Key Points Highlighted on y = 2^x -->
+      <circle cx="180" cy="130" r="4.5" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
+      <text x="135" y="128" fill="#38bdf8" font-size="10" font-weight="bold" font-family="sans-serif">(0, 1)</text>
+
+      <circle cx="220" cy="90" r="4" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
+      <text x="226" y="85" fill="#38bdf8" font-size="10" font-weight="bold" font-family="sans-serif">(1, 2)</text>
+
+      <!-- Key Points Highlighted on y = log_2(x) -->
+      <circle cx="220" cy="170" r="4.5" fill="#34d399" stroke="#ffffff" stroke-width="1.5" />
+      <text x="212" y="190" fill="#34d399" font-size="10" font-weight="bold" font-family="sans-serif">(1, 0)</text>
+
+      <circle cx="260" cy="130" r="4" fill="#34d399" stroke="#ffffff" stroke-width="1.5" />
+      <text x="268" y="145" fill="#34d399" font-size="10" font-weight="bold" font-family="sans-serif">(2, 1)</text>
+
+      <!-- Jensen's Inequality / Convexity Chord on y = 2^x -->
+      <line x1="180" y1="130" x2="220" y2="90" stroke="#f43f5e" stroke-width="1.8" stroke-dasharray="3 3" />
+      <circle cx="200" cy="110" r="3" fill="#f43f5e" />
+      <line x1="200" y1="110" x2="200" y2="114" stroke="#f43f5e" stroke-width="1.5" />
+
+      <!-- Bottom Insight Legend -->
+      <g transform="translate(14, 212)">
+        <rect width="432" height="28" rx="8" fill="#0f172a" stroke="#1e293b" />
+        <text x="12" y="18" fill="#cbd5e1" font-size="10" font-family="sans-serif">
+          幾何核心：<tspan fill="#f59e0b" font-weight="bold">對稱於 y = x</tspan>；指數函數恆過 <tspan fill="#38bdf8" font-weight="bold">(0, 1)</tspan> 漸近線為 x 軸；對數函數恆過 <tspan fill="#34d399" font-weight="bold">(1, 0)</tspan> 漸近線為 y 軸
+        </text>
+      </g>
+    </svg>
+
+    <!-- ========================================================================= -->
+    <!-- 14. 函數圖形平移與伸縮外觀補償法 (function-transformation) -->
+    <!-- ========================================================================= -->
+    <svg 
+      v-else-if="type === 'function-transformation'" 
+      viewBox="0 0 460 220" 
+      class="w-full max-w-xl h-auto drop-shadow-md"
+    >
+      <defs>
+        <marker id="arrow-shift-x" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#38bdf8" />
+        </marker>
+        <marker id="arrow-shift-y" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#34d399" />
+        </marker>
+      </defs>
+
+      <rect width="460" height="220" rx="16" fill="#090d16" />
+
+      <!-- Coordinate Axes: Origin (150, 150) -->
+      <line x1="30" y1="150" x2="430" y2="150" stroke="#475569" stroke-width="1.2" />
+      <text x="435" y="154" fill="#94a3b8" font-size="11" font-family="sans-serif">x</text>
+
+      <line x1="150" y1="195" x2="150" y2="20" stroke="#475569" stroke-width="1.2" />
+      <text x="145" y="14" fill="#94a3b8" font-size="11" font-family="sans-serif">y</text>
+
+      <!-- Baseline Curve: y = 2^x (Gray, passes through (150, 115)) -->
+      <path 
+        d="M 40,148 C 90,147 125,140 150,115 C 170,95 180,65 190,20" 
+        fill="none" 
+        stroke="#64748b" 
+        stroke-width="2" 
+        stroke-dasharray="3 3"
+      />
+      <circle cx="150" cy="115" r="3.5" fill="#94a3b8" />
+      <text x="85" y="112" fill="#94a3b8" font-size="10" font-family="sans-serif">基準：y = 2^x (過 (0, 1))</text>
+
+      <!-- Curve 2: Shifted Right 2 units: y = 2^{x - 2} (Sky Blue, passes through (220, 115)) -->
+      <path 
+        d="M 110,148 C 160,147 195,140 220,115 C 240,95 250,65 260,20" 
+        fill="none" 
+        stroke="#38bdf8" 
+        stroke-width="2.5" 
+      />
+      <circle cx="220" cy="115" r="4.5" fill="#38bdf8" stroke="#ffffff" stroke-width="1" />
+      <text x="228" y="112" fill="#38bdf8" font-size="11" font-weight="bold" font-family="sans-serif">(2, 1)</text>
+
+      <!-- Horizontal Shift Arrow -->
+      <line x1="156" y1="115" x2="212" y2="115" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow-shift-x)" />
+      <text x="156" y="103" fill="#38bdf8" font-size="9" font-family="sans-serif">向右平移 2 單位</text>
+      <text x="268" y="45" fill="#38bdf8" font-size="11" font-weight="bold" font-family="sans-serif">y = 2^{x - 2}</text>
+      <text x="268" y="60" fill="#7dd3fc" font-size="9" font-family="sans-serif">內部補償：x 換成 (x - 2)</text>
+
+      <!-- Curve 3: Shifted Up 2 units: y = 2^x + 2 (Emerald, passes through (150, 45)) -->
+      <path 
+        d="M 40,78 C 90,77 125,70 150,45 C 160,30 165,15 170,5" 
+        fill="none" 
+        stroke="#34d399" 
+        stroke-width="2.5" 
+      />
+      <circle cx="150" cy="45" r="4.5" fill="#34d399" stroke="#ffffff" stroke-width="1" />
+      <text x="156" y="48" fill="#34d399" font-size="11" font-weight="bold" font-family="sans-serif">(0, 3)</text>
+
+      <!-- Vertical Shift Arrow -->
+      <line x1="150" y1="108" x2="150" y2="52" stroke="#34d399" stroke-width="2" marker-end="url(#arrow-shift-y)" />
+      <text x="96" y="75" fill="#34d399" font-size="9" font-family="sans-serif">向上平移 2</text>
+      <text x="178" y="28" fill="#34d399" font-size="11" font-weight="bold" font-family="sans-serif">y = 2^x + 2</text>
+      <text x="178" y="42" fill="#6ee7b7" font-size="9" font-family="sans-serif">外部變更：整體加上 2</text>
+
+      <!-- Bottom Rule Legend -->
+      <g transform="translate(14, 180)">
+        <rect width="432" height="30" rx="8" fill="#0f172a" stroke="#1e293b" />
+        <text x="12" y="19" fill="#cbd5e1" font-size="10" font-family="sans-serif">
+          外觀補償心法：<tspan fill="#38bdf8" font-weight="bold">左右平移以 y 軸為中心</tspan>，內部相反補償扣回；<tspan fill="#34d399" font-weight="bold">上下平移以 x 軸為中心</tspan>，外部直接增減！
+        </text>
+      </g>
+    </svg>
+
+    <!-- ========================================================================= -->
+    <!-- 15. 超越方程式圖形交點判定 (transcendental-roots-2x) -->
+    <!-- ========================================================================= -->
+    <svg 
+      v-else-if="type === 'transcendental-roots-2x'" 
+      viewBox="0 0 460 250" 
+      class="w-full max-w-xl h-auto drop-shadow-md"
+    >
+      <rect width="460" height="250" rx="16" fill="#090d16" />
+
+      <!-- Coordinate Grid lines -->
+      <g stroke="#1e293b" stroke-width="0.8" stroke-dasharray="2 2">
+        <line x1="40" y1="50" x2="420" y2="50" />
+        <line x1="40" y1="90" x2="420" y2="90" />
+        <line x1="40" y1="130" x2="420" y2="130" />
+        <line x1="40" y1="170" x2="420" y2="170" />
+        <line x1="40" y1="210" x2="420" y2="210" />
+        <line x1="80" y1="20" x2="80" y2="220" />
+        <line x1="120" y1="20" x2="120" y2="220" />
+        <line x1="160" y1="20" x2="160" y2="220" />
+        <line x1="200" y1="20" x2="200" y2="220" />
+        <line x1="240" y1="20" x2="240" y2="220" />
+        <line x1="280" y1="20" x2="280" y2="220" />
+        <line x1="320" y1="20" x2="320" y2="220" />
+      </g>
+
+      <!-- Origin at (200, 170). Scale: 1 unit = 32px -->
+      <!-- x-axis -->
+      <line x1="30" y1="170" x2="430" y2="170" stroke="#64748b" stroke-width="1.5" />
+      <text x="435" y="174" fill="#94a3b8" font-size="11" font-family="sans-serif">x</text>
+
+      <!-- y-axis -->
+      <line x1="200" y1="225" x2="200" y2="18" stroke="#64748b" stroke-width="1.5" />
+      <text x="195" y="14" fill="#94a3b8" font-size="11" font-family="sans-serif">y</text>
+      <text x="188" y="184" fill="#64748b" font-size="10" font-family="sans-serif">O</text>
+
+      <!-- Graph 1: Line y = x + 3 (Rose Red) -->
+      <line x1="56" y1="218" x2="274" y2="20" stroke="#f43f5e" stroke-width="2.5" />
+      <text x="245" y="15" fill="#f43f5e" font-size="12" font-weight="bold" font-family="sans-serif">y₂ = x + 3</text>
+      <circle cx="104" cy="170" r="3.5" fill="#f43f5e" />
+      <text x="84" y="186" fill="#fda4af" font-size="9" font-family="sans-serif">(-3, 0)</text>
+      <circle cx="200" cy="74" r="3.5" fill="#f43f5e" />
+      <text x="160" y="78" fill="#fda4af" font-size="10" font-family="sans-serif">(0, 3)</text>
+
+      <!-- Graph 2: Curve y = 2^x (Sky Blue) -->
+      <path 
+        d="M 40,169 C 90,168 150,163 200,138 C 225,125 250,90 274,20" 
+        fill="none" 
+        stroke="#38bdf8" 
+        stroke-width="2.8" 
+      />
+      <text x="282" y="32" fill="#38bdf8" font-size="12" font-weight="bold" font-family="sans-serif">y₁ = 2^x</text>
+
+      <!-- Intersection 1: in (-3, -2). x ≈ -2.86 -> (108, 165.5) -->
+      <circle cx="108" cy="165.5" r="5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.8" />
+      <rect x="52" y="130" width="108" height="22" rx="6" fill="#78350f" fill-opacity="0.85" stroke="#f59e0b" stroke-width="1" />
+      <text x="58" y="145" fill="#fef3c7" font-size="10" font-weight="bold" font-family="sans-serif">交點 1：x ∈ (-3, -2)</text>
+
+      <!-- Intersection 2: in (0, 3). x ≈ 2.45 -> (268, 30) -->
+      <circle cx="268" cy="30" r="5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.8" />
+      <rect x="280" y="65" width="102" height="22" rx="6" fill="#78350f" fill-opacity="0.85" stroke="#f59e0b" stroke-width="1" />
+      <text x="286" y="80" fill="#fef3c7" font-size="10" font-weight="bold" font-family="sans-serif">交點 2：x ∈ (0, 3)</text>
+
+      <!-- Height comparisons for root finding -->
+      <line x1="200" y1="74" x2="200" y2="138" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="2 2" />
+      <circle cx="200" cy="138" r="3" fill="#38bdf8" />
+      <text x="206" y="112" fill="#94a3b8" font-size="9" font-family="sans-serif">x=0: 直線高於指數</text>
+
+      <!-- Bottom Insight Legend -->
+      <g transform="translate(14, 212)">
+        <rect width="432" height="28" rx="8" fill="#0f172a" stroke="#1e293b" />
+        <text x="12" y="18" fill="#cbd5e1" font-size="10" font-family="sans-serif">
+          方程式與圖形等價本質：<tspan fill="#f59e0b" font-weight="bold">方程式實根個數 ≡ 函數圖形交點個數（恰有 2 個交點）</tspan>，遠方指數反超直線！
+        </text>
+      </g>
+    </svg>
+
+    <!-- ========================================================================= -->
+    <!-- 16. 觀念辨析題多圖形交點分析 (transcendental-multi-roots) -->
+    <!-- ========================================================================= -->
+    <svg 
+      v-else-if="type === 'transcendental-multi-roots'" 
+      viewBox="0 0 460 220" 
+      class="w-full max-w-xl h-auto drop-shadow-md"
+    >
+      <rect width="460" height="220" rx="16" fill="#090d16" />
+
+      <!-- Left Subpanel: 2^x = -x -->
+      <g transform="translate(10, 10)">
+        <rect width="210" height="165" rx="12" fill="#0f172a" stroke="#1e293b" />
+        <text x="14" y="24" fill="#38bdf8" font-size="11" font-weight="bold" font-family="sans-serif">(1) 2^x + x = 0 ⟹ 2^x = -x</text>
+
+        <!-- Axes: Origin (100, 110) -->
+        <line x1="20" y1="110" x2="190" y2="110" stroke="#475569" stroke-width="1.2" />
+        <line x1="100" y1="145" x2="100" y2="35" stroke="#475569" stroke-width="1.2" />
+
+        <!-- y = 2^x (Sky) -->
+        <path d="M 25,108 C 60,107 85,100 100,80 C 115,60 125,40 135,35" fill="none" stroke="#38bdf8" stroke-width="2.2" />
+
+        <!-- y = -x (Rose line passing through (100, 110)) -->
+        <line x1="30" y1="40" x2="170" y2="145" stroke="#f43f5e" stroke-width="2.2" />
+
+        <!-- Intersection point at Quadrant II (-0.64, 0.64) -> (80, 90) -->
+        <circle cx="80" cy="90" r="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" />
+        <text x="35" y="85" fill="#fef3c7" font-size="10" font-weight="bold" font-family="sans-serif">恰 1 交點</text>
+
+        <!-- Bottom badge -->
+        <rect x="45" y="132" width="115" height="22" rx="6" fill="#0369a1" fill-opacity="0.6" />
+        <text x="56" y="147" fill="#e0f2fe" font-size="11" font-weight="bold" font-family="sans-serif">恰有 1 個相異實根</text>
+      </g>
+
+      <!-- Right Subpanel: 2^x = x^2 -->
+      <g transform="translate(240, 10)">
+        <rect width="210" height="165" rx="12" fill="#0f172a" stroke="#1e293b" />
+        <text x="14" y="24" fill="#a78bfa" font-size="11" font-weight="bold" font-family="sans-serif">(2) 2^x - x² = 0 ⟹ 2^x = x²</text>
+
+        <!-- Axes: Origin (100, 110) -->
+        <line x1="20" y1="110" x2="190" y2="110" stroke="#475569" stroke-width="1.2" />
+        <line x1="100" y1="145" x2="100" y2="35" stroke="#475569" stroke-width="1.2" />
+
+        <!-- y = x^2 Parabola (Amber) -->
+        <path d="M 55,35 Q 100,145 145,35" fill="none" stroke="#f59e0b" stroke-width="2.2" />
+
+        <!-- y = 2^x (Sky) -->
+        <path d="M 25,108 C 60,107 85,100 100,80 C 115,65 130,55 155,35" fill="none" stroke="#38bdf8" stroke-width="2.2" />
+
+        <!-- 3 Intersections: -->
+        <circle cx="78" cy="92" r="3.5" fill="#f43f5e" stroke="#ffffff" stroke-width="1" />
+        <circle cx="125" cy="68" r="3.5" fill="#f43f5e" stroke="#ffffff" stroke-width="1" />
+        <circle cx="150" cy="38" r="3.5" fill="#f43f5e" stroke="#ffffff" stroke-width="1" />
+
+        <text x="14" y="70" fill="#f43f5e" font-size="9" font-family="sans-serif">x∈(-1,0)</text>
+        <text x="110" y="85" fill="#f43f5e" font-size="9" font-family="sans-serif">x=2</text>
+        <text x="156" y="45" fill="#f43f5e" font-size="9" font-family="sans-serif">x=4</text>
+
+        <!-- Bottom badge -->
+        <rect x="45" y="132" width="115" height="22" rx="6" fill="#6d28d9" fill-opacity="0.6" />
+        <text x="56" y="147" fill="#ede9fe" font-size="11" font-weight="bold" font-family="sans-serif">共有 3 個相異實根！</text>
+      </g>
+
+      <!-- Bottom Insight Legend -->
+      <g transform="translate(10, 185)">
+        <rect width="440" height="26" rx="8" fill="#090d16" stroke="#334155" />
+        <text x="12" y="17" fill="#cbd5e1" font-size="10" font-family="sans-serif">
+          直覺化移項本質：不用盲目運算，<tspan fill="#38bdf8" font-weight="bold">將方程式拆成能畫的兩圖形</tspan>，由交點位置與曲線走勢一目了然！
+        </text>
+      </g>
+    </svg>
+
   </div>
 </template>
