@@ -885,7 +885,7 @@ const props = defineProps<{
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
         <!-- Subpanel 1: 2^x = -x -->
         <FunctionGraph
-          title="(1) 2^x = -x"
+          title="(1) $2^x = -x$"
           titleColor="#38bdf8"
           :width="230"
           :height="185"
@@ -905,7 +905,7 @@ const props = defineProps<{
 
         <!-- Subpanel 2: 2^x = x^2 -->
         <FunctionGraph
-          title="(2) 2^x = x²"
+          title="(2) $2^x = x^2$"
           titleColor="#a78bfa"
           :width="230"
           :height="185"

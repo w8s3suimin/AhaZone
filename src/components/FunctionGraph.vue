@@ -466,7 +466,7 @@ function onTouchEnd() {
           :style="{ color: titleColor }"
         >
           <span class="w-1.5 h-1.5 rounded-full" :style="{ backgroundColor: titleColor }"></span>
-          <span>{{ title }}</span>
+          <span v-html="renderRichMathText(title)"></span>
         </span>
 
         <!-- Function Legend (圖例) Badges -->
