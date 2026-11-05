@@ -144,7 +144,10 @@ export function renderFormulaItem(raw: string): FormattedFormula {
     // 只有確實含有中文字，且不是 (a ≠ 0) 等純數學條件時，才視為說明備註抽離
     if (hasChinese && !isMathCondition) {
       text = mainPart;
-      note = noteMatch[2].trim();
+      note = noteMatch[2].trim()
+        .replace(/\\text\{([^}]+)\}/g, '$1')
+        .replace(/\\quad/g, ' ')
+        .replace(/\\/g, '');
     }
   }
 
