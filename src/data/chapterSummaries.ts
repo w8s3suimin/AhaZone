@@ -5,6 +5,7 @@ export interface ChapterConcept {
   description: string;
   formulas?: string[]; // 每條公式獨立一列
   diagramType?: string; // 幾何圖像視覺化
+  diagramPosition?: 'bottom' | 'right'; // 圖像放置位置（預設下方，公式短時可放右側）
   track?: 'common' | 'mathA' | 'mathB'; // 標註為共同、數A專屬或數B專屬
 }
 
@@ -1874,7 +1875,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         formulas: [
           '指數基準點與漸近線：y = a^x \\text{ 恆過 } (0, 1) \\text{，漸近線為 } y = 0',
           '對數基準點與漸近線：y = \\log_a x \\text{ 恆過 } (1, 0) \\text{，漸近線為 } x = 0',
-          '指數凹向上（琴生不等式）：\\frac{a^x + a^y}{2} \\ge a^{\\frac{x+y}{2}} \\quad (弦中點高度高於曲線點高度)',
+          '指數凹向上（琴生不等式）：\\frac{a^x + a^y}{2} \\ge {\\large a^{\\textstyle \\frac{x+y}{2}}} \\quad (弦中點高度高於曲線點高度)',
           '對數凹向下 (a > 1)：\\frac{\\log_a x_1 + \\log_a x_2}{2} < \\log_a\\left(\\frac{x_1 + x_2}{2}\\right) \\quad (x_1 \\ne x_2)'
         ],
         track: 'common'
@@ -1883,6 +1884,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '3. 圖形平移與伸縮的「外觀補償法」',
         description: '左右以 $y$ 軸為中心內部補償扣回；上下以 $x$ 軸為中心外部直接縮放疊加：',
         diagramType: 'function-transformation',
+        diagramPosition: 'right',
         formulas: [
           '水平向右平移 h 單位：x \\to (x - h) \\implies y = f(x - h)',
           '水平沿 x 軸伸長 k 倍：x \\to \\left(\\frac{x}{k}\\right) \\implies y = f\\left(\\frac{x}{k}\\right)',

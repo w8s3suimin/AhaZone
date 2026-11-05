@@ -339,47 +339,93 @@ const chapterResources = computed(() => {
             <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3" v-html="renderRichMathText(concept.description)"></p>
           </div>
 
-          <!-- Visual Illustration Diagram (若單元具幾何圖解則動態呈現) -->
+          <!-- 佈局分支：若設定 diagramPosition === 'right'，在寬螢幕將短公式置於左、圖形置於右 -->
           <div 
-            v-if="concept.diagramType"
-            class="my-2.5 w-full flex flex-col items-center"
-            :class="concept.diagramType === 'lens-optics' ? '' : 'rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner'"
+            v-if="concept.diagramPosition === 'right' && concept.diagramType"
+            class="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-4 items-center"
           >
-            <ConceptDiagram :type="concept.diagramType" />
-          </div>
-
-          <!-- Formulas list: 以 KaTeX 數學排版引擎渲染真實分數、上下標與希臘字母 -->
-          <div 
-            v-if="concept.formulas && concept.formulas.length > 0"
-            class="mt-2 space-y-2.5"
-          >
+            <!-- 左欄：公式列表 -->
             <div 
-              v-for="(fItem, fIdx) in concept.formulas"
-              :key="fIdx"
-              class="px-4 py-3 rounded-xl bg-slate-950/90 border border-slate-800/90 text-slate-100 text-sm tracking-wide flex flex-wrap items-center gap-2 overflow-x-auto shadow-inner"
+              v-if="concept.formulas && concept.formulas.length > 0"
+              class="space-y-2.5"
             >
-              <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
-              <!-- 前置中文名稱標籤 -->
-              <span 
-                v-if="renderFormulaItem(fItem).label" 
-                class="font-bold text-sky-400 shrink-0"
+              <div 
+                v-for="(fItem, fIdx) in concept.formulas"
+                :key="fIdx"
+                class="px-4 py-3 rounded-xl bg-slate-950/90 border border-slate-800/90 text-slate-100 text-sm tracking-wide flex flex-wrap items-center gap-2 overflow-x-auto shadow-inner"
               >
-                {{ renderFormulaItem(fItem).label }}
-              </span>
-              <!-- KaTeX 渲染之高畫質數學公式（含真實垂直分數線、精緻下標） -->
-              <span 
-                class="text-sky-100 select-all font-sans text-sm sm:text-base leading-none py-0.5"
-                v-html="renderFormulaItem(fItem).mathHtml"
-              />
-              <!-- 後置補充備註說明 -->
-              <span 
-                v-if="renderFormulaItem(fItem).note" 
-                class="text-xs text-slate-400 font-sans ml-1"
-              >
-                {{ renderFormulaItem(fItem).note }}
-              </span>
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
+                <span 
+                  v-if="renderFormulaItem(fItem).label" 
+                  class="font-bold text-sky-400 shrink-0"
+                >
+                  {{ renderFormulaItem(fItem).label }}
+                </span>
+                <span 
+                  class="text-sky-100 select-all font-sans text-sm sm:text-base leading-none py-0.5"
+                  v-html="renderFormulaItem(fItem).mathHtml"
+                />
+                <span 
+                  v-if="renderFormulaItem(fItem).note" 
+                  class="text-xs text-slate-400 font-sans ml-1"
+                >
+                  {{ renderFormulaItem(fItem).note }}
+                </span>
+              </div>
+            </div>
+
+            <!-- 右欄：視覺圖解 -->
+            <div 
+              class="w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner h-full justify-center"
+            >
+              <ConceptDiagram :type="concept.diagramType" />
             </div>
           </div>
+
+          <!-- 預設垂直單欄佈局：圖形在上，公式在下 -->
+          <template v-else>
+            <!-- Visual Illustration Diagram (若單元具幾何圖解則動態呈現) -->
+            <div 
+              v-if="concept.diagramType"
+              class="my-2.5 w-full flex flex-col items-center"
+              :class="concept.diagramType === 'lens-optics' ? '' : 'rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner'"
+            >
+              <ConceptDiagram :type="concept.diagramType" />
+            </div>
+
+            <!-- Formulas list: 以 KaTeX 數學排版引擎渲染真實分數、上下標與希臘字母 -->
+            <div 
+              v-if="concept.formulas && concept.formulas.length > 0"
+              class="mt-2 space-y-2.5"
+            >
+              <div 
+                v-for="(fItem, fIdx) in concept.formulas"
+                :key="fIdx"
+                class="px-4 py-3 rounded-xl bg-slate-950/90 border border-slate-800/90 text-slate-100 text-sm tracking-wide flex flex-wrap items-center gap-2 overflow-x-auto shadow-inner"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
+                <!-- 前置中文名稱標籤 -->
+                <span 
+                  v-if="renderFormulaItem(fItem).label" 
+                  class="font-bold text-sky-400 shrink-0"
+                >
+                  {{ renderFormulaItem(fItem).label }}
+                </span>
+                <!-- KaTeX 渲染之高畫質數學公式（含真實垂直分數線、精緻下標） -->
+                <span 
+                  class="text-sky-100 select-all font-sans text-sm sm:text-base leading-none py-0.5"
+                  v-html="renderFormulaItem(fItem).mathHtml"
+                />
+                <!-- 後置補充備註說明 -->
+                <span 
+                  v-if="renderFormulaItem(fItem).note" 
+                  class="text-xs text-slate-400 font-sans ml-1"
+                >
+                  {{ renderFormulaItem(fItem).note }}
+                </span>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
     </div>
