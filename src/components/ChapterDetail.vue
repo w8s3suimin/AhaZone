@@ -372,7 +372,16 @@ const chapterResources = computed(() => {
                 共同核心
               </span>
             </div>
-            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3" v-html="renderRichMathText(concept.description)"></p>
+
+            <!-- 佈局分支：若設定 diagramPosition === 'top'，在說明/表格最上方呈現圖形 -->
+            <div 
+              v-if="concept.diagramPosition === 'top' && concept.diagramType"
+              class="my-3 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
+            >
+              <ConceptDiagram :type="concept.diagramType" />
+            </div>
+
+            <div class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3" v-html="renderRichMathText(concept.description)"></div>
           </div>
 
           <!-- 佈局分支：若設定 diagramPosition === 'right'，在寬螢幕將短公式置於左、圖形置於右 -->
@@ -418,8 +427,8 @@ const chapterResources = computed(() => {
             </div>
           </div>
 
-          <!-- 預設垂直單欄佈局：圖形在上，公式在下 -->
-          <template v-else>
+          <!-- 預設垂直單欄佈局：若不是 top 且不是 right，圖形在說明下方，公式在最下 -->
+          <template v-else-if="concept.diagramPosition !== 'top'">
             <!-- Visual Illustration Diagram (若單元具幾何圖解則動態呈現) -->
             <div 
               v-if="concept.diagramType"
@@ -453,6 +462,35 @@ const chapterResources = computed(() => {
                   v-html="renderFormulaItem(fItem).mathHtml"
                 />
                 <!-- 後置補充備註說明 -->
+                <span 
+                  v-if="renderFormulaItem(fItem).note" 
+                  class="text-xs text-slate-400 font-sans ml-1"
+                >
+                  {{ renderFormulaItem(fItem).note }}
+                </span>
+              </div>
+            </div>
+          </template>
+
+          <!-- 若 diagramPosition === 'top' 但有填寫 formulas，在下方呈現公式卡片 -->
+          <template v-else-if="concept.formulas && concept.formulas.length > 0">
+            <div class="mt-2 space-y-2.5">
+              <div 
+                v-for="(fItem, fIdx) in concept.formulas"
+                :key="fIdx"
+                class="px-4 py-3 rounded-xl bg-slate-950/90 border border-slate-800/90 text-slate-100 text-sm tracking-wide flex flex-wrap items-center gap-2 overflow-x-auto shadow-inner"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
+                <span 
+                  v-if="renderFormulaItem(fItem).label" 
+                  class="font-bold text-sky-400 shrink-0"
+                >
+                  {{ renderFormulaItem(fItem).label }}
+                </span>
+                <span 
+                  class="text-sky-100 select-all font-sans text-sm sm:text-base leading-none py-0.5"
+                  v-html="renderFormulaItem(fItem).mathHtml"
+                />
                 <span 
                   v-if="renderFormulaItem(fItem).note" 
                   class="text-xs text-slate-400 font-sans ml-1"
