@@ -471,7 +471,7 @@ const currentTransConfig = computed(() => {
 
   const desc = `**目前方程式**：$${formulaLatex}$。<br/>` +
     `**幾何特徵**：基準錨點移至 $(${pxR}, ${pyR})$，${asymText}。<br/>` +
-    `<span class="text-amber-400 font-semibold">💡 順序心法</span>：先平移後伸縮 $\\neq$ 先伸縮後平移！觀察上方歷程鏈與各項係數變化。`;
+    `<span class="text-amber-400 font-semibold">💡 順序心法</span>：先平移後伸縮 ≠ 先伸縮後平移！觀察上方歷程鏈與各項係數變化。`;
 
   return {
     xRange: [xMin, xMax] as [number, number],
@@ -1409,7 +1409,7 @@ const currentFeatureDisplay = computed(() => {
           <div class="text-xs sm:text-sm text-slate-300 space-y-1">
             <div v-html="currentFeatureDisplay"></div>
             <div class="text-slate-400 text-[11px] sm:text-xs pt-0.5">
-              <span class="text-amber-400 font-semibold">💡 順序心法</span>：先平移後伸縮 $\\neq$ 先伸縮後平移！觀察上方歷程鏈與各項係數變化。
+              <span class="text-amber-400 font-semibold">💡 順序心法</span>：先平移後伸縮 ≠ 先伸縮後平移！觀察上方歷程鏈與各項係數變化。
             </div>
           </div>
         </div>
