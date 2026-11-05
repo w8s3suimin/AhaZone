@@ -875,6 +875,78 @@ const props = defineProps<{
     </div>
 
     <!-- ========================================================================= -->
+    <!-- 15-B. 範例二圖形交點判定實根區間：2^x = x + 6 (transcendental-roots-x6) -->
+    <!-- ========================================================================= -->
+    <div 
+      v-else-if="type === 'transcendental-roots-x6'" 
+      class="w-full max-w-xl flex flex-col items-center gap-2 select-none"
+    >
+      <FunctionGraph
+        title="由圖形判定實根區間：y₁ = 2^x 與 y₂ = x + 6"
+        titleColor="#38bdf8"
+        :width="460"
+        :height="240"
+        :xRange="[-7.5, 5]"
+        :yRange="[-1.5, 18]"
+        :yStep="3"
+        :padding="{ top: 26, right: 30, bottom: 24, left: 30 }"
+        :functions="[
+          { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.6 },
+          { fn: (x: number) => x + 6, color: '#f43f5e', strokeWidth: 2.4 }
+        ]"
+        :points="[
+          { x: -6, y: 0, color: '#f43f5e', label: '(-6, 0)', labelPos: 'bottom' },
+          { x: 0, y: 6, color: '#f43f5e', label: '(0, 6)', labelPos: 'left' },
+          { x: 0, y: 1, color: '#38bdf8', label: '(0, 1)', labelPos: 'right' },
+          { x: -5.984, y: 0.016, color: '#f59e0b', radius: 4.5, label: '交點A(-6,-5)', labelPos: 'top-right' },
+          { x: 3.256, y: 9.256, color: '#f59e0b', radius: 4.5, label: '交點B(3,4)', labelPos: 'bottom-right' }
+        ]"
+        :lines="[
+          { x1: 0, y1: 1, x2: 0, y2: 6, color: '#f59e0b', strokeWidth: 1.2, dashArray: '2 2' }
+        ]"
+      >
+        <template #default="{ toScreenX, toScreenY }">
+          <text 
+            :x="toScreenX(3.8) + 6" 
+            :y="toScreenY(Math.pow(2, 3.8))" 
+            fill="#38bdf8" 
+            font-size="12" 
+            font-weight="bold"
+            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
+            class="chart-halo"
+          >
+            <tspan font-style="italic">y</tspan><tspan font-size="8" dy="2">1</tspan><tspan dy="-2"> = 2</tspan><tspan font-style="italic" font-size="8" dy="-4">x</tspan>
+          </text>
+          <text 
+            :x="toScreenX(-3.5)" 
+            :y="toScreenY(-3.5 + 6) - 10" 
+            fill="#f43f5e" 
+            font-size="12" 
+            font-weight="bold"
+            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
+            class="chart-halo"
+          >
+            <tspan font-style="italic">y</tspan><tspan font-size="8" dy="2">2</tspan><tspan dy="-2"> = </tspan><tspan font-style="italic">x</tspan> + 6
+          </text>
+          <text 
+            :x="toScreenX(0) + 6" 
+            :y="toScreenY(3.5)" 
+            fill="#fbbf24" 
+            font-size="9" 
+            font-family="sans-serif"
+            class="chart-halo"
+          >
+            x=0: 直線高於指數
+          </text>
+        </template>
+      </FunctionGraph>
+
+      <div class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-center font-sans">
+        勘根核心：直線截距 <span class="text-rose-400 font-bold">(-6, 0)</span> 與 <span class="text-rose-400 font-bold">(0, 6)</span>；在 <span class="text-amber-400 font-bold">(-6, -5)</span> 與 <span class="text-amber-400 font-bold">(3, 4)</span> 指數與直線高低互換，恰有 2 相異實根！
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
     <!-- 16. 觀念辨析題多圖形交點分析 (transcendental-multi-roots) -->
     <!-- ========================================================================= -->
     <div 
