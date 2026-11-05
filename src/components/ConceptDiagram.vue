@@ -597,17 +597,16 @@ const props = defineProps<{
       class="w-full max-w-xl flex flex-col items-center gap-2 select-none"
     >
       <FunctionGraph
-        title="對稱與凹凸性：y = 2^x 與 y = log₂(x) 對稱於 y = x"
+        title="對稱與凹凸性"
         titleColor="#f59e0b"
         :width="460"
         :height="260"
-        :xRange="[-3.2, 5.5]"
-        :yRange="[-2.2, 5.5]"
-        :padding="{ top: 26, right: 30, bottom: 24, left: 30 }"
+        :xRange="[-3.5, 5.5]"
+        :yRange="[-2.5, 5.5]"
         :functions="[
-          { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.6 },
-          { fn: (x: number) => x > 0.03 ? Math.log2(x) : NaN, domain: [0.03, 5.5], color: '#34d399', strokeWidth: 2.6 },
-          { fn: (x: number) => x, color: '#f59e0b', strokeWidth: 1.5, dashArray: '4 4' }
+          { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.6, label: 'y = 2^x', description: '凹向上指數' },
+          { fn: (x: number) => x > 0.03 ? Math.log2(x) : NaN, domain: [0.03, 5.5], color: '#34d399', strokeWidth: 2.6, label: 'y = \\log_2 x', description: '凹向下對數' },
+          { fn: (x: number) => x, color: '#f59e0b', strokeWidth: 1.5, dashArray: '4 4', label: 'y = x', description: '對稱軸' }
         ]"
         :lines="[
           { x1: 0, y1: 1, x2: 1, y2: 0, color: '#64748b', strokeWidth: 1, dashArray: '2 2' },
@@ -627,43 +626,6 @@ const props = defineProps<{
         ]"
       >
         <template #default="{ toScreenX, toScreenY }">
-          <!-- Curve 1 Label -->
-          <text 
-            :x="toScreenX(2.2) + 8" 
-            :y="toScreenY(4.6)" 
-            fill="#38bdf8" 
-            font-size="12" 
-            font-weight="bold"
-            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
-            class="chart-halo"
-          >
-            <tspan font-style="italic">y</tspan> = 2<tspan font-style="italic" font-size="8" dy="-4">x</tspan>
-            <tspan font-size="9" font-family="sans-serif" font-weight="normal" fill="#7dd3fc" dx="4">凹向上</tspan>
-          </text>
-          <!-- Curve 2 Label -->
-          <text 
-            :x="toScreenX(4.2)" 
-            :y="toScreenY(2.1) - 10" 
-            fill="#34d399" 
-            font-size="12" 
-            font-weight="bold"
-            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
-            class="chart-halo"
-          >
-            <tspan font-style="italic">y</tspan> = log₂<tspan font-style="italic">x</tspan>
-            <tspan font-size="9" font-family="sans-serif" font-weight="normal" fill="#6ee7b7" dx="4">凹向下</tspan>
-          </text>
-          <!-- Symmetry Axis Label -->
-          <text 
-            :x="toScreenX(3.8)" 
-            :y="toScreenY(3.8) - 8" 
-            fill="#f59e0b" 
-            font-size="11" 
-            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
-            class="chart-halo"
-          >
-            <tspan font-style="italic">y</tspan> = <tspan font-style="italic">x</tspan>（對稱軸）
-          </text>
           <!-- Jensen Comparison note -->
           <text 
             :x="toScreenX(1) - 8" 
@@ -693,17 +655,16 @@ const props = defineProps<{
       class="w-full max-w-md flex flex-col items-center gap-2 select-none"
     >
       <FunctionGraph
-        title="外觀補償法：左右以 y 軸為中心、上下以 x 軸為中心"
+        title="平移外觀補償法"
         titleColor="#38bdf8"
         :width="420"
-        :height="220"
+        :height="230"
         :xRange="[-3.5, 4.5]"
         :yRange="[-1, 6]"
-        :padding="{ top: 26, right: 26, bottom: 24, left: 26 }"
         :functions="[
-          { fn: (x: number) => Math.pow(2, x), color: '#64748b', strokeWidth: 1.8, dashArray: '3 3' },
-          { fn: (x: number) => Math.pow(2, x - 2), color: '#38bdf8', strokeWidth: 2.4 },
-          { fn: (x: number) => Math.pow(2, x) + 2, color: '#34d399', strokeWidth: 2.4 }
+          { fn: (x: number) => Math.pow(2, x), color: '#64748b', strokeWidth: 1.8, dashArray: '3 3', label: 'y = 2^x', description: '基準' },
+          { fn: (x: number) => Math.pow(2, x - 2), color: '#38bdf8', strokeWidth: 2.4, label: 'y = 2^{x - 2}', description: '右移 2' },
+          { fn: (x: number) => Math.pow(2, x) + 2, color: '#34d399', strokeWidth: 2.4, label: 'y = 2^x + 2', description: '上移 2' }
         ]"
         :points="[
           { x: 0, y: 1, color: '#94a3b8', label: '(0, 1)', labelPos: 'left' },
@@ -755,42 +716,6 @@ const props = defineProps<{
           >
             向上平移 2
           </text>
-
-          <!-- Baseline curve label -->
-          <text 
-            :x="toScreenX(-1.5)" 
-            :y="toScreenY(Math.pow(2, -1.5)) - 8" 
-            fill="#94a3b8" 
-            font-size="11" 
-            font-family="'KaTeX_Math', 'KaTeX_Main', serif" 
-            class="chart-halo"
-          >
-            <tspan font-style="italic">y</tspan> = 2<tspan font-style="italic" font-size="8" dy="-4">x</tspan>
-          </text>
-
-          <!-- Shifted curves labels -->
-          <text 
-            :x="toScreenX(2.8)" 
-            :y="toScreenY(Math.pow(2, 0.8)) + 4" 
-            fill="#38bdf8" 
-            font-size="11" 
-            font-weight="bold" 
-            font-family="'KaTeX_Math', 'KaTeX_Main', serif" 
-            class="chart-halo"
-          >
-            <tspan font-style="italic">y</tspan> = 2<tspan font-size="8" dy="-4"><tspan font-style="italic">x</tspan> - 2</tspan>
-          </text>
-          <text 
-            :x="toScreenX(1.4)" 
-            :y="toScreenY(Math.pow(2, 1.4) + 2) - 8" 
-            fill="#34d399" 
-            font-size="11" 
-            font-weight="bold" 
-            font-family="'KaTeX_Math', 'KaTeX_Main', serif" 
-            class="chart-halo"
-          >
-            <tspan font-style="italic">y</tspan> = 2<tspan font-style="italic" font-size="8" dy="-4">x</tspan><tspan dy="4"> + 2</tspan>
-          </text>
         </template>
       </FunctionGraph>
 
@@ -808,16 +733,15 @@ const props = defineProps<{
       class="w-full max-w-xl flex flex-col items-center gap-2 select-none"
     >
       <FunctionGraph
-        title="超越方程式圖形判定：y₁ = 2^x 與 y₂ = x + 3"
+        title="超越方程式圖形判定"
         titleColor="#38bdf8"
         :width="460"
-        :height="240"
+        :height="250"
         :xRange="[-4.2, 3.8]"
         :yRange="[-1.5, 7.5]"
-        :padding="{ top: 26, right: 30, bottom: 24, left: 30 }"
         :functions="[
-          { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.6 },
-          { fn: (x: number) => x + 3, color: '#f43f5e', strokeWidth: 2.4 }
+          { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.6, label: 'y_1 = 2^x', description: '指數曲線' },
+          { fn: (x: number) => x + 3, color: '#f43f5e', strokeWidth: 2.4, label: 'y_2 = x + 3', description: '斜率 1 直線' }
         ]"
         :points="[
           { x: -3, y: 0, color: '#f43f5e', label: '(-3, 0)', labelPos: 'bottom' },
@@ -831,35 +755,12 @@ const props = defineProps<{
         ]"
       >
         <template #default="{ toScreenX, toScreenY }">
-          <!-- Mathematical Equation Labels on Curves with Halo -->
-          <text 
-            :x="toScreenX(2.8) + 8" 
-            :y="toScreenY(Math.pow(2, 2.8))" 
-            fill="#38bdf8" 
-            font-size="12" 
-            font-weight="bold"
-            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
-            class="chart-halo"
-          >
-            <tspan font-style="italic">y</tspan><tspan font-size="8" dy="2">1</tspan><tspan dy="-2"> = 2</tspan><tspan font-style="italic" font-size="8" dy="-4">x</tspan>
-          </text>
-          <text 
-            :x="toScreenX(-1.8)" 
-            :y="toScreenY(-1.8 + 3) - 10" 
-            fill="#f43f5e" 
-            font-size="12" 
-            font-weight="bold"
-            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
-            class="chart-halo"
-          >
-            <tspan font-style="italic">y</tspan><tspan font-size="8" dy="2">2</tspan><tspan dy="-2"> = </tspan><tspan font-style="italic">x</tspan> + 3
-          </text>
           <!-- Height comparison note at x = 0 -->
           <text 
             :x="toScreenX(0) + 6" 
             :y="toScreenY(2)" 
             fill="#fbbf24" 
-            font-size="9" 
+            font-size="9.5" 
             font-family="sans-serif"
             class="chart-halo"
           >
@@ -882,17 +783,16 @@ const props = defineProps<{
       class="w-full max-w-xl flex flex-col items-center gap-2 select-none"
     >
       <FunctionGraph
-        title="由圖形判定實根區間：y₁ = 2^x 與 y₂ = x + 6"
+        title="由圖形判定實根區間"
         titleColor="#38bdf8"
         :width="460"
-        :height="240"
+        :height="250"
         :xRange="[-7.5, 5]"
         :yRange="[-1.5, 18]"
         :yStep="3"
-        :padding="{ top: 26, right: 30, bottom: 24, left: 30 }"
         :functions="[
-          { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.6 },
-          { fn: (x: number) => x + 6, color: '#f43f5e', strokeWidth: 2.4 }
+          { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.6, label: 'y_1 = 2^x', description: '指數曲線' },
+          { fn: (x: number) => x + 6, color: '#f43f5e', strokeWidth: 2.4, label: 'y_2 = x + 6', description: '斜率 1 直線' }
         ]"
         :points="[
           { x: -6, y: 0, color: '#f43f5e', label: '(-6, 0)', labelPos: 'bottom' },
@@ -907,32 +807,10 @@ const props = defineProps<{
       >
         <template #default="{ toScreenX, toScreenY }">
           <text 
-            :x="toScreenX(3.8) + 6" 
-            :y="toScreenY(Math.pow(2, 3.8))" 
-            fill="#38bdf8" 
-            font-size="12" 
-            font-weight="bold"
-            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
-            class="chart-halo"
-          >
-            <tspan font-style="italic">y</tspan><tspan font-size="8" dy="2">1</tspan><tspan dy="-2"> = 2</tspan><tspan font-style="italic" font-size="8" dy="-4">x</tspan>
-          </text>
-          <text 
-            :x="toScreenX(-3.5)" 
-            :y="toScreenY(-3.5 + 6) - 10" 
-            fill="#f43f5e" 
-            font-size="12" 
-            font-weight="bold"
-            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
-            class="chart-halo"
-          >
-            <tspan font-style="italic">y</tspan><tspan font-size="8" dy="2">2</tspan><tspan dy="-2"> = </tspan><tspan font-style="italic">x</tspan> + 6
-          </text>
-          <text 
             :x="toScreenX(0) + 6" 
             :y="toScreenY(3.5)" 
             fill="#fbbf24" 
-            font-size="9" 
+            font-size="9.5" 
             font-family="sans-serif"
             class="chart-halo"
           >
@@ -956,16 +834,15 @@ const props = defineProps<{
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
         <!-- Subpanel 1: 2^x = -x -->
         <FunctionGraph
-          title="(1) 2^x + x = 0 ⟹ 2^x = -x"
+          title="(1) 2^x = -x"
           titleColor="#38bdf8"
           :width="230"
-          :height="175"
+          :height="185"
           :xRange="[-3.5, 2.5]"
           :yRange="[-1.5, 4.5]"
-          :padding="{ top: 26, right: 18, bottom: 20, left: 20 }"
           :functions="[
-            { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.4 },
-            { fn: (x: number) => -x, color: '#f43f5e', strokeWidth: 2.2 }
+            { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.4, label: 'y_1 = 2^x' },
+            { fn: (x: number) => -x, color: '#f43f5e', strokeWidth: 2.2, label: 'y_2 = -x' }
           ]"
           :points="[
             { x: -0.641, y: 0.641, color: '#f59e0b', label: '交點A(-1,0)', labelPos: 'top-left' }
@@ -977,17 +854,16 @@ const props = defineProps<{
 
         <!-- Subpanel 2: 2^x = x^2 -->
         <FunctionGraph
-          title="(2) 2^x - x² = 0 ⟹ 2^x = x²"
+          title="(2) 2^x = x²"
           titleColor="#a78bfa"
           :width="230"
-          :height="175"
+          :height="185"
           :xRange="[-2.2, 4.5]"
           :yRange="[-1.5, 18]"
           :yStep="3"
-          :padding="{ top: 26, right: 18, bottom: 20, left: 20 }"
           :functions="[
-            { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.4 },
-            { fn: (x: number) => x * x, color: '#f59e0b', strokeWidth: 2.2 }
+            { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.4, label: 'y_1 = 2^x' },
+            { fn: (x: number) => x * x, color: '#f59e0b', strokeWidth: 2.2, label: 'y_2 = x^2' }
           ]"
           :points="[
             { x: -0.767, y: 0.588, color: '#f43f5e', label: '交點A(-1,0)', labelPos: 'top-left' },
