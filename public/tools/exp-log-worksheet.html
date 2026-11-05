@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>指數律與對數律自主訓練卷（無限隨機出題卷）- AhaZone</title>
+  
+  <!-- KaTeX for pristine math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Screen Styles */
+    body {
+      background-color: #0b0f19;
+      color: #334155;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Heiti TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Simulation of realistic A4 Paper Sheet */
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      height: 297mm;
+      max-height: 297mm;
+      padding: 11mm 14mm 9mm 14mm;
+      margin: 24px auto;
+      background: #ffffff;
+      box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      box-sizing: border-box;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    /* Print Specific Formatting */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 12mm;
+      }
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .a4-page {
+        width: 100% !important;
+        height: 280mm !important;
+        max-height: 280mm !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 2mm 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        page-break-after: always;
+        break-after: page;
+      }
+      .a4-page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+      .print-hide-answers .inline-answer {
+        display: none !important;
+      }
+      .print-hide-answers .answer-placeholder {
+        display: inline-block !important;
+      }
+    }
+
+    .dashed-divider {
+      border-right: 1.5px dashed #cbd5e1;
+    }
+
+    .katex {
+      font-size: 1.05em !important;
+    }
+
+    .editable-title:hover {
+      outline: 1.5px dashed #38bdf8;
+      border-radius: 4px;
+      cursor: text;
+    }
+
+    /* Smooth pulse transition */
+    @keyframes pulseSuccess {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    .animate-regenerate {
+      animation: pulseSuccess 0.3s ease-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased selection:bg-sky-500 selection:text-white">
+
+  <!-- Floating Control Bar (Hidden when Printing) -->
+  <header class="no-print sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 text-white px-4 py-3 shadow-xl">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand & Document Info -->
+      <div class="flex items-center gap-3">
+        <span class="p-2 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30">
+          <i data-lucide="file-code-2" class="w-5 h-5"></i>
+        </span>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold text-white tracking-wide">指數律與對數律動態出題卷</h1>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30" id="serialBadge">#EXP-0000</span>
+          </div>
+          <p class="text-xs text-slate-400">高中核心數學 ｜ 30 題標準訓練卷 ｜ 支援即時 A4 列印與答案核對</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 flex-wrap">
+        
+        <!-- Toggle Answer View -->
+        <button 
+          id="btnToggleAnswers" 
+          onclick="toggleAnswers()"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors shadow-sm"
+          title="在題目旁即時呈現答案（適合課堂投影或快速批改）"
+        >
+          <i data-lucide="eye" class="w-4 h-4 text-amber-400"></i>
+          <span id="toggleAnswerText">顯示答案</span>
+        </button>
+
+        <!-- Toggle Answer Sheet Page -->
+        <button 
+          id="btnToggleAnswerPage" 
+          onclick="toggleAnswerPage()"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors shadow-sm"
+          title="顯示/隱藏第 2 頁獨立標準解答頁"
+        >
+          <i data-lucide="file-check" class="w-4 h-4 text-emerald-400"></i>
+          <span id="toggleAnswerPageText">解答頁：開啟</span>
+        </button>
+
+        <!-- Regenerate Button -->
+        <button 
+          onclick="regenerateWorksheet()"
+          class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white shadow-md shadow-sky-950/40 transition-all active:scale-95"
+          title="按此立即重新亂數生成 30 道全新題目（快捷鍵：R）"
+        >
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          <span>重新出題 (R)</span>
+        </button>
+
+        <!-- Print PDF Button -->
+        <button 
+          onclick="triggerPrint()"
+          class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/40 transition-all active:scale-95"
+          title="以標準 A4 尺寸直接列印或另存為 PDF（快捷鍵：P）"
+        >
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>列印 / 另存 PDF (P)</span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Document View Area -->
+  <main class="py-4 px-2">
+
+    <!-- PAGE 1: 試題卷 (Test Paper) -->
+    <div id="page1" class="a4-page">
+      
+      <!-- Exam Header -->
+      <div class="border-b-2 border-slate-900 pb-2 mb-2">
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <div 
+              class="editable-title text-xs font-bold text-sky-800 tracking-wider inline-block px-1 py-0.5 rounded cursor-pointer" 
+              contenteditable="true" 
+              title="點擊可自訂抬頭（如：XX高中 數學隨堂測驗）"
+            >
+              高中數學核心素養課堂訓練卷 ｜ 單元隨堂強化
+            </div>
+            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+              指數律與對數律運算演練試卷
+            </h2>
+          </div>
+          <div class="text-right text-xs text-slate-500 font-mono">
+            <div>卷號：<span id="headerSerial" class="font-bold text-slate-800">#EXP-0000</span></div>
+            <div>時間：40 分鐘 ｜ 滿分：100 分</div>
+          </div>
+        </div>
+
+        <!-- Student Info Fields -->
+        <div class="mt-2 pt-1.5 border-t border-slate-300 flex items-center justify-between text-xs font-medium text-slate-700">
+          <div class="flex items-center gap-6">
+            <span>班級：<span class="inline-block w-20 border-b border-slate-700"></span></span>
+            <span>姓名：<span class="inline-block w-28 border-b border-slate-700"></span></span>
+            <span>座號：<span class="inline-block w-16 border-b border-slate-700"></span></span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span>日期：____ 年 ____ 月 ____ 日</span>
+            <div class="px-3 py-0.5 border border-slate-800 rounded font-bold text-slate-900 bg-slate-50">
+              得分：<span class="inline-block w-12 text-center text-sm"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="mt-1 text-[11px] text-slate-500 flex items-center justify-between">
+          <span>作答說明：全卷共 30 題，兩大題型各 15 題。第一大題請化簡為最簡整數或分數；第二大題請化為四位小數。</span>
+          <span class="text-sky-700 font-semibold">【請將最終答案整齊填寫於等號後方】</span>
+        </div>
+      </div>
+
+      <!-- Questions Grid (2 Columns: Left = 題型1, Right = 題型2) -->
+      <div class="grid grid-cols-2 gap-4 flex-1">
+        
+        <!-- Left Column: 題型一 (指數律 15 題) -->
+        <div class="dashed-divider pr-3 flex flex-col justify-between">
+          <div class="bg-sky-50 border-l-4 border-sky-600 px-2 py-1 mb-1 flex items-center justify-between rounded-r">
+            <span class="text-xs font-bold text-sky-950">一、指數律化簡與求值（共 15 題）</span>
+            <span class="text-[10px] text-sky-700">每題 3 分</span>
+          </div>
+
+          <!-- Type 1 Question List (15 items) -->
+          <div id="type1List" class="flex-1 flex flex-col justify-between text-xs">
+            <!-- Generated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Right Column: 題型二 (對數律 15 題) -->
+        <div class="pl-1 flex flex-col justify-between">
+          <div class="bg-indigo-50 border-l-4 border-indigo-600 px-2 py-1 mb-1 flex items-center justify-between rounded-r">
+            <span class="text-xs font-bold text-indigo-950">二、常用對數律化簡與求值（共 15 題）</span>
+            <span class="text-[10px] text-indigo-700">每題 3 分</span>
+          </div>
+
+          <!-- Type 2 Question List (15 items) -->
+          <div id="type2List" class="flex-1 flex flex-col justify-between text-xs">
+            <!-- Generated dynamically via JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Page 1 Footer -->
+      <div class="pt-1.5 mt-1 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-400">
+        <span>AhaZone 核心數理智能教具 ｜ 本試題卷由演算法動態亂數生成，版權所有</span>
+        <span>第 1 頁，共 <span id="totalPagesSpan">2</span> 頁</span>
+      </div>
+
+    </div>
+
+    <!-- PAGE 2: 標準解答頁 (Answer Key Sheet) -->
+    <div id="page2" class="a4-page">
+      
+      <!-- Answer Header -->
+      <div class="border-b-2 border-slate-900 pb-2 mb-2">
+        <div class="flex justify-between items-start">
+          <div>
+            <span class="text-xs font-bold text-emerald-800 tracking-wider">【教師用 ｜ 自修對卷專用】</span>
+            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+              指數律與對數律運算演練試卷【標準解答與解析】
+            </h2>
+          </div>
+          <div class="text-right text-xs text-slate-500 font-mono">
+            <div>對應卷號：<span id="answerSerial" class="font-bold text-slate-800">#EXP-0000</span></div>
+            <div>生成時間：<span id="answerTimestamp" class="font-medium text-slate-700">2026-11-05</span></div>
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">
+          ※ 題型一數值皆已化為最簡整數或真/假分數；題型二提供四位小數（依常用對數定義）及質因數對數分解式以供教學參考。
+        </p>
+      </div>
+
+      <!-- Answers Grid (Side by side comparison) -->
+      <div class="grid grid-cols-2 gap-4 flex-1">
+        
+        <!-- Type 1 Answers -->
+        <div class="dashed-divider pr-3 flex flex-col justify-between">
+          <div class="bg-emerald-50 border-l-4 border-emerald-600 px-2 py-1 mb-1.5 rounded-r flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-950">一、指數律解答（15 題）</span>
+            <span class="text-[10px] text-emerald-700 font-medium">最簡分數 / 整數</span>
+          </div>
+
+          <div id="type1AnswerList" class="flex-1 flex flex-col justify-between text-xs">
+            <!-- Generated dynamically -->
+          </div>
+        </div>
+
+        <!-- Type 2 Answers -->
+        <div class="pl-1 flex flex-col justify-between">
+          <div class="bg-emerald-50 border-l-4 border-emerald-600 px-2 py-1 mb-1.5 rounded-r flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-950">二、常用對數律解答（15 題）</span>
+            <span class="text-[10px] text-emerald-700 font-medium">小數四位 ｜ 質因數對數展開</span>
+          </div>
+
+          <div id="type2AnswerList" class="flex-1 flex flex-col justify-between text-xs">
+            <!-- Generated dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Page 2 Footer -->
+      <div class="pt-1.5 mt-1 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-400">
+        <span>AhaZone 核心數理智能教具 ｜ 考卷解答頁</span>
+        <span>第 2 頁，共 2 頁</span>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Script: Exact Excel Random Generator & Render Logic -->
+  <script>
+    // State
+    let currentQuestions = { type1: [], type2: [] };
+    let showInlineAnswers = false;
+    let showAnswerPage = true;
+
+    // Greatest Common Divisor helper
+    function gcd(a, b) {
+      a = Math.abs(a);
+      b = Math.abs(b);
+      while (b) {
+        let t = b;
+        b = a % b;
+        a = t;
+      }
+      return a;
+    }
+
+    // Random integer between min and max inclusive
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Prime factorization for numbers with factors 2, 3, 5, 7
+    function factorize(num) {
+      const factors = { 2: 0, 3: 0, 5: 0, 7: 0 };
+      let n = Math.abs(num);
+      [2, 3, 5, 7].forEach(p => {
+        while (n > 0 && n % p === 0) {
+          factors[p]++;
+          n = Math.floor(n / p);
+        }
+      });
+      return { factors, remainder: n };
+    }
+
+    /*
+     * Generate Type 1 Questions (指數律 15 題)
+     * Exact replication of Excel Sheet1 formula:
+     * - base1 in [1..3], base2 in [4..6]
+     * - D_num in [1..5]
+     * - D_den in [1..5], D_den != D_num (MOD lookup table)
+     * - sign in {1, -1}
+     * - F_num = base1 ^ D_den, F_den = base2 ^ D_den
+     * - Question: (F_num / F_den) ^ (sign * D_num / D_den) = 
+     * - Answer: (base1 / base2) ^ (sign * D_num)
+     */
+    function generateType1Questions() {
+      const list = [];
+      const lookupTable = { 0: 5, 1: 1, 2: 2, 3: 3, 4: 4 };
+
+      for (let i = 1; i <= 15; i++) {
+        const base1 = randInt(1, 3);
+        const base2 = randInt(4, 6);
+        const dNum = randInt(1, 5);
+
+        // Lookup logic guarantees dDen != dNum and dDen in [1..5]
+        const modVal = (dNum + randInt(1, 4)) % 5;
+        const dDen = lookupTable[modVal];
+
+        const sign = Math.random() > 0.5 ? 1 : -1;
+
+        const fNum = Math.pow(base1, dDen);
+        const fDen = Math.pow(base2, dDen);
+
+        // Exponent fraction simplification
+        const expG = gcd(dNum, dDen);
+        const expNum = (dNum / expG) * sign;
+        const expDen = dDen / expG;
+
+        let expLatex = '';
+        if (expDen === 1) {
+          expLatex = `${expNum}`;
+        } else {
+          if (expNum < 0) {
+            expLatex = `-\\frac{${Math.abs(expNum)}}{${expDen}}`;
+          } else {
+            expLatex = `\\frac{${expNum}}{${expDen}}`;
+          }
+        }
+
+        // Answer calculation
+        let ansNum = 0;
+        let ansDen = 0;
+        if (sign === 1) {
+          ansNum = Math.pow(base1, dNum);
+          ansDen = Math.pow(base2, dNum);
+        } else {
+          ansNum = Math.pow(base2, dNum);
+          ansDen = Math.pow(base1, dNum);
+        }
+
+        const ansG = gcd(ansNum, ansDen);
+        ansNum = ansNum / ansG;
+        ansDen = ansDen / ansG;
+
+        let ansLatex = '';
+        if (ansDen === 1) {
+          ansLatex = `${ansNum}`;
+        } else {
+          ansLatex = `\\frac{${ansNum}}{${ansDen}}`;
+        }
+
+        // Formula LaTeX
+        const questionLatex = `\\left( \\frac{${fNum}}{${fDen}} \\right)^{${expLatex}} =`;
+
+        list.push({
+          id: i,
+          fNum,
+          fDen,
+          expLatex,
+          questionLatex,
+          ansLatex,
+          ansNum,
+          ansDen
+        });
+      }
+      return list;
+    }
+
+    /*
+     * Generate Type 2 Questions (常用對數律 15 題)
+     * Exact replication of Excel Sheet1 formula:
+     * - B1, C1, D1 in [1..10], P1 = B1 * C1 * D1
+     * - B2, C2, D2 in [1..10], P2 = B2 * C2 * D2
+     * - G1 = P1 / gcd(P1, P2), G2 = P2 / gcd(P1, P2)
+     * - Question: log(G1 / G2) = 
+     * - Answer: log10(G1 / G2) formatted to 4 decimals (e.g. -1.5563)
+     */
+    function generateType2Questions() {
+      const list = [];
+      for (let i = 1; i <= 15; i++) {
+        const b1 = randInt(1, 10), c1 = randInt(1, 10), d1 = randInt(1, 10);
+        const b2 = randInt(1, 10), c2 = randInt(1, 10), d2 = randInt(1, 10);
+
+        const p1 = b1 * c1 * d1;
+        const p2 = b2 * c2 * d2;
+
+        const g = gcd(p1, p2);
+        const g1 = Math.floor(p1 / g);
+        const g2 = Math.floor(p2 / g);
+
+        let questionLatex = '';
+        if (g2 === 1) {
+          questionLatex = `\\log(${g1}) =`;
+        } else {
+          questionLatex = `\\log\\left( \\frac{${g1}}{${g2}} \\right) =`;
+        }
+
+        const logVal = Math.log10(g1 / g2);
+        const logValStr = logVal.toFixed(4);
+
+        // Prime log decomposition
+        const f1 = factorize(g1);
+        const f2 = factorize(g2);
+        const netExps = {
+          2: f1.factors[2] - f2.factors[2],
+          3: f1.factors[3] - f2.factors[3],
+          5: f1.factors[5] - f2.factors[5],
+          7: f1.factors[7] - f2.factors[7]
+        };
+
+        const terms = [];
+        [2, 3, 5, 7].forEach(p => {
+          const exp = netExps[p];
+          if (exp !== 0) {
+            let prefix = '';
+            if (terms.length > 0 && exp > 0) prefix = '+';
+            if (exp === 1) {
+              terms.push(`${prefix}\\log ${p}`);
+            } else if (exp === -1) {
+              terms.push(`-\\log ${p}`);
+            } else {
+              terms.push(`${prefix}${exp}\\log ${p}`);
+            }
+          }
+        });
+
+        const decompLatex = terms.length > 0 ? terms.join(' ') : '0';
+
+        list.push({
+          id: i,
+          g1,
+          g2,
+          questionLatex,
+          logValStr,
+          decompLatex
+        });
+      }
+      return list;
+    }
+
+    // Render Math via KaTeX safely
+    function renderMath(element, latexStr, displayMode = false) {
+      if (!window.katex) {
+        element.textContent = latexStr;
+        return;
+      }
+      try {
+        window.katex.render(latexStr, element, {
+          displayMode: displayMode,
+          throwOnError: false
+        });
+      } catch (e) {
+        element.textContent = latexStr;
+      }
+    }
+
+    // Refresh entire worksheet
+    function regenerateWorksheet() {
+      // Generate Serial
+      const now = new Date();
+      const serial = '#EXP-' + now.getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('serialBadge').textContent = serial;
+      document.getElementById('headerSerial').textContent = serial;
+      document.getElementById('answerSerial').textContent = serial;
+      document.getElementById('answerTimestamp').textContent = now.toLocaleDateString('zh-TW', {
+        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+      });
+
+      // Generate Questions
+      currentQuestions.type1 = generateType1Questions();
+      currentQuestions.type2 = generateType2Questions();
+
+      // Render Question Sheet (Page 1)
+      renderPage1();
+
+      // Render Answer Sheet (Page 2)
+      renderPage2();
+
+      // Re-initialize Lucide icons
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+
+      // Add feedback animation to page
+      const p1 = document.getElementById('page1');
+      p1.classList.remove('animate-regenerate');
+      void p1.offsetWidth; // trigger reflow
+      p1.classList.add('animate-regenerate');
+    }
+
+    function renderPage1() {
+      const t1Container = document.getElementById('type1List');
+      const t2Container = document.getElementById('type2List');
+      t1Container.innerHTML = '';
+      t2Container.innerHTML = '';
+
+      // Render Type 1 (指數律 15 題)
+      currentQuestions.type1.forEach((q, idx) => {
+        const item = document.createElement('div');
+        item.className = 'py-1 px-1 border-b border-slate-100 flex items-center justify-between min-h-[35px]';
+        
+        const leftWrap = document.createElement('div');
+        leftWrap.className = 'flex items-center gap-1.5';
+        
+        const numSpan = document.createElement('span');
+        numSpan.className = 'font-bold text-slate-400 font-mono w-6 text-right';
+        numSpan.textContent = `(${idx + 1})`;
+        
+        const mathSpan = document.createElement('span');
+        mathSpan.className = 'font-serif text-slate-900';
+        renderMath(mathSpan, q.questionLatex, false);
+        
+        leftWrap.appendChild(numSpan);
+        leftWrap.appendChild(mathSpan);
+
+        // Answer area on question sheet
+        const rightWrap = document.createElement('div');
+        rightWrap.className = 'flex items-center gap-1 text-right';
+
+        const answerSpan = document.createElement('span');
+        answerSpan.className = `inline-answer font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200 ${showInlineAnswers ? '' : 'hidden'}`;
+        renderMath(answerSpan, q.ansLatex, false);
+
+        const blankLine = document.createElement('span');
+        blankLine.className = `answer-placeholder border-b-2 border-slate-400 w-16 inline-block ${showInlineAnswers ? 'hidden' : ''}`;
+
+        rightWrap.appendChild(answerSpan);
+        rightWrap.appendChild(blankLine);
+
+        item.appendChild(leftWrap);
+        item.appendChild(rightWrap);
+        t1Container.appendChild(item);
+      });
+
+      // Render Type 2 (對數律 15 題)
+      currentQuestions.type2.forEach((q, idx) => {
+        const item = document.createElement('div');
+        item.className = 'py-1 px-1 border-b border-slate-100 flex items-center justify-between min-h-[35px]';
+
+        const leftWrap = document.createElement('div');
+        leftWrap.className = 'flex items-center gap-1.5';
+
+        const numSpan = document.createElement('span');
+        numSpan.className = 'font-bold text-slate-400 font-mono w-6 text-right';
+        numSpan.textContent = `(${idx + 1})`;
+
+        const mathSpan = document.createElement('span');
+        mathSpan.className = 'font-serif text-slate-900';
+        renderMath(mathSpan, q.questionLatex, false);
+
+        leftWrap.appendChild(numSpan);
+        leftWrap.appendChild(mathSpan);
+
+        // Answer area
+        const rightWrap = document.createElement('div');
+        rightWrap.className = 'flex items-center gap-1 text-right';
+
+        const answerSpan = document.createElement('span');
+        answerSpan.className = `inline-answer font-bold font-mono text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200 ${showInlineAnswers ? '' : 'hidden'}`;
+        answerSpan.textContent = q.logValStr;
+
+        const blankLine = document.createElement('span');
+        blankLine.className = `answer-placeholder border-b-2 border-slate-400 w-16 inline-block ${showInlineAnswers ? 'hidden' : ''}`;
+
+        rightWrap.appendChild(answerSpan);
+        rightWrap.appendChild(blankLine);
+
+        item.appendChild(leftWrap);
+        item.appendChild(rightWrap);
+        t2Container.appendChild(item);
+      });
+    }
+
+    function renderPage2() {
+      const a1Container = document.getElementById('type1AnswerList');
+      const a2Container = document.getElementById('type2AnswerList');
+      a1Container.innerHTML = '';
+      a2Container.innerHTML = '';
+
+      // Render Type 1 Answers
+      currentQuestions.type1.forEach((q, idx) => {
+        const row = document.createElement('div');
+        row.className = 'py-1 px-1.5 border-b border-slate-100 flex items-center justify-between min-h-[35px] hover:bg-slate-50 transition-colors';
+
+        const qCol = document.createElement('div');
+        qCol.className = 'flex items-center gap-1.5 text-slate-600';
+        const numSpan = document.createElement('span');
+        numSpan.className = 'font-bold text-slate-400 font-mono w-5';
+        numSpan.textContent = `${idx + 1}.`;
+        const qMath = document.createElement('span');
+        renderMath(qMath, q.questionLatex, false);
+        qCol.appendChild(numSpan);
+        qCol.appendChild(qMath);
+
+        const aCol = document.createElement('div');
+        aCol.className = 'font-bold text-emerald-800 text-right pr-2';
+        renderMath(aCol, q.ansLatex, false);
+
+        row.appendChild(qCol);
+        row.appendChild(aCol);
+        a1Container.appendChild(row);
+      });
+
+      // Render Type 2 Answers
+      currentQuestions.type2.forEach((q, idx) => {
+        const row = document.createElement('div');
+        row.className = 'py-1 px-1.5 border-b border-slate-100 flex items-center justify-between min-h-[35px] hover:bg-slate-50 transition-colors';
+
+        const qCol = document.createElement('div');
+        qCol.className = 'flex items-center gap-1.5 text-slate-600';
+        const numSpan = document.createElement('span');
+        numSpan.className = 'font-bold text-slate-400 font-mono w-5';
+        numSpan.textContent = `${idx + 1}.`;
+        const qMath = document.createElement('span');
+        renderMath(qMath, q.questionLatex, false);
+        qCol.appendChild(numSpan);
+        qCol.appendChild(qMath);
+
+        const aCol = document.createElement('div');
+        aCol.className = 'text-right flex items-center gap-2 pr-2';
+
+        // Decomposition formula
+        const decomp = document.createElement('span');
+        decomp.className = 'text-[10px] text-slate-500 hidden sm:inline-block';
+        renderMath(decomp, q.decompLatex, false);
+
+        // Decimal value
+        const valSpan = document.createElement('span');
+        valSpan.className = 'font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200';
+        valSpan.textContent = q.logValStr;
+
+        aCol.appendChild(decomp);
+        aCol.appendChild(valSpan);
+
+        row.appendChild(qCol);
+        row.appendChild(aCol);
+        a2Container.appendChild(row);
+      });
+    }
+
+    // Toggle inline answers on question paper
+    function toggleAnswers() {
+      showInlineAnswers = !showInlineAnswers;
+      document.getElementById('toggleAnswerText').textContent = showInlineAnswers ? '隱藏答案' : '顯示答案';
+      
+      const inlines = document.querySelectorAll('.inline-answer');
+      const blanks = document.querySelectorAll('.answer-placeholder');
+
+      inlines.forEach(el => {
+        if (showInlineAnswers) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+
+      blanks.forEach(el => {
+        if (showInlineAnswers) el.classList.add('hidden');
+        else el.classList.remove('hidden');
+      });
+    }
+
+    // Toggle Answer Sheet Page
+    function toggleAnswerPage() {
+      showAnswerPage = !showAnswerPage;
+      const p2 = document.getElementById('page2');
+      const textSpan = document.getElementById('toggleAnswerPageText');
+      const totalSpan = document.getElementById('totalPagesSpan');
+
+      if (showAnswerPage) {
+        p2.style.display = 'flex';
+        textSpan.textContent = '解答頁：開啟';
+        totalSpan.textContent = '2';
+      } else {
+        p2.style.display = 'none';
+        textSpan.textContent = '解答頁：關閉';
+        totalSpan.textContent = '1';
+      }
+    }
+
+    // Trigger Print
+    function triggerPrint() {
+      window.print();
+    }
+
+    // Keyboard Shortcuts (R: Regenerate, P: Print)
+    window.addEventListener('keydown', (e) => {
+      // Don't trigger if user is editing title
+      if (document.activeElement && document.activeElement.getAttribute('contenteditable') === 'true') {
+        return;
+      }
+      if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        regenerateWorksheet();
+      } else if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+        // native print is fine
+      } else if (e.key === 'p' || e.key === 'P') {
+        e.preventDefault();
+        triggerPrint();
+      }
+    });
+
+    // Initialize when KaTeX is ready
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+      
+      // Wait for KaTeX to load if needed
+      const checkKatex = setInterval(() => {
+        if (window.katex) {
+          clearInterval(checkKatex);
+          regenerateWorksheet();
+        }
+      }, 50);
+
+      // Fallback
+      setTimeout(() => {
+        clearInterval(checkKatex);
+        regenerateWorksheet();
+      }, 500);
+    });
+  </script>
+</body>
+</html>

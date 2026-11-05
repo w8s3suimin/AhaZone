@@ -28,6 +28,33 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     rating: 4.9
   },
 
+  // 2. 指數律與對數律動態隨機出題卷（無限題庫）
+  {
+    id: 'res-dynamic-exp-log-worksheet',
+    title: '指數律與對數律自動化出題訓練卷（無限隨機題庫）',
+    subtitle: '一鍵動態出題 ｜ 仿真 A4 試卷 ｜ 支援即時列印與標準答案頁',
+    description: '依據高中數學常考運算演算法，一鍵隨機生成 30 道精選指數律與常用對數律基礎運算題。具備仿真標準 A4 試卷排版，點擊重新整理即可產生全新試卷與對應解答，支援瀏覽器一鍵列印成實體紙本測驗卷。',
+    type: 'dynamic',
+    stage: 'senior',
+    grade: 's11-math',
+    gradeLabel: '高二數學',
+    subject: 'math',
+    subjectLabel: '高中數學',
+    chapter: '指數函數與對數函數',
+    tags: ['動態出題', '無限題庫', '指數律', '對數律', 'A4列印', '課堂測驗'],
+    filePath: '/tools/exp-log-worksheet.html',
+    ahaInsight: '指數律化簡「底數同次先對消、負次方倒數反轉」；對數律將真數質因數相乘拆解為對數相加減，隨心掌握精準四位小數與符號化簡！',
+    learningGoals: [
+      '熟練分數次方與負整數指數的快速化簡互換',
+      '精熟常用對數真數相乘除拆解與小數運算估計',
+      '隨機無限出題，建立學生扎實無死角的計算基本功'
+    ],
+    featured: true,
+    date: '2026-11-05',
+    downloads: 856,
+    rating: 5.0
+  },
+
   // --- 由 Python 發布器自動掛載的 Google Drive 資源 ---
   {
     "id": "res-drive-1a1a74cb443",
