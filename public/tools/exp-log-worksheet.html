@@ -65,38 +65,58 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 8mm 12mm;
+        margin: 6mm 10mm;
       }
-      body {
+      *, *::before, *::after {
+        box-sizing: border-box !important;
+      }
+      html, body {
         background: #ffffff !important;
         color: #000000 !important;
         margin: 0 !important;
         padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+      }
+      main {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        display: block !important;
       }
       .no-print {
         display: none !important;
       }
       .a4-page {
         width: 100% !important;
-        height: 280mm !important;
-        max-height: 280mm !important;
-        min-height: auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
         margin: 0 !important;
         padding: 2mm 0 !important;
         box-shadow: none !important;
         border: none !important;
-        page-break-after: always;
-        break-after: page;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        overflow: visible !important;
       }
       .a4-page:last-child {
-        page-break-after: auto;
-        break-after: auto;
+        page-break-after: auto !important;
+        break-after: auto !important;
       }
       .print-hide-answers .inline-answer {
         display: none !important;
       }
       .print-hide-answers .answer-placeholder {
         display: inline-block !important;
+      }
+      .question-row {
+        min-height: 32px !important;
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
       }
     }
 
@@ -595,7 +615,7 @@
       // Render Type 1 (指數律 15 題)
       currentQuestions.type1.forEach((q, idx) => {
         const item = document.createElement('div');
-        item.className = 'py-1 px-1 border-b border-slate-100 flex items-center justify-between min-h-[35px]';
+        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center justify-between min-h-[34px]';
         
         const leftWrap = document.createElement('div');
         leftWrap.className = 'flex items-center gap-1.5';
@@ -633,7 +653,7 @@
       // Render Type 2 (對數律 15 題)
       currentQuestions.type2.forEach((q, idx) => {
         const item = document.createElement('div');
-        item.className = 'py-1 px-1 border-b border-slate-100 flex items-center justify-between min-h-[35px]';
+        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center justify-between min-h-[34px]';
 
         const leftWrap = document.createElement('div');
         leftWrap.className = 'flex items-center gap-1.5';
@@ -675,63 +695,62 @@
       a1Container.innerHTML = '';
       a2Container.innerHTML = '';
 
-      // Render Type 1 Answers
+      // Render Type 1 Answers: directly next to equal sign!
       currentQuestions.type1.forEach((q, idx) => {
         const row = document.createElement('div');
-        row.className = 'py-1 px-1.5 border-b border-slate-100 flex items-center justify-between min-h-[35px] hover:bg-slate-50 transition-colors';
+        row.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center min-h-[34px] hover:bg-slate-50 transition-colors';
 
-        const qCol = document.createElement('div');
-        qCol.className = 'flex items-center gap-1.5 text-slate-600';
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-5';
-        numSpan.textContent = `${idx + 1}.`;
+        numSpan.className = 'font-bold text-slate-400 font-mono w-6 text-right shrink-0 mr-1';
+        numSpan.textContent = `(${idx + 1})`;
+
+        const mathWrap = document.createElement('div');
+        mathWrap.className = 'flex items-center text-slate-800';
+
         const qMath = document.createElement('span');
-        renderMath(qMath, q.questionLatex, false);
-        qCol.appendChild(numSpan);
-        qCol.appendChild(qMath);
+        renderMath(qMath, q.questionLatex, false); // Contains '=' at the end
 
-        const aCol = document.createElement('div');
-        aCol.className = 'font-bold text-emerald-800 text-right pr-2';
-        renderMath(aCol, q.ansLatex, false);
+        const aMath = document.createElement('span');
+        aMath.className = 'font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300 ml-1.5';
+        renderMath(aMath, q.ansLatex, false);
 
-        row.appendChild(qCol);
-        row.appendChild(aCol);
+        mathWrap.appendChild(qMath);
+        mathWrap.appendChild(aMath);
+
+        row.appendChild(numSpan);
+        row.appendChild(mathWrap);
         a1Container.appendChild(row);
       });
 
-      // Render Type 2 Answers
+      // Render Type 2 Answers: directly next to equal sign!
       currentQuestions.type2.forEach((q, idx) => {
         const row = document.createElement('div');
-        row.className = 'py-1 px-1.5 border-b border-slate-100 flex items-center justify-between min-h-[35px] hover:bg-slate-50 transition-colors';
+        row.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center min-h-[34px] hover:bg-slate-50 transition-colors';
 
-        const qCol = document.createElement('div');
-        qCol.className = 'flex items-center gap-1.5 text-slate-600';
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-5';
-        numSpan.textContent = `${idx + 1}.`;
+        numSpan.className = 'font-bold text-slate-400 font-mono w-6 text-right shrink-0 mr-1';
+        numSpan.textContent = `(${idx + 1})`;
+
+        const mathWrap = document.createElement('div');
+        mathWrap.className = 'flex items-center text-slate-800 flex-wrap gap-y-0.5';
+
         const qMath = document.createElement('span');
-        renderMath(qMath, q.questionLatex, false);
-        qCol.appendChild(numSpan);
-        qCol.appendChild(qMath);
+        renderMath(qMath, q.questionLatex, false); // Contains '=' at the end
 
-        const aCol = document.createElement('div');
-        aCol.className = 'text-right flex items-center gap-2 pr-2';
-
-        // Decomposition formula
-        const decomp = document.createElement('span');
-        decomp.className = 'text-[10px] text-slate-500 hidden sm:inline-block';
-        renderMath(decomp, q.decompLatex, false);
-
-        // Decimal value
         const valSpan = document.createElement('span');
-        valSpan.className = 'font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200';
+        valSpan.className = 'font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300 ml-1.5';
         valSpan.textContent = q.logValStr;
 
-        aCol.appendChild(decomp);
-        aCol.appendChild(valSpan);
+        const decompSpan = document.createElement('span');
+        decompSpan.className = 'text-[11px] text-slate-500 ml-2 hidden sm:inline-block';
+        renderMath(decompSpan, `(${q.decompLatex})`, false);
 
-        row.appendChild(qCol);
-        row.appendChild(aCol);
+        mathWrap.appendChild(qMath);
+        mathWrap.appendChild(valSpan);
+        mathWrap.appendChild(decompSpan);
+
+        row.appendChild(numSpan);
+        row.appendChild(mathWrap);
         a2Container.appendChild(row);
       });
     }
