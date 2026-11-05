@@ -592,322 +592,287 @@ const props = defineProps<{
     <!-- ========================================================================= -->
     <!-- 13. 指數函數與對數函數對稱性與凹凸性 (exp-log-symmetry) -->
     <!-- ========================================================================= -->
-    <svg 
+    <div 
       v-else-if="type === 'exp-log-symmetry'" 
-      viewBox="0 0 460 260" 
-      class="w-full max-w-xl h-auto drop-shadow-md select-none"
+      class="w-full max-w-xl flex flex-col items-center gap-2 select-none"
     >
-      <defs>
-        <marker id="arrow-axis-explog" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#64748b" />
-        </marker>
-        <marker id="arrow-jensen" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto">
-          <circle cx="2.5" cy="2.5" r="2" fill="#f43f5e" />
-        </marker>
-      </defs>
-
-      <rect width="460" height="260" rx="16" fill="#090d16" />
-
-      <!-- Coordinate Grid lines (scale: 1 unit = 36px, Origin O = (170, 170)) -->
-      <g stroke="#1e293b" stroke-width="0.8" stroke-dasharray="2 2">
-        <line x1="26" y1="26" x2="430" y2="26" />
-        <line x1="26" y1="62" x2="430" y2="62" />
-        <line x1="26" y1="98" x2="430" y2="98" />
-        <line x1="26" y1="134" x2="430" y2="134" />
-        <line x1="26" y1="170" x2="430" y2="170" />
-        <line x1="26" y1="206" x2="430" y2="206" />
-        <line x1="26" y1="242" x2="430" y2="242" />
-
-        <line x1="62" y1="15" x2="62" y2="245" />
-        <line x1="98" y1="15" x2="98" y2="245" />
-        <line x1="134" y1="15" x2="134" y2="245" />
-        <line x1="170" y1="15" x2="170" y2="245" />
-        <line x1="206" y1="15" x2="206" y2="245" />
-        <line x1="242" y1="15" x2="242" y2="245" />
-        <line x1="278" y1="15" x2="278" y2="245" />
-        <line x1="314" y1="15" x2="314" y2="245" />
-        <line x1="350" y1="15" x2="350" y2="245" />
-        <line x1="386" y1="15" x2="386" y2="245" />
-        <line x1="422" y1="15" x2="422" y2="245" />
-      </g>
-
-      <!-- Axes: Origin (170, 170) -->
-      <!-- x-axis -->
-      <line x1="26" y1="170" x2="438" y2="170" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow-axis-explog)" />
-      <text x="442" y="174" fill="#94a3b8" font-size="13" font-family="'KaTeX_Math', 'Cambria Math', 'Times New Roman', serif" font-style="italic">x</text>
-
-      <!-- y-axis -->
-      <line x1="170" y1="248" x2="170" y2="14" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow-axis-explog)" />
-      <text x="165" y="10" fill="#94a3b8" font-size="13" font-family="'KaTeX_Math', 'Cambria Math', 'Times New Roman', serif" font-style="italic">y</text>
-      <text x="156" y="184" fill="#64748b" font-size="11" font-family="'KaTeX_Main', 'Cambria Math', 'Times New Roman', serif">O</text>
-
-      <!-- Symmetry line y = x (X + Y = 340) -->
-      <line x1="88" y1="252" x2="330" y2="10" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 4" stroke-opacity="0.8" />
-      <text x="316" y="24" fill="#f59e0b" font-size="13" font-family="'KaTeX_Math', 'KaTeX_Main', 'Cambria Math', 'Times New Roman', serif">
-        <tspan font-style="italic">y</tspan><tspan font-family="'KaTeX_Main', serif"> = </tspan><tspan font-style="italic">x</tspan> <tspan font-family="sans-serif" font-size="10" fill="#fbbf24">（對稱軸）</tspan>
-      </text>
-
-      <!-- Reflection Lines connecting symmetric pairs (strictly perpendicular to y = x) -->
-      <!-- (0, 1)=(170, 134) <-> (1, 0)=(206, 170) -->
-      <line x1="170" y1="134" x2="206" y2="170" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2 2" stroke-opacity="0.6" />
-      <!-- (1, 2)=(206, 98) <-> (2, 1)=(242, 134) -->
-      <line x1="206" y1="98" x2="242" y2="134" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2 2" stroke-opacity="0.6" />
-      <!-- (2, 4)=(242, 26) <-> (4, 2)=(314, 98) -->
-      <line x1="242" y1="26" x2="314" y2="98" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2 2" stroke-opacity="0.6" />
-
-      <!-- Curve 1: y = 2^x (Mathematically exact sampled path, passing precisely through (0,1), (1,2), (2,4)) -->
-      <path 
-        d="M 33.2,167.4 L 36.8,167.2 L 40.4,167.0 L 44.0,166.8 L 47.6,166.6 L 51.2,166.3 L 54.8,166.1 L 58.4,165.8 L 62.0,165.5 L 65.6,165.2 L 69.2,164.8 L 72.8,164.5 L 76.4,164.1 L 80.0,163.6 L 83.6,163.2 L 87.2,162.7 L 90.8,162.2 L 94.4,161.6 L 98.0,161.0 L 101.6,160.4 L 105.2,159.7 L 108.8,158.9 L 112.4,158.1 L 116.0,157.3 L 119.6,156.4 L 123.2,155.4 L 126.8,154.3 L 130.4,153.2 L 134.0,152.0 L 137.6,150.7 L 141.2,149.3 L 144.8,147.8 L 148.4,146.2 L 152.0,144.5 L 155.6,142.7 L 159.2,140.8 L 162.8,138.7 L 166.4,136.4 L 170.0,134.0 L 173.6,131.4 L 177.2,128.6 L 180.8,125.7 L 184.4,122.5 L 188.0,119.1 L 191.6,115.4 L 195.2,111.5 L 198.8,107.3 L 202.4,102.8 L 206.0,98.0 L 209.6,92.8 L 213.2,87.3 L 216.8,81.4 L 220.4,75.0 L 224.0,68.2 L 227.6,60.9 L 231.2,53.0 L 234.8,44.6 L 238.4,35.6 L 242.0,26.0 L 245.6,15.7" 
-        fill="none" 
-        stroke="#38bdf8" 
-        stroke-width="2.6" 
-      />
-      <!-- KaTeX formatted formula label for y = 2^x -->
-      <g transform="translate(185, 36)">
-        <text fill="#38bdf8" font-size="14" font-family="'KaTeX_Math', 'KaTeX_Main', 'Cambria Math', 'Times New Roman', serif">
-          <tspan font-style="italic">y</tspan><tspan font-family="'KaTeX_Main', serif"> = 2</tspan><tspan font-style="italic" font-size="10" dy="-6">x</tspan>
-        </text>
-        <text x="32" y="-1" fill="#7dd3fc" font-size="9" font-family="sans-serif">凹向上（弦高於弧）</text>
-      </g>
-
-      <!-- Curve 2: y = log_2(x) (Mathematically exact sampled path, passing precisely through (1,0), (2,1), (4,2)) -->
-      <path 
-        d="M 175.9,263.6 L 176.4,260.0 L 176.8,256.4 L 177.3,252.8 L 177.8,249.2 L 178.4,245.6 L 179.0,242.0 L 179.6,238.4 L 180.3,234.8 L 181.1,231.2 L 181.9,227.6 L 182.7,224.0 L 183.6,220.4 L 184.6,216.8 L 185.7,213.2 L 186.8,209.6 L 188.0,206.0 L 189.3,202.4 L 190.7,198.8 L 192.2,195.2 L 193.8,191.6 L 195.5,188.0 L 197.3,184.4 L 199.2,180.8 L 201.3,177.2 L 203.6,173.6 L 206.0,170.0 L 208.6,166.4 L 211.4,162.8 L 214.3,159.2 L 217.5,155.6 L 220.9,152.0 L 224.6,148.4 L 228.5,144.8 L 232.7,141.2 L 237.2,137.6 L 242.0,134.0 L 247.2,130.4 L 252.7,126.8 L 258.6,123.2 L 265.0,119.6 L 271.8,116.0 L 279.1,112.4 L 287.0,108.8 L 295.4,105.2 L 304.4,101.6 L 314.0,98.0 L 324.3,94.4 L 335.4,90.8 L 347.3,87.2 L 360.0,83.6 L 373.6,80.0 L 388.3,76.4 L 403.9,72.8 L 420.7,69.2" 
-        fill="none" 
-        stroke="#34d399" 
-        stroke-width="2.6" 
-      />
-      <!-- KaTeX formatted formula label for y = log_2(x) -->
-      <g transform="translate(340, 86)">
-        <text fill="#34d399" font-size="14" font-family="'KaTeX_Math', 'KaTeX_Main', 'Cambria Math', 'Times New Roman', serif">
-          <tspan font-style="italic">y</tspan><tspan font-family="'KaTeX_Main', serif"> = log</tspan><tspan font-family="'KaTeX_Main', serif" font-size="10" dy="4">2</tspan><tspan dy="-4">&#8201;</tspan><tspan font-style="italic">x</tspan>
-        </text>
-        <text x="0" y="16" fill="#6ee7b7" font-size="9" font-family="sans-serif">凹向下（漸近線 <tspan font-family="'KaTeX_Math', serif" font-style="italic">x</tspan> = 0）</text>
-      </g>
-
-      <!-- Jensen's Inequality / Convexity Demonstration on y = 2^x -->
-      <!-- Chord from (0, 1)=(170, 134) to (2, 4)=(242, 26) -->
-      <line x1="170" y1="134" x2="242" y2="26" stroke="#f43f5e" stroke-width="1.8" stroke-dasharray="3 3" />
-      <!-- Midpoint of chord at x = 1: (206, 80), height is 2.5 -->
-      <circle cx="206" cy="80" r="3.5" fill="#f43f5e" stroke="#ffffff" stroke-width="1" />
-      <!-- Vertical indicator showing chord midpoint is higher than curve point (206, 98) (height 2) -->
-      <line x1="206" y1="80" x2="206" y2="98" stroke="#f43f5e" stroke-width="1.5" />
-      <text x="86" y="88" fill="#fda4af" font-size="9.5" font-family="sans-serif" font-weight="500">
-        弦中點 <tspan font-family="'KaTeX_Main', serif">2.5 &gt; </tspan>曲線點 <tspan font-family="'KaTeX_Main', serif">2.0</tspan>
-      </text>
-
-      <!-- Exact Key Points on y = 2^x: (0, 1), (1, 2), (2, 4) -->
-      <circle cx="170" cy="134" r="4" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
-      <text x="128" y="138" fill="#38bdf8" font-size="11" font-family="'KaTeX_Main', 'Cambria Math', 'Times New Roman', serif">(0, 1)</text>
-
-      <circle cx="206" cy="98" r="4" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
-      <text x="214" y="103" fill="#38bdf8" font-size="11" font-family="'KaTeX_Main', 'Cambria Math', 'Times New Roman', serif">(1, 2)</text>
-
-      <circle cx="242" cy="26" r="4" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
-      <text x="248" y="24" fill="#38bdf8" font-size="11" font-family="'KaTeX_Main', 'Cambria Math', 'Times New Roman', serif">(2, 4)</text>
-
-      <!-- Exact Key Points on y = log_2(x): (1, 0), (2, 1), (4, 2) -->
-      <circle cx="206" cy="170" r="4" fill="#34d399" stroke="#ffffff" stroke-width="1.5" />
-      <text x="200" y="188" fill="#34d399" font-size="11" font-family="'KaTeX_Main', 'Cambria Math', 'Times New Roman', serif">(1, 0)</text>
-
-      <circle cx="242" cy="134" r="4" fill="#34d399" stroke="#ffffff" stroke-width="1.5" />
-      <text x="248" y="146" fill="#34d399" font-size="11" font-family="'KaTeX_Main', 'Cambria Math', 'Times New Roman', serif">(2, 1)</text>
-
-      <circle cx="314" cy="98" r="4" fill="#34d399" stroke="#ffffff" stroke-width="1.5" />
-      <text x="320" y="112" fill="#34d399" font-size="11" font-family="'KaTeX_Main', 'Cambria Math', 'Times New Roman', serif">(4, 2)</text>
+      <FunctionGraph
+        title="對稱與凹凸性：y = 2^x 與 y = log₂(x) 對稱於 y = x"
+        titleColor="#f59e0b"
+        :width="460"
+        :height="260"
+        :xRange="[-3.2, 5.5]"
+        :yRange="[-2.2, 5.5]"
+        :padding="{ top: 26, right: 30, bottom: 24, left: 30 }"
+        :functions="[
+          { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.6 },
+          { fn: (x: number) => x > 0.03 ? Math.log2(x) : NaN, domain: [0.03, 5.5], color: '#34d399', strokeWidth: 2.6 },
+          { fn: (x: number) => x, color: '#f59e0b', strokeWidth: 1.5, dashArray: '4 4' }
+        ]"
+        :lines="[
+          { x1: 0, y1: 1, x2: 1, y2: 0, color: '#64748b', strokeWidth: 1, dashArray: '2 2' },
+          { x1: 1, y1: 2, x2: 2, y2: 1, color: '#64748b', strokeWidth: 1, dashArray: '2 2' },
+          { x1: 2, y1: 4, x2: 4, y2: 2, color: '#64748b', strokeWidth: 1, dashArray: '2 2' },
+          { x1: 0, y1: 1, x2: 2, y2: 4, color: '#f43f5e', strokeWidth: 1.6, dashArray: '3 3' },
+          { x1: 1, y1: 2, x2: 1, y2: 2.5, color: '#f43f5e', strokeWidth: 1.5 }
+        ]"
+        :points="[
+          { x: 0, y: 1, color: '#38bdf8', label: '(0, 1)', labelPos: 'left' },
+          { x: 1, y: 2, color: '#38bdf8', label: '(1, 2)', labelPos: 'left' },
+          { x: 2, y: 4, color: '#38bdf8', label: '(2, 4)', labelPos: 'right' },
+          { x: 1, y: 0, color: '#34d399', label: '(1, 0)', labelPos: 'bottom' },
+          { x: 2, y: 1, color: '#34d399', label: '(2, 1)', labelPos: 'bottom-right' },
+          { x: 4, y: 2, color: '#34d399', label: '(4, 2)', labelPos: 'bottom-right' },
+          { x: 1, y: 2.5, color: '#f43f5e', radius: 3.5, label: '弦中點(1, 2.5)', labelPos: 'top-left' }
+        ]"
+      >
+        <template #default="{ toScreenX, toScreenY }">
+          <!-- Curve 1 Label -->
+          <text 
+            :x="toScreenX(2.2) + 8" 
+            :y="toScreenY(4.6)" 
+            fill="#38bdf8" 
+            font-size="12" 
+            font-weight="bold"
+            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
+            class="chart-halo"
+          >
+            <tspan font-style="italic">y</tspan> = 2<tspan font-style="italic" font-size="8" dy="-4">x</tspan>
+            <tspan font-size="9" font-family="sans-serif" font-weight="normal" fill="#7dd3fc" dx="4">凹向上</tspan>
+          </text>
+          <!-- Curve 2 Label -->
+          <text 
+            :x="toScreenX(4.2)" 
+            :y="toScreenY(2.1) - 10" 
+            fill="#34d399" 
+            font-size="12" 
+            font-weight="bold"
+            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
+            class="chart-halo"
+          >
+            <tspan font-style="italic">y</tspan> = log₂<tspan font-style="italic">x</tspan>
+            <tspan font-size="9" font-family="sans-serif" font-weight="normal" fill="#6ee7b7" dx="4">凹向下</tspan>
+          </text>
+          <!-- Symmetry Axis Label -->
+          <text 
+            :x="toScreenX(3.8)" 
+            :y="toScreenY(3.8) - 8" 
+            fill="#f59e0b" 
+            font-size="11" 
+            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
+            class="chart-halo"
+          >
+            <tspan font-style="italic">y</tspan> = <tspan font-style="italic">x</tspan>（對稱軸）
+          </text>
+          <!-- Jensen Comparison note -->
+          <text 
+            :x="toScreenX(1) - 8" 
+            :y="toScreenY(2.25)" 
+            fill="#fda4af" 
+            font-size="9" 
+            font-family="sans-serif"
+            text-anchor="end"
+            class="chart-halo"
+          >
+            弦中點 2.5 > 曲線點 2.0
+          </text>
+        </template>
+      </FunctionGraph>
 
       <!-- Bottom Insight Legend -->
-      <g transform="translate(14, 222)">
-        <rect width="432" height="28" rx="8" fill="#0f172a" stroke="#1e293b" />
-        <text x="12" y="18" fill="#cbd5e1" font-size="10" font-family="sans-serif">
-          幾何核心：<tspan fill="#f59e0b" font-weight="bold">對稱於 y = x</tspan>；指數恆過 <tspan fill="#38bdf8" font-weight="bold">(0, 1)</tspan> 漸近線為 x 軸；對數恆過 <tspan fill="#34d399" font-weight="bold">(1, 0)</tspan> 漸近線為 y 軸
-        </text>
-      </g>
-    </svg>
+      <div class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-center font-sans">
+        幾何核心：<span class="text-amber-400 font-bold">對稱於 y = x</span>；指數恆過 <span class="text-sky-400 font-bold">(0, 1)</span> 漸近線為 x 軸；對數恆過 <span class="text-emerald-400 font-bold">(1, 0)</span> 漸近線為 y 軸
+      </div>
+    </div>
 
     <!-- ========================================================================= -->
     <!-- 14. 函數圖形平移與伸縮外觀補償法 (function-transformation) -->
     <!-- ========================================================================= -->
-    <svg 
+    <div 
       v-else-if="type === 'function-transformation'" 
-      viewBox="0 0 420 220" 
-      class="w-full max-w-md h-auto drop-shadow-md select-none"
+      class="w-full max-w-md flex flex-col items-center gap-2 select-none"
     >
-      <defs>
-        <marker id="arrow-shift-x" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#38bdf8" />
-        </marker>
-        <marker id="arrow-shift-y" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#34d399" />
-        </marker>
-      </defs>
+      <FunctionGraph
+        title="外觀補償法：左右以 y 軸為中心、上下以 x 軸為中心"
+        titleColor="#38bdf8"
+        :width="420"
+        :height="220"
+        :xRange="[-3.5, 4.5]"
+        :yRange="[-1, 6]"
+        :padding="{ top: 26, right: 26, bottom: 24, left: 26 }"
+        :functions="[
+          { fn: (x: number) => Math.pow(2, x), color: '#64748b', strokeWidth: 1.8, dashArray: '3 3' },
+          { fn: (x: number) => Math.pow(2, x - 2), color: '#38bdf8', strokeWidth: 2.4 },
+          { fn: (x: number) => Math.pow(2, x) + 2, color: '#34d399', strokeWidth: 2.4 }
+        ]"
+        :points="[
+          { x: 0, y: 1, color: '#94a3b8', label: '(0, 1)', labelPos: 'left' },
+          { x: 2, y: 1, color: '#38bdf8', label: '(2, 1)', labelPos: 'bottom-right' },
+          { x: 0, y: 3, color: '#34d399', label: '(0, 3)', labelPos: 'top-left' }
+        ]"
+      >
+        <template #default="{ toScreenX, toScreenY }">
+          <!-- Horizontal translation arrow from (0, 1) to (2, 1) -->
+          <line 
+            :x1="toScreenX(0) + 6" 
+            :y1="toScreenY(1)" 
+            :x2="toScreenX(2) - 8" 
+            :y2="toScreenY(1)" 
+            stroke="#38bdf8" 
+            stroke-width="1.8" 
+            marker-end="url(#arrow-axis-generic)" 
+          />
+          <text 
+            :x="toScreenX(1)" 
+            :y="toScreenY(1) - 6" 
+            fill="#38bdf8" 
+            font-size="9" 
+            text-anchor="middle" 
+            font-family="sans-serif"
+            class="chart-halo"
+          >
+            向右平移 2
+          </text>
+          
+          <!-- Vertical translation arrow from (0, 1) to (0, 3) -->
+          <line 
+            :x1="toScreenX(0)" 
+            :y1="toScreenY(1) - 6" 
+            :x2="toScreenX(0)" 
+            :y2="toScreenY(3) + 8" 
+            stroke="#34d399" 
+            stroke-width="1.8" 
+            marker-end="url(#arrow-axis-generic)" 
+          />
+          <text 
+            :x="toScreenX(0) - 8" 
+            :y="toScreenY(2)" 
+            fill="#34d399" 
+            font-size="9" 
+            text-anchor="end" 
+            font-family="sans-serif"
+            class="chart-halo"
+          >
+            向上平移 2
+          </text>
 
-      <rect width="420" height="220" rx="16" fill="#090d16" />
+          <!-- Baseline curve label -->
+          <text 
+            :x="toScreenX(-1.5)" 
+            :y="toScreenY(Math.pow(2, -1.5)) - 8" 
+            fill="#94a3b8" 
+            font-size="11" 
+            font-family="'KaTeX_Math', 'KaTeX_Main', serif" 
+            class="chart-halo"
+          >
+            <tspan font-style="italic">y</tspan> = 2<tspan font-style="italic" font-size="8" dy="-4">x</tspan>
+          </text>
 
-      <!-- Coordinate Axes: Origin (130, 150), scale = 35 -->
-      <line x1="20" y1="150" x2="395" y2="150" stroke="#475569" stroke-width="1.2" />
-      <text x="400" y="154" fill="#94a3b8" font-size="12" font-family="'KaTeX_Math', 'Cambria Math', 'Times New Roman', serif" font-style="italic">x</text>
-
-      <line x1="130" y1="195" x2="130" y2="18" stroke="#475569" stroke-width="1.2" />
-      <text x="124" y="14" fill="#94a3b8" font-size="12" font-family="'KaTeX_Math', 'Cambria Math', 'Times New Roman', serif" font-style="italic">y</text>
-
-      <!-- Baseline Curve: y = 2^x (Gray dashed, exact math path through (0, 1) = (130, 115)) -->
-      <path 
-        d="M 28.0,146.2 L 38.5,145.3 L 49.0,144.2 L 59.5,142.9 L 70.0,141.3 L 80.5,139.2 L 91.0,136.7 L 101.5,133.7 L 112.0,129.9 L 122.5,125.3 L 133.0,119.5 L 143.5,112.5 L 154.0,103.8 L 164.5,93.1 L 175.0,80.0 L 185.5,63.8 L 196.0,43.9 L 206.5,19.4" 
-        fill="none" 
-        stroke="#64748b" 
-        stroke-width="1.8" 
-        stroke-dasharray="3 3"
-      />
-      <circle cx="130" cy="115" r="3.5" fill="#94a3b8" />
-      <text x="56" y="112" fill="#94a3b8" font-size="10" font-family="'KaTeX_Math', 'KaTeX_Main', serif">
-        <tspan font-style="italic">y</tspan><tspan font-family="'KaTeX_Main', serif"> = 2</tspan><tspan font-style="italic" font-size="8" dy="-4">x</tspan>
-      </text>
-
-      <!-- Shifted Right 2 units: y = 2^{x - 2} (Sky Blue, exactly shifted +70px through (2, 1) = (200, 115)) -->
-      <path 
-        d="M 98.0,146.2 L 108.5,145.3 L 119.0,144.2 L 129.5,142.9 L 140.0,141.3 L 150.5,139.2 L 161.0,136.7 L 171.5,133.7 L 182.0,129.9 L 192.5,125.3 L 203.0,119.5 L 213.5,112.5 L 224.0,103.8 L 234.5,93.1 L 245.0,80.0 L 255.5,63.8 L 266.0,43.9 L 276.5,19.4" 
-        fill="none" 
-        stroke="#38bdf8" 
-        stroke-width="2.4" 
-      />
-      <circle cx="200" cy="115" r="4.5" fill="#38bdf8" stroke="#ffffff" stroke-width="1" />
-      <text x="206" y="112" fill="#38bdf8" font-size="11" font-family="'KaTeX_Main', serif">(2, 1)</text>
-
-      <!-- Horizontal Shift Arrow -->
-      <line x1="136" y1="115" x2="192" y2="115" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#arrow-shift-x)" />
-      <text x="138" y="105" fill="#38bdf8" font-size="8.5" font-family="sans-serif">向右平移 2</text>
-      <!-- KaTeX formula for shifted right -->
-      <g transform="translate(262, 50)">
-        <text fill="#38bdf8" font-size="13" font-family="'KaTeX_Math', 'KaTeX_Main', serif">
-          <tspan font-style="italic">y</tspan><tspan font-family="'KaTeX_Main', serif"> = 2</tspan><tspan font-size="9" dy="-5"><tspan font-style="italic">x</tspan> &#8722; 2</tspan>
-        </text>
-        <text x="0" y="14" fill="#7dd3fc" font-size="8.5" font-family="sans-serif">代入 (x &#8722; 2)</text>
-      </g>
-
-      <!-- Shifted Up 2 units: y = 2^x + 2 (Emerald Green, exactly shifted -70px through (0, 3) = (130, 45)) -->
-      <path 
-        d="M 28.0,76.2 L 38.5,75.3 L 49.0,74.2 L 59.5,72.9 L 70.0,71.3 L 80.5,69.2 L 91.0,66.7 L 101.5,63.7 L 112.0,59.9 L 122.5,55.3 L 133.0,49.5 L 143.5,42.5 L 154.0,33.8 L 164.5,23.1 L 175.0,10.0" 
-        fill="none" 
-        stroke="#34d399" 
-        stroke-width="2.4" 
-      />
-      <circle cx="130" cy="45" r="4.5" fill="#34d399" stroke="#ffffff" stroke-width="1" />
-      <text x="136" y="47" fill="#34d399" font-size="11" font-family="'KaTeX_Main', serif">(0, 3)</text>
-
-      <!-- Vertical Shift Arrow -->
-      <line x1="130" y1="108" x2="130" y2="52" stroke="#34d399" stroke-width="1.8" marker-end="url(#arrow-shift-y)" />
-      <text x="82" y="78" fill="#34d399" font-size="8.5" font-family="sans-serif">向上平移 2</text>
-      <!-- KaTeX formula for shifted up -->
-      <g transform="translate(156, 26)">
-        <text fill="#34d399" font-size="13" font-family="'KaTeX_Math', 'KaTeX_Main', serif">
-          <tspan font-style="italic">y</tspan><tspan font-family="'KaTeX_Main', serif"> = 2</tspan><tspan font-style="italic" font-size="9" dy="-5">x</tspan><tspan dy="5"> + 2</tspan>
-        </text>
-        <text x="0" y="14" fill="#6ee7b7" font-size="8.5" font-family="sans-serif">外部整體 + 2</text>
-      </g>
+          <!-- Shifted curves labels -->
+          <text 
+            :x="toScreenX(2.8)" 
+            :y="toScreenY(Math.pow(2, 0.8)) + 4" 
+            fill="#38bdf8" 
+            font-size="11" 
+            font-weight="bold" 
+            font-family="'KaTeX_Math', 'KaTeX_Main', serif" 
+            class="chart-halo"
+          >
+            <tspan font-style="italic">y</tspan> = 2<tspan font-size="8" dy="-4"><tspan font-style="italic">x</tspan> - 2</tspan>
+          </text>
+          <text 
+            :x="toScreenX(1.4)" 
+            :y="toScreenY(Math.pow(2, 1.4) + 2) - 8" 
+            fill="#34d399" 
+            font-size="11" 
+            font-weight="bold" 
+            font-family="'KaTeX_Math', 'KaTeX_Main', serif" 
+            class="chart-halo"
+          >
+            <tspan font-style="italic">y</tspan> = 2<tspan font-style="italic" font-size="8" dy="-4">x</tspan><tspan dy="4"> + 2</tspan>
+          </text>
+        </template>
+      </FunctionGraph>
 
       <!-- Bottom Rule Legend -->
-      <g transform="translate(12, 178)">
-        <rect width="396" height="30" rx="8" fill="#0f172a" stroke="#1e293b" />
-        <text x="10" y="19" fill="#cbd5e1" font-size="9.5" font-family="sans-serif">
-          外觀補償心法：<tspan fill="#38bdf8" font-weight="bold">左右平移以 y 軸為中心</tspan>內部補償；<tspan fill="#34d399" font-weight="bold">上下平移以 x 軸為中心</tspan>外部增減
-        </text>
-      </g>
-    </svg>
+      <div class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-center font-sans">
+        外觀補償心法：<span class="text-sky-400 font-bold">左右平移以 y 軸為中心</span>內部補償；<span class="text-emerald-400 font-bold">上下平移以 x 軸為中心</span>外部增減
+      </div>
+    </div>
 
     <!-- ========================================================================= -->
     <!-- 15. 超越方程式圖形交點判定 (transcendental-roots-2x) -->
     <!-- ========================================================================= -->
-    <svg 
+    <div 
       v-else-if="type === 'transcendental-roots-2x'" 
-      viewBox="0 0 460 250" 
-      class="w-full max-w-xl h-auto drop-shadow-md select-none"
+      class="w-full max-w-xl flex flex-col items-center gap-2 select-none"
     >
-      <rect width="460" height="250" rx="16" fill="#090d16" />
-
-      <!-- Coordinate Grid lines (Origin O = (180, 180), scale = 28) -->
-      <g stroke="#1e293b" stroke-width="0.8" stroke-dasharray="2 2">
-        <line x1="30" y1="40" x2="420" y2="40" />
-        <line x1="30" y1="68" x2="420" y2="68" />
-        <line x1="30" y1="96" x2="420" y2="96" />
-        <line x1="30" y1="124" x2="420" y2="124" />
-        <line x1="30" y1="152" x2="420" y2="152" />
-        <line x1="30" y1="180" x2="420" y2="180" />
-        <line x1="30" y1="208" x2="420" y2="208" />
-
-        <line x1="68" y1="20" x2="68" y2="225" />
-        <line x1="96" y1="20" x2="96" y2="225" />
-        <line x1="124" y1="20" x2="124" y2="225" />
-        <line x1="152" y1="20" x2="152" y2="225" />
-        <line x1="180" y1="20" x2="180" y2="225" />
-        <line x1="208" y1="20" x2="208" y2="225" />
-        <line x1="236" y1="20" x2="236" y2="225" />
-        <line x1="264" y1="20" x2="264" y2="225" />
-      </g>
-
-      <!-- Axes -->
-      <line x1="30" y1="180" x2="430" y2="180" stroke="#64748b" stroke-width="1.5" />
-      <text x="435" y="184" fill="#94a3b8" font-size="12" font-family="'KaTeX_Math', 'Cambria Math', 'Times New Roman', serif" font-style="italic">x</text>
-
-      <line x1="180" y1="230" x2="180" y2="16" stroke="#64748b" stroke-width="1.5" />
-      <text x="175" y="12" fill="#94a3b8" font-size="12" font-family="'KaTeX_Math', 'Cambria Math', 'Times New Roman', serif" font-style="italic">y</text>
-      <text x="168" y="194" fill="#64748b" font-size="11" font-family="'KaTeX_Main', serif">O</text>
-
-      <!-- Graph 1: Line y₂ = x + 3 (Rose Red, exact line through (-3,0)=(96,180) and (0,3)=(180,96)) -->
-      <line x1="40" y1="236" x2="265" y2="11" stroke="#f43f5e" stroke-width="2.5" />
-      <g transform="translate(230, 16)">
-        <text fill="#f43f5e" font-size="13" font-family="'KaTeX_Math', 'KaTeX_Main', serif">
-          <tspan font-style="italic">y</tspan><tspan font-size="9" dy="3">2</tspan><tspan dy="-3"> = </tspan><tspan font-style="italic">x</tspan> + 3
-        </text>
-      </g>
-      <!-- Line intercepts -->
-      <circle cx="96" cy="180" r="3.5" fill="#f43f5e" />
-      <text x="74" y="196" fill="#fda4af" font-size="10" font-family="'KaTeX_Main', serif">(-3, 0)</text>
-
-      <circle cx="180" cy="96" r="3.5" fill="#f43f5e" />
-      <text x="142" y="100" fill="#fda4af" font-size="10" font-family="'KaTeX_Main', serif">(0, 3)</text>
-
-      <!-- Graph 2: Curve y₁ = 2^x (Sky Blue, mathematically exact sampled path) -->
-      <path 
-        d="M 68.0,178.3 L 76.4,177.8 L 84.8,177.3 L 93.2,176.7 L 101.6,176.0 L 110.0,175.1 L 118.4,173.9 L 126.8,172.5 L 135.2,170.8 L 143.6,168.6 L 152.0,166.0 L 160.4,162.8 L 168.8,158.8 L 177.2,153.9 L 185.6,147.8 L 194.0,140.4 L 202.4,131.2 L 210.8,120.0 L 219.2,106.1 L 227.6,89.0 L 236.0,68.0 L 244.4,42.1 L 250.0,23.5" 
-        fill="none" 
-        stroke="#38bdf8" 
-        stroke-width="2.6" 
-      />
-      <g transform="translate(254, 42)">
-        <text fill="#38bdf8" font-size="13" font-family="'KaTeX_Math', 'KaTeX_Main', serif">
-          <tspan font-style="italic">y</tspan><tspan font-size="9" dy="3">1</tspan><tspan dy="-3"> = 2</tspan><tspan font-style="italic" font-size="9" dy="-5">x</tspan>
-        </text>
-      </g>
-      <circle cx="180" cy="152" r="3.5" fill="#38bdf8" />
-      <text x="186" y="156" fill="#38bdf8" font-size="10" font-family="'KaTeX_Main', serif">(0, 1)</text>
-
-      <!-- Height comparisons for root finding at x = 0 -->
-      <line x1="180" y1="96" x2="180" y2="152" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="2 2" />
-      <text x="185" y="128" fill="#fbbf24" font-size="8.5" font-family="sans-serif"><tspan font-family="'KaTeX_Math', serif" font-style="italic">x</tspan>=0: 直線高於指數</text>
-
-      <!-- Intersection 1: at x ≈ -2.86 -> (100.0, 176.0) (Exact intersection of y1 and y2) -->
-      <circle cx="100" cy="176" r="5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.8" />
-      <rect x="36" y="136" width="128" height="22" rx="6" fill="#78350f" fill-opacity="0.9" stroke="#f59e0b" stroke-width="1" />
-      <text x="42" y="151" fill="#fef3c7" font-size="10" font-weight="bold" font-family="sans-serif">
-        交點 1：<tspan font-family="'KaTeX_Math', serif" font-style="italic">x</tspan> &#8712; (&#8722;3, &#8722;2)
-      </text>
-
-      <!-- Intersection 2: at x ≈ 2.46 -> (248.8, 27.2) (Exact intersection of y1 and y2) -->
-      <circle cx="248.8" cy="27.2" r="5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.8" />
-      <rect x="268" y="65" width="112" height="22" rx="6" fill="#78350f" fill-opacity="0.9" stroke="#f59e0b" stroke-width="1" />
-      <text x="274" y="80" fill="#fef3c7" font-size="10" font-weight="bold" font-family="sans-serif">
-        交點 2：<tspan font-family="'KaTeX_Math', serif" font-style="italic">x</tspan> &#8712; (0, 3)
-      </text>
+      <FunctionGraph
+        title="超越方程式圖形判定：y₁ = 2^x 與 y₂ = x + 3"
+        titleColor="#38bdf8"
+        :width="460"
+        :height="240"
+        :xRange="[-4.2, 3.8]"
+        :yRange="[-1.5, 7.5]"
+        :padding="{ top: 26, right: 30, bottom: 24, left: 30 }"
+        :functions="[
+          { fn: (x: number) => Math.pow(2, x), color: '#38bdf8', strokeWidth: 2.6 },
+          { fn: (x: number) => x + 3, color: '#f43f5e', strokeWidth: 2.4 }
+        ]"
+        :points="[
+          { x: -3, y: 0, color: '#f43f5e', label: '(-3, 0)', labelPos: 'bottom' },
+          { x: 0, y: 3, color: '#f43f5e', label: '(0, 3)', labelPos: 'left' },
+          { x: 0, y: 1, color: '#38bdf8', label: '(0, 1)', labelPos: 'right' },
+          { x: -2.857, y: 0.143, color: '#f59e0b', radius: 4.5, label: '交點A(-3,-2)', labelPos: 'top-left' },
+          { x: 2.457, y: 5.457, color: '#f59e0b', radius: 4.5, label: '交點B(0,3)', labelPos: 'bottom-right' }
+        ]"
+        :lines="[
+          { x1: 0, y1: 1, x2: 0, y2: 3, color: '#f59e0b', strokeWidth: 1.2, dashArray: '2 2' }
+        ]"
+      >
+        <template #default="{ toScreenX, toScreenY }">
+          <!-- Mathematical Equation Labels on Curves with Halo -->
+          <text 
+            :x="toScreenX(2.8) + 8" 
+            :y="toScreenY(Math.pow(2, 2.8))" 
+            fill="#38bdf8" 
+            font-size="12" 
+            font-weight="bold"
+            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
+            class="chart-halo"
+          >
+            <tspan font-style="italic">y</tspan><tspan font-size="8" dy="2">1</tspan><tspan dy="-2"> = 2</tspan><tspan font-style="italic" font-size="8" dy="-4">x</tspan>
+          </text>
+          <text 
+            :x="toScreenX(-1.8)" 
+            :y="toScreenY(-1.8 + 3) - 10" 
+            fill="#f43f5e" 
+            font-size="12" 
+            font-weight="bold"
+            font-family="'KaTeX_Math', 'KaTeX_Main', serif"
+            class="chart-halo"
+          >
+            <tspan font-style="italic">y</tspan><tspan font-size="8" dy="2">2</tspan><tspan dy="-2"> = </tspan><tspan font-style="italic">x</tspan> + 3
+          </text>
+          <!-- Height comparison note at x = 0 -->
+          <text 
+            :x="toScreenX(0) + 6" 
+            :y="toScreenY(2)" 
+            fill="#fbbf24" 
+            font-size="9" 
+            font-family="sans-serif"
+            class="chart-halo"
+          >
+            x=0: 直線高於指數
+          </text>
+        </template>
+      </FunctionGraph>
 
       <!-- Bottom Insight Legend -->
-      <g transform="translate(14, 212)">
-        <rect width="432" height="28" rx="8" fill="#0f172a" stroke="#1e293b" />
-        <text x="12" y="18" fill="#cbd5e1" font-size="10" font-family="sans-serif">
-          幾何破題本質：<tspan fill="#f59e0b" font-weight="bold">方程式實根個數 ≡ 函數圖形交點個數（恰 2 個交點）</tspan>，遠方指數必反超直線！
-        </text>
-      </g>
-    </svg>
+      <div class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-center font-sans">
+        幾何破題本質：<span class="text-amber-400 font-bold">方程式實根個數 ≡ 函數圖形交點個數（恰 2 個交點）</span>，遠方指數必反超直線！
+      </div>
+    </div>
 
     <!-- ========================================================================= -->
     <!-- 16. 觀念辨析題多圖形交點分析 (transcendental-multi-roots) -->
@@ -931,7 +896,7 @@ const props = defineProps<{
             { fn: (x: number) => -x, color: '#f43f5e', strokeWidth: 2.2 }
           ]"
           :points="[
-            { x: -0.641, y: 0.641, color: '#f59e0b', label: '恰 1 交點', labelPos: 'top-left' }
+            { x: -0.641, y: 0.641, color: '#f59e0b', label: '交點A(-1,0)', labelPos: 'top-left' }
           ]"
           :badges="[
             { x: -0.5, y: -0.8, text: '恰有 1 個相異實根', color: '#e0f2fe', bgColor: '#0369a1' }
@@ -953,9 +918,9 @@ const props = defineProps<{
             { fn: (x: number) => x * x, color: '#f59e0b', strokeWidth: 2.2 }
           ]"
           :points="[
-            { x: -0.767, y: 0.588, color: '#f43f5e', label: 'x ∈ (-1, 0)', labelPos: 'top-left' },
-            { x: 2, y: 4, color: '#f43f5e', label: 'x = 2', labelPos: 'bottom-right' },
-            { x: 4, y: 16, color: '#f43f5e', label: 'x = 4', labelPos: 'top-left' }
+            { x: -0.767, y: 0.588, color: '#f43f5e', label: '交點A(-1,0)', labelPos: 'top-left' },
+            { x: 2, y: 4, color: '#f43f5e', label: '交點B(2,4)', labelPos: 'bottom-right' },
+            { x: 4, y: 16, color: '#f43f5e', label: '交點C(4,16)', labelPos: 'top-left' }
           ]"
           :badges="[
             { x: 1.15, y: -0.8, text: '共有 3 個相異實根！', color: '#ede9fe', bgColor: '#6d28d9' }
