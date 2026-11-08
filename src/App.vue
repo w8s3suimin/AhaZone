@@ -10,7 +10,7 @@ import PdfViewerModal from './components/PdfViewerModal.vue';
 import { INITIAL_RESOURCES } from './data/resources';
 import { CURRICULUM_DATA } from './data/curriculum';
 import { EducationStage, ResourceType, SubjectId, ResourceItem } from './types';
-import { Search, Filter } from 'lucide-vue-next';
+import { Search, Filter, CheckCircle2 } from 'lucide-vue-next';
 
 const resources = ref<ResourceItem[]>(INITIAL_RESOURCES);
 const stage = ref<EducationStage>('senior');
@@ -71,7 +71,7 @@ const filteredResources = computed(() => {
 
 // View mode logic:
 // If chapter is selected AND user has NOT explicitly selected a specific resourceType filter AND not searching:
-// Show Chapter Detail Workbench View (Upper: Coordinate workspace + Lower: SOP derivation & diagnostic data table).
+// Show Chapter Detail View.
 // Otherwise: Show Resource Cards Grid View.
 const isChapterDetailView = computed(() => {
   return !!selectedChapter.value && resourceType.value === 'all' && !searchQuery.value.trim();
@@ -135,7 +135,7 @@ onMounted(() => {
     resourceType.value = 'all';
     searchQuery.value = '';
   } else {
-    // 預設載入高中數學經典單元「指數函數與對數函數」，呈現函數坐標互動區與步驟解題數據表
+    // 預設載入高中數學經典單元「指數函數與對數函數」
     selectedChapter.value = '指數函數與對數函數';
     stage.value = 'senior';
   }
@@ -181,13 +181,13 @@ watch(selectedChapter, (newCh) => {
     />
 
     <!-- Main Workbench Area: 左右分欄 Workbench 佈局 -->
-    <main class="flex-1 w-full max-w-[1920px] mx-auto px-3 sm:px-6 py-4">
-      <div class="flex flex-col lg:flex-row gap-4 items-start w-full">
+    <main class="flex-1 w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <div class="flex flex-col lg:flex-row gap-5 items-start w-full">
         
         <!-- 左側 300px 知識樹階層導航 (Desktop 300px 固定寬度) -->
         <div 
           v-if="isDesktopSidebarOpen"
-          class="hidden lg:block w-[300px] shrink-0 sticky top-16"
+          class="hidden lg:block w-[300px] shrink-0 sticky top-20"
         >
           <CurriculumTree
             mode="embedded"
@@ -199,10 +199,10 @@ watch(selectedChapter, (newCh) => {
           />
         </div>
 
-        <!-- 右側 Workbench 主工作區 -->
+        <!-- 右側主工作區 -->
         <div class="flex-1 min-w-0 w-full space-y-4">
           
-          <!-- Condition A: Chapter Workbench Mode (上方：函數坐標互動區；下方：步驟解題與診斷數據表) -->
+          <!-- Condition A: Chapter Workbench Mode (五大板塊依序呈現) -->
           <ChapterDetail
             v-if="isChapterDetailView && selectedChapter"
             :chapterName="selectedChapter"
@@ -225,17 +225,17 @@ watch(selectedChapter, (newCh) => {
             />
 
             <!-- Filter Status Bar Header -->
-            <div class="flex flex-wrap items-center justify-between gap-2.5 bg-[#161b22] border border-[#30363d] px-3.5 py-2 rounded-md font-mono text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2.5 bg-[#161b22] border border-[#30363d] px-4 py-2.5 rounded-md text-xs">
               <div class="flex items-center gap-2 text-[#8b949e]">
                 <Filter class="w-3.5 h-3.5 text-amber-500" />
                 <span>
-                  MATCHED_RESOURCES: <strong class="text-amber-400 font-bold">{{ filteredResources.length }}</strong>
+                  共篩選出 <strong class="text-amber-400 font-bold font-mono">{{ filteredResources.length }}</strong> 筆資源
                 </span>
                 <span v-if="selectedChapter" class="text-[#c9d1d9]">
-                  // CHAPTER: <span class="text-amber-400">{{ selectedChapter }}</span>
+                  （單元：<span class="text-amber-400 font-semibold">{{ selectedChapter }}</span>）
                 </span>
                 <span v-if="resourceType !== 'all'" class="text-[#8b949e]">
-                  // FILTERED
+                  （型態篩選中）
                 </span>
               </div>
 
@@ -244,14 +244,14 @@ watch(selectedChapter, (newCh) => {
                 @click="resetFilters"
                 class="text-[#8b949e] hover:text-amber-400 transition-colors underline"
               >
-                CLEAR_FILTERS
+                清除所有篩選條件
               </button>
             </div>
 
-            <!-- Cards Grid (Workbench Clean Grid) -->
+            <!-- Cards Grid -->
             <div 
               v-if="filteredResources.length > 0" 
-              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5"
+              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
             >
               <ResourceCard
                 v-for="res in filteredResources"
@@ -263,17 +263,17 @@ watch(selectedChapter, (newCh) => {
             </div>
 
             <!-- Empty State -->
-            <div v-else class="bg-[#161b22] border border-dashed border-[#30363d] rounded-md p-10 text-center font-mono">
+            <div v-else class="bg-[#161b22] border border-dashed border-[#30363d] rounded-md p-10 text-center">
               <Search class="w-10 h-10 text-[#484f58] mx-auto mb-3" />
-              <h3 class="text-sm font-bold text-[#f0f6fc] mb-1">找不到符合條件的教學資源</h3>
-              <p class="text-xs text-[#8b949e] max-w-md mx-auto mb-4 font-sans">
-                可點選左側課綱知識樹瀏覽單元重點筆記，或更換關鍵字重新搜尋。
+              <h3 class="text-base font-bold text-[#f0f6fc] mb-1">找不到符合條件的教學資源</h3>
+              <p class="text-xs text-[#8b949e] max-w-md mx-auto mb-4">
+                可點選左側課綱進度地圖瀏覽單元重點筆記，或更換關鍵字重新搜尋。
               </p>
               <button
                 @click="resetFilters"
-                class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs rounded-md transition-colors"
+                class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs rounded-md transition-colors"
               >
-                RESET_ALL
+                重置篩選條件
               </button>
             </div>
 
@@ -296,18 +296,24 @@ watch(selectedChapter, (newCh) => {
       @close="isMobileDrawerOpen = false"
     />
 
-    <!-- Workbench Compact Footer -->
-    <footer class="mt-8 bg-[#161b22] border-t border-[#30363d] py-3.5 text-xs font-mono text-[#8b949e]">
-      <div class="max-w-[1920px] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span class="font-bold text-[#f0f6fc]">AhaZone</span>
-          <span>// 108 課綱中學數理解析工作台</span>
+    <!-- Footer -->
+    <footer class="mt-12 bg-[#161b22] border-t border-[#30363d] py-6">
+      <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center justify-center sm:justify-start gap-2">
+            <span class="font-extrabold text-base tracking-tight text-white">悟境</span>
+            <span class="text-slate-400 font-mono text-sm">｜ AhaZone</span>
+          </div>
+          <p class="text-xs text-[#8b949e]">
+            專為台灣國中、高中 108 課綱數理體系打造的動態直觀學習庫
+          </p>
         </div>
 
-        <div class="flex items-center gap-4 text-[11px]">
-          <span>STATUS: OPERATIONAL</span>
-          <span class="text-amber-500">ACCENT: #f59e0b</span>
-          <span>GRAPHITE: #0d1117</span>
+        <div class="flex items-center gap-4 text-xs text-[#8b949e]">
+          <span class="flex items-center gap-1.5">
+            <CheckCircle2 class="w-3.5 h-3.5 text-emerald-400" />
+            <span>108 課綱數理整合平台</span>
+          </span>
         </div>
       </div>
     </footer>

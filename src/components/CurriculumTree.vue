@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { ChevronDown, ChevronRight, RotateCcw, X, Filter, Folder, FolderOpen, Hash } from 'lucide-vue-next';
+import { ChevronDown, ChevronRight, BookOpen, RotateCcw, X, Filter, Folder, FolderOpen } from 'lucide-vue-next';
 import { CURRICULUM_DATA, ChapterItem } from '../data/curriculum';
 import { EducationStage, ResourceItem } from '../types';
 
@@ -87,13 +87,13 @@ watch(() => props.selectedChapter, (chName) => {
 const availableSubjects = computed(() => {
   if (currentStage.value === 'junior') {
     return [
-      { id: 'math' as const, name: '國中數學', code: 'J-MATH' },
-      { id: 'science' as const, name: '國中自然', code: 'J-SCI' }
+      { id: 'math' as const, name: '國中數學' },
+      { id: 'science' as const, name: '國中自然' }
     ];
   } else {
     return [
-      { id: 'math' as const, name: '高中數學', code: 'S-MATH' },
-      { id: 'physics' as const, name: '高中物理', code: 'S-PHY' }
+      { id: 'math' as const, name: '高中數學' },
+      { id: 'physics' as const, name: '高中物理' }
     ];
   }
 });
@@ -151,8 +151,8 @@ const getResourceCountForChapter = (chapterName: string) => {
       <!-- Mobile Drawer Header -->
       <div class="p-3.5 border-b border-[#30363d] flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <Hash class="w-4 h-4 text-amber-500" />
-          <span class="font-mono font-bold text-xs text-[#f0f6fc]">TREE // 知識樹導航</span>
+          <BookOpen class="w-4 h-4 text-amber-500" />
+          <span class="font-bold text-xs text-[#f0f6fc]">108 課綱進度地圖</span>
         </div>
         <button
           @click="emit('close')"
@@ -168,17 +168,17 @@ const getResourceCountForChapter = (chapterName: string) => {
         <div class="grid grid-cols-2 bg-[#0d1117] p-1 rounded-md border border-[#30363d] gap-1">
           <button
             @click="currentStage = 'junior'"
-            class="py-1 text-xs font-mono font-semibold rounded-md transition-colors"
+            class="py-1 text-xs font-semibold rounded-md transition-colors"
             :class="currentStage === 'junior' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
           >
-            國中 (JUNIOR)
+            國中
           </button>
           <button
             @click="currentStage = 'senior'"
-            class="py-1 text-xs font-mono font-semibold rounded-md transition-colors"
+            class="py-1 text-xs font-semibold rounded-md transition-colors"
             :class="currentStage === 'senior' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
           >
-            高中 (SENIOR)
+            高中
           </button>
         </div>
 
@@ -188,7 +188,7 @@ const getResourceCountForChapter = (chapterName: string) => {
             v-for="subj in availableSubjects"
             :key="subj.id"
             @click="activeSubject = subj.id"
-            class="py-1 px-2 rounded-md text-xs font-mono transition-colors text-center truncate"
+            class="py-1 px-2 rounded-md text-xs transition-colors text-center truncate"
             :class="activeSubject === subj.id 
               ? 'border border-amber-500 bg-amber-500/10 text-amber-400 font-bold' 
               : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#21262d]'"
@@ -202,16 +202,16 @@ const getResourceCountForChapter = (chapterName: string) => {
           v-if="currentStage === 'senior' && activeSubject === 'math'"
           class="px-2.5 py-1.5 bg-[#0d1117] rounded-md border border-[#30363d] flex items-center justify-between text-xs"
         >
-          <span class="text-[#8b949e] font-mono text-[11px] flex items-center gap-1">
+          <span class="text-[#8b949e] text-[11px] flex items-center gap-1">
             <Filter class="w-3 h-3 text-amber-500" />
-            TRACK:
+            分流：
           </span>
-          <div class="flex gap-1 font-mono text-[11px]">
+          <div class="flex gap-1 text-[11px]">
             <button
               v-for="t in [
-                { key: 'all', label: 'ALL' },
-                { key: 'mathA', label: '數A' },
-                { key: 'mathB', label: '數B' },
+                { key: 'all', label: '全部' },
+                { key: 'mathA', label: '數甲' },
+                { key: 'mathB', label: '數乙' },
                 { key: 'common', label: '共同' }
               ]"
               :key="t.key"
@@ -231,8 +231,8 @@ const getResourceCountForChapter = (chapterName: string) => {
             :key="grade.gradeId"
             class="space-y-1"
           >
-            <div class="text-[11px] font-mono text-[#8b949e] px-1 pt-1">
-              // {{ grade.gradeName }}
+            <div class="text-[11px] font-semibold text-[#8b949e] px-1 pt-1">
+              {{ grade.gradeName }}
             </div>
 
             <div 
@@ -242,7 +242,7 @@ const getResourceCountForChapter = (chapterName: string) => {
             >
               <button
                 @click="toggleSemester(`${grade.gradeId}-${sIdx}`)"
-                class="w-full px-2.5 py-1.5 flex items-center justify-between bg-[#161b22] hover:bg-[#21262d] transition-colors text-left font-mono"
+                class="w-full px-2.5 py-1.5 flex items-center justify-between bg-[#161b22] hover:bg-[#21262d] transition-colors text-left"
               >
                 <div class="flex items-center gap-1.5 truncate">
                   <component 
@@ -265,7 +265,7 @@ const getResourceCountForChapter = (chapterName: string) => {
                   v-for="chapter in filterChapters(sem.chapters)"
                   :key="chapter.name"
                   @click="emit('selectChapter', selectedChapter === chapter.name ? null : chapter.name); emit('close')"
-                  class="w-full text-left px-2 py-1 rounded-md text-xs flex items-center justify-between transition-colors font-mono"
+                  class="w-full text-left px-2 py-1 rounded-md text-xs flex items-center justify-between transition-colors"
                   :class="selectedChapter === chapter.name 
                     ? 'border-l-2 border-amber-500 bg-amber-500/10 text-amber-400 font-semibold pl-2' 
                     : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#161b22]'"
@@ -273,7 +273,7 @@ const getResourceCountForChapter = (chapterName: string) => {
                   <div class="flex items-center gap-1.5 truncate pr-2">
                     <span 
                       v-if="chapter.tagLabel" 
-                      class="text-[9px] px-1 py-0.2 rounded-md bg-[#161b22] border border-[#30363d] text-[#8b949e] shrink-0"
+                      class="text-[9px] px-1 py-0.2 rounded-md bg-[#161b22] border border-[#30363d] text-[#8b949e] shrink-0 font-mono"
                     >
                       {{ chapter.tagLabel }}
                     </span>
@@ -298,17 +298,16 @@ const getResourceCountForChapter = (chapterName: string) => {
 
   <!-- Case B: Desktop 300px Left Workbench Column -->
   <aside 
-    v-else
     class="w-[300px] min-w-[300px] max-w-[300px] bg-[#161b22] border border-[#30363d] rounded-md p-3.5 flex flex-col gap-3 shadow-none"
   >
     <!-- Header: Knowledge Tree Label -->
     <div class="flex items-center justify-between border-b border-[#30363d] pb-2.5">
       <div class="flex items-center gap-1.5">
-        <Hash class="w-3.5 h-3.5 text-amber-500" />
-        <span class="font-mono font-bold text-xs text-[#f0f6fc]">KNOWLEDGE_TREE</span>
+        <BookOpen class="w-3.5 h-3.5 text-amber-500" />
+        <span class="font-bold text-xs text-[#f0f6fc]">108 課綱進度地圖</span>
       </div>
       <span class="font-mono text-[10px] text-[#8b949e] px-1.5 py-0.5 rounded-md bg-[#0d1117] border border-[#30363d]">
-        108課綱
+        單元導航
       </span>
     </div>
 
@@ -316,17 +315,17 @@ const getResourceCountForChapter = (chapterName: string) => {
     <div class="grid grid-cols-2 bg-[#0d1117] p-1 rounded-md border border-[#30363d] gap-1">
       <button
         @click="currentStage = 'junior'"
-        class="py-1 text-xs font-mono font-semibold rounded-md transition-colors text-center"
+        class="py-1 text-xs font-semibold rounded-md transition-colors text-center"
         :class="currentStage === 'junior' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
       >
-        國中 (JUNIOR)
+        國中
       </button>
       <button
         @click="currentStage = 'senior'"
-        class="py-1 text-xs font-mono font-semibold rounded-md transition-colors text-center"
+        class="py-1 text-xs font-semibold rounded-md transition-colors text-center"
         :class="currentStage === 'senior' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
       >
-        高中 (SENIOR)
+        高中
       </button>
     </div>
 
@@ -336,7 +335,7 @@ const getResourceCountForChapter = (chapterName: string) => {
         v-for="subj in availableSubjects"
         :key="subj.id"
         @click="activeSubject = subj.id"
-        class="py-1 px-2 rounded-md text-xs font-mono transition-colors text-center truncate"
+        class="py-1 px-2 rounded-md text-xs transition-colors text-center truncate"
         :class="activeSubject === subj.id 
           ? 'border border-amber-500 bg-amber-500/10 text-amber-400 font-bold' 
           : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#21262d]'"
@@ -350,17 +349,17 @@ const getResourceCountForChapter = (chapterName: string) => {
       v-if="currentStage === 'senior' && activeSubject === 'math'"
       class="px-2.5 py-1.5 bg-[#0d1117] rounded-md border border-[#30363d] flex items-center justify-between text-xs"
     >
-      <span class="text-[#8b949e] font-mono text-[11px] flex items-center gap-1">
+      <span class="text-[#8b949e] text-[11px] flex items-center gap-1">
         <Filter class="w-3 h-3 text-amber-500" />
         分流：
       </span>
 
-      <div class="flex gap-1 font-mono text-[11px]">
+      <div class="flex gap-1 text-[11px]">
         <button
           v-for="t in [
             { key: 'all', label: '全部' },
-            { key: 'mathA', label: '數A' },
-            { key: 'mathB', label: '數B' },
+            { key: 'mathA', label: '數甲' },
+            { key: 'mathB', label: '數乙' },
             { key: 'common', label: '共同' }
           ]"
           :key="t.key"
@@ -376,10 +375,10 @@ const getResourceCountForChapter = (chapterName: string) => {
     <!-- Active Selected Chapter Indicator -->
     <div 
       v-if="selectedChapter"
-      class="px-2.5 py-1.5 bg-[#0d1117] border border-[#30363d] rounded-md flex items-center justify-between text-xs font-mono"
+      class="px-2.5 py-1.5 bg-[#0d1117] border border-[#30363d] rounded-md flex items-center justify-between text-xs"
     >
       <div class="truncate pr-2">
-        <span class="text-[#8b949e] text-[10px] block">ACTIVE:</span>
+        <span class="text-[#8b949e] text-[10px] block">目前閱讀單元：</span>
         <span class="font-bold text-amber-400 truncate block font-sans">{{ selectedChapter }}</span>
       </div>
       <button
@@ -399,8 +398,8 @@ const getResourceCountForChapter = (chapterName: string) => {
         class="space-y-1"
       >
         <!-- Grade Subtitle -->
-        <div class="text-[11px] font-mono text-[#8b949e] px-1 pt-1">
-          // {{ grade.gradeName }}
+        <div class="text-[11px] font-semibold text-[#8b949e] px-1 pt-1">
+          {{ grade.gradeName }}
         </div>
 
         <!-- Semesters / Volumes Accordion -->
@@ -412,7 +411,7 @@ const getResourceCountForChapter = (chapterName: string) => {
           <!-- Semester Header -->
           <button
             @click="toggleSemester(`${grade.gradeId}-${sIdx}`)"
-            class="w-full px-2.5 py-1.5 flex items-center justify-between bg-[#161b22] hover:bg-[#21262d] transition-colors text-left font-mono"
+            class="w-full px-2.5 py-1.5 flex items-center justify-between bg-[#161b22] hover:bg-[#21262d] transition-colors text-left"
           >
             <div class="flex items-center gap-1.5 truncate">
               <component 
@@ -436,7 +435,7 @@ const getResourceCountForChapter = (chapterName: string) => {
               v-for="chapter in filterChapters(sem.chapters)"
               :key="chapter.name"
               @click="emit('selectChapter', selectedChapter === chapter.name ? null : chapter.name)"
-              class="w-full text-left px-2 py-1 rounded-md text-xs flex items-center justify-between transition-colors font-mono"
+              class="w-full text-left px-2 py-1 rounded-md text-xs flex items-center justify-between transition-colors"
               :class="selectedChapter === chapter.name 
                 ? 'border-l-2 border-amber-500 bg-amber-500/10 text-amber-400 font-semibold pl-2' 
                 : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#161b22]'"
@@ -444,7 +443,7 @@ const getResourceCountForChapter = (chapterName: string) => {
               <div class="flex items-center gap-1.5 truncate pr-2">
                 <span 
                   v-if="chapter.tagLabel" 
-                  class="text-[9px] px-1 py-0.2 rounded-md bg-[#161b22] border border-[#30363d] text-[#8b949e] shrink-0"
+                  class="text-[9px] px-1 py-0.2 rounded-md bg-[#161b22] border border-[#30363d] text-[#8b949e] shrink-0 font-mono"
                 >
                   {{ chapter.tagLabel }}
                 </span>

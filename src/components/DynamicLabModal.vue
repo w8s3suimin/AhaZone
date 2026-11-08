@@ -36,7 +36,7 @@ onUnmounted(() => {
   <Teleport to="body">
     <div 
       v-if="resource"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4 font-mono"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4"
     >
     <div 
       class="w-full h-full max-w-7xl bg-[#161b22] border border-[#30363d] rounded-md overflow-hidden flex flex-col shadow-2xl"
@@ -44,34 +44,34 @@ onUnmounted(() => {
     >
       
       <!-- Top Header -->
-      <div class="px-3.5 py-2.5 bg-[#0d1117] border-b border-[#30363d] flex items-center justify-between gap-4">
+      <div class="px-4 py-3 bg-[#0d1117] border-b border-[#30363d] flex items-center justify-between gap-4">
         <div class="flex items-center gap-2.5">
-          <div class="w-7 h-7 rounded-md bg-[#161b22] border border-[#30363d] flex items-center justify-center">
-            <component :is="resource.tags.includes('3D') ? Compass : FileText" class="w-3.5 h-3.5 text-amber-500" />
+          <div class="w-8 h-8 rounded-md bg-[#161b22] border border-[#30363d] flex items-center justify-center">
+            <component :is="resource.tags.includes('3D') ? Compass : FileText" class="w-4 h-4 text-amber-500" />
           </div>
           <div>
-            <h2 class="text-xs sm:text-sm font-bold text-[#f0f6fc] flex items-center gap-2">
-              <span class="font-sans">{{ resource.title }}</span>
-              <span class="text-[10px] text-amber-400 px-1.5 py-0.2 rounded-md bg-[#161b22] border border-[#30363d]">
-                {{ resource.gradeLabel }} // {{ resource.chapter }}
+            <h2 class="text-sm sm:text-base font-bold text-[#f0f6fc] flex items-center gap-2">
+              <span>{{ resource.title }}</span>
+              <span class="text-xs text-amber-400 px-2 py-0.5 rounded-md bg-[#161b22] border border-[#30363d]">
+                {{ resource.gradeLabel }} · {{ resource.chapter }}
               </span>
             </h2>
           </div>
         </div>
 
-        <div class="flex items-center gap-1.5 text-xs">
+        <div class="flex items-center gap-2 text-xs">
           <button
             @click="showGuide = !showGuide"
-            class="px-2.5 py-1 rounded-md text-xs font-mono flex items-center gap-1.5 transition-colors border"
+            class="px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors border"
             :class="showGuide ? 'bg-amber-500 text-black font-bold border-amber-500' : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:text-[#f0f6fc]'"
           >
             <Lightbulb class="w-3.5 h-3.5" />
-            <span class="hidden sm:inline">GUIDE // 操作指引</span>
+            <span class="hidden sm:inline">觀念導引</span>
           </button>
 
           <button
             @click="iframeKey++"
-            class="p-1 rounded-md bg-[#161b22] text-[#8b949e] hover:text-amber-500 border border-[#30363d] transition-colors"
+            class="p-1.5 rounded-md bg-[#161b22] text-[#8b949e] hover:text-amber-500 border border-[#30363d] transition-colors"
             title="重新載入"
           >
             <RefreshCw class="w-3.5 h-3.5" />
@@ -81,7 +81,7 @@ onUnmounted(() => {
             :href="resource.filePath"
             target="_blank"
             rel="noopener noreferrer"
-            class="p-1 rounded-md bg-[#161b22] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] transition-colors"
+            class="p-1.5 rounded-md bg-[#161b22] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] transition-colors"
             title="在新分頁開啟"
           >
             <ExternalLink class="w-3.5 h-3.5" />
@@ -89,7 +89,7 @@ onUnmounted(() => {
 
           <button
             @click="isFullscreen = !isFullscreen"
-            class="p-1 rounded-md bg-[#161b22] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] transition-colors"
+            class="p-1.5 rounded-md bg-[#161b22] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] transition-colors"
             :title="isFullscreen ? '退出全螢幕' : '全螢幕'"
           >
             <component :is="isFullscreen ? Minimize2 : Maximize2" class="w-3.5 h-3.5" />
@@ -97,7 +97,7 @@ onUnmounted(() => {
 
           <button
             @click="emit('close')"
-            class="p-1 rounded-md bg-[#161b22] hover:bg-[#21262d] text-[#8b949e] hover:text-amber-500 border border-[#30363d] transition-colors"
+            class="p-1.5 rounded-md bg-[#161b22] hover:bg-[#21262d] text-[#8b949e] hover:text-amber-500 border border-[#30363d] transition-colors"
             title="關閉"
           >
             <X class="w-3.5 h-3.5" />
@@ -122,21 +122,21 @@ onUnmounted(() => {
         <!-- Guide Sidebar -->
         <div 
           v-if="showGuide"
-          class="w-full md:w-80 lg:w-96 bg-[#161b22] border-t md:border-t-0 md:border-l border-[#30363d] p-3.5 overflow-y-auto space-y-3 text-xs text-[#c9d1d9]"
+          class="w-full md:w-80 lg:w-96 bg-[#161b22] border-t md:border-t-0 md:border-l border-[#30363d] p-4 overflow-y-auto space-y-3.5 text-xs text-[#c9d1d9]"
         >
-          <div class="flex items-center gap-1.5 text-amber-400 font-bold text-xs border-b border-[#30363d] pb-2">
-            <Lightbulb class="w-3.5 h-3.5 text-amber-500" />
-            <span>[GUIDE // 操作與目標分析]</span>
+          <div class="flex items-center gap-2 text-amber-400 font-bold text-sm border-b border-[#30363d] pb-2">
+            <Lightbulb class="w-4 h-4 text-amber-500" />
+            <span>觀念指引</span>
           </div>
 
-          <div v-if="resource.ahaInsight" class="bg-[#0d1117] border border-[#30363d] rounded-md p-2.5 text-[#c9d1d9] leading-relaxed">
-            <div class="font-bold text-amber-400 mb-0.5">[TARGET]：</div>
-            <div class="font-sans text-[#8b949e]">{{ resource.ahaInsight }}</div>
+          <div v-if="resource.ahaInsight" class="bg-[#0d1117] border border-[#30363d] rounded-md p-3 text-[#c9d1d9] leading-relaxed">
+            <div class="font-bold text-amber-400 mb-1">探索目標：</div>
+            <div class="text-[#8b949e]">{{ resource.ahaInsight }}</div>
           </div>
 
-          <div v-if="resource.learningGoals && resource.learningGoals.length > 0" class="space-y-1.5">
-            <span class="font-bold text-[#f0f6fc] block">[KEY_TASKS]：</span>
-            <ul class="space-y-1 list-disc list-inside text-[#8b949e] font-sans">
+          <div v-if="resource.learningGoals && resource.learningGoals.length > 0" class="space-y-2">
+            <span class="font-bold text-[#f0f6fc] block">學習核心任務：</span>
+            <ul class="space-y-1 list-disc list-inside text-[#8b949e]">
               <li v-for="(goal, idx) in resource.learningGoals" :key="idx" class="leading-relaxed">
                 {{ goal }}
               </li>
@@ -144,18 +144,18 @@ onUnmounted(() => {
           </div>
 
           <!-- Operation Tips -->
-          <div v-if="resource.operationTips && resource.operationTips.length > 0" class="space-y-1.5 pt-2 border-t border-[#30363d]">
-            <span class="font-bold text-[#f0f6fc] block">[INTERACTION_TIPS]：</span>
-            <div class="space-y-1.5 text-[#8b949e]">
+          <div v-if="resource.operationTips && resource.operationTips.length > 0" class="space-y-2 pt-2 border-t border-[#30363d]">
+            <span class="font-bold text-[#f0f6fc] block">互動操作密技：</span>
+            <div class="space-y-2 text-[#8b949e]">
               <div 
                 v-for="(tip, idx) in resource.operationTips" 
                 :key="idx"
-                class="p-2 rounded-md bg-[#0d1117] border border-[#30363d]"
+                class="p-2.5 rounded-md bg-[#0d1117] border border-[#30363d]"
               >
-                <strong class="block mb-0.5 text-amber-400 font-mono">
+                <strong class="block mb-0.5 text-amber-400">
                   {{ tip.title }}
                 </strong>
-                <span class="font-sans">{{ tip.desc }}</span>
+                <span>{{ tip.desc }}</span>
               </div>
             </div>
           </div>

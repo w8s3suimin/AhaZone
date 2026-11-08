@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue';
-import { X, Download, FileText, CheckCircle, ExternalLink, Lightbulb } from 'lucide-vue-next';
+import { X, Download, FileText, CheckCircle, ExternalLink } from 'lucide-vue-next';
 import { ResourceItem } from '../types';
 
 const props = defineProps<{
@@ -60,21 +60,21 @@ const downloadUrl = computed(() => {
   <Teleport to="body">
     <div 
       v-if="resource"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4 font-mono"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4"
     >
     <div class="w-full h-full max-w-6xl bg-[#161b22] border border-[#30363d] rounded-md overflow-hidden flex flex-col shadow-2xl">
       
       <!-- Top Header -->
-      <div class="px-3.5 py-2.5 bg-[#0d1117] border-b border-[#30363d] flex items-center justify-between gap-4">
+      <div class="px-4 py-3 bg-[#0d1117] border-b border-[#30363d] flex items-center justify-between gap-4">
         <div class="flex items-center gap-2.5">
-          <div class="w-7 h-7 rounded-md bg-[#161b22] border border-[#30363d] flex items-center justify-center">
-            <FileText class="w-3.5 h-3.5 text-amber-500" />
+          <div class="w-8 h-8 rounded-md bg-[#161b22] border border-[#30363d] flex items-center justify-center">
+            <FileText class="w-4 h-4 text-amber-500" />
           </div>
           <div>
-            <h2 class="text-xs sm:text-sm font-bold text-[#f0f6fc] flex items-center gap-2">
-              <span class="font-sans">{{ resource.title }}</span>
-              <span class="text-[10px] text-[#8b949e] px-1.5 py-0.2 rounded-md bg-[#161b22] border border-[#30363d]">
-                {{ resource.gradeLabel }} // {{ resource.chapter }}
+            <h2 class="text-sm sm:text-base font-bold text-[#f0f6fc] flex items-center gap-2">
+              <span>{{ resource.title }}</span>
+              <span class="text-xs text-[#8b949e] px-2 py-0.5 rounded-md bg-[#161b22] border border-[#30363d]">
+                {{ resource.gradeLabel }} · {{ resource.chapter }}
               </span>
             </h2>
           </div>
@@ -85,7 +85,7 @@ const downloadUrl = computed(() => {
           <div v-if="resource.answerPath" class="flex bg-[#161b22] p-0.5 rounded-md border border-[#30363d]">
             <button
               @click="activeTab = 'question'"
-              class="px-2.5 py-1 rounded-md text-xs font-mono flex items-center gap-1 transition-colors"
+              class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1 transition-colors"
               :class="activeTab === 'question' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
             >
               <FileText class="w-3.5 h-3.5" />
@@ -93,7 +93,7 @@ const downloadUrl = computed(() => {
             </button>
             <button
               @click="activeTab = 'answer'"
-              class="px-2.5 py-1 rounded-md text-xs font-mono flex items-center gap-1 transition-colors"
+              class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1 transition-colors"
               :class="activeTab === 'answer' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
             >
               <CheckCircle class="w-3.5 h-3.5" />
@@ -105,11 +105,11 @@ const downloadUrl = computed(() => {
           <a
             :href="downloadUrl"
             download
-            class="px-2.5 py-1 rounded-md bg-[#0d1117] hover:bg-[#21262d] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] flex items-center gap-1.5 transition-colors"
+            class="px-2.5 py-1 rounded-md bg-[#0d1117] hover:bg-[#21262d] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] flex items-center gap-1.5 transition-colors font-semibold"
             title="下載 PDF 檔案"
           >
             <Download class="w-3.5 h-3.5 text-amber-500" />
-            <span class="hidden sm:inline">DOWNLOAD</span>
+            <span class="hidden sm:inline">下載 PDF</span>
           </a>
 
           <!-- External open -->
@@ -117,8 +117,8 @@ const downloadUrl = computed(() => {
             :href="currentPdfUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="p-1 rounded-md bg-[#0d1117] hover:bg-[#21262d] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] transition-colors"
-            title="另開全螢幕分頁"
+            class="p-1.5 rounded-md bg-[#0d1117] hover:bg-[#21262d] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] transition-colors"
+            title="在新分頁開啟"
           >
             <ExternalLink class="w-3.5 h-3.5" />
           </a>
@@ -126,7 +126,7 @@ const downloadUrl = computed(() => {
           <!-- Close -->
           <button
             @click="emit('close')"
-            class="p-1 rounded-md bg-[#0d1117] hover:bg-[#21262d] text-[#8b949e] hover:text-amber-500 border border-[#30363d] transition-colors"
+            class="p-1.5 rounded-md bg-[#0d1117] hover:bg-[#21262d] text-[#8b949e] hover:text-amber-500 border border-[#30363d] transition-colors"
             title="關閉"
           >
             <X class="w-3.5 h-3.5" />
@@ -137,10 +137,10 @@ const downloadUrl = computed(() => {
       <!-- Aha Insight Banner -->
       <div 
         v-if="resource.ahaInsight"
-        class="bg-[#0d1117] px-3.5 py-2 border-b border-[#30363d] text-xs text-[#c9d1d9] flex items-center gap-2"
+        class="bg-[#0d1117] px-4 py-2 border-b border-[#30363d] text-xs text-[#c9d1d9] flex items-center gap-2"
       >
-        <span class="text-amber-400 font-bold">[KEY_INSIGHT]：</span>
-        <span class="text-[#8b949e] font-sans truncate">{{ resource.ahaInsight }}</span>
+        <span class="text-amber-400 font-bold">訣竅 (Aha! Moment)：</span>
+        <span class="text-[#8b949e] truncate">{{ resource.ahaInsight }}</span>
       </div>
 
       <!-- PDF Embedded Viewer -->
