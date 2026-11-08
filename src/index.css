@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  /* 電腦版本（1024px 以上桌機與筆電環境）全站基準尺寸修正為 125% 舒適比例 */
+  @media (min-width: 1024px) {
+    html {
+      font-size: 125%; /* 預設 16px 放大為 20px (125%) */
+    }
+  }
+
   body {
     background-color: #0d1117;
     color: #c9d1d9;

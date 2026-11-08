@@ -265,11 +265,11 @@ const chapterResources = computed(() => {
     </div>
 
     <!-- Chapter Header Box -->
-    <div class="p-4 rounded-md bg-[#161b22] border border-[#30363d] space-y-2.5">
+    <div class="p-4 sm:p-5 rounded-md bg-[#161b22] border border-[#30363d] space-y-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <BookOpen class="w-4 h-4 text-amber-500" />
-          <h2 class="text-xl sm:text-2xl font-bold text-[#f0f6fc] tracking-tight">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#f0f6fc] tracking-tight">
             {{ chapterName }}
           </h2>
         </div>
@@ -281,7 +281,7 @@ const chapterResources = computed(() => {
       <!-- Scope notice -->
       <div 
         v-if="displayedScopeNotice"
-        class="px-3 py-2 rounded-md bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-xs leading-relaxed"
+        class="px-3.5 py-2.5 rounded-md bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-xs sm:text-sm leading-relaxed"
       >
         <span class="text-amber-500 font-bold">課綱範圍說明：</span>
         <span>{{ displayedScopeNotice }}</span>
@@ -290,7 +290,7 @@ const chapterResources = computed(() => {
       <!-- Aha! Insight Box -->
       <div 
         v-if="displayedAhaInsight"
-        class="px-3.5 py-2.5 rounded-md bg-[#0d1117] border border-amber-500/40 text-[#c9d1d9] text-xs leading-relaxed flex items-start gap-2"
+        class="px-4 py-3 rounded-md bg-[#0d1117] border border-amber-500/40 text-[#c9d1d9] text-xs sm:text-sm leading-relaxed flex items-start gap-2.5"
       >
         <Lightbulb class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
         <div>
@@ -303,11 +303,11 @@ const chapterResources = computed(() => {
     <!-- ========================================================================= -->
     <!-- 第一大板塊：重點整理 (Core Concepts & Formulas) -->
     <!-- ========================================================================= -->
-    <section class="rounded-md bg-[#161b22] border border-[#30363d] p-4 space-y-3.5">
-      <div class="flex items-center justify-between border-b border-[#30363d] pb-2.5">
+    <section class="rounded-md bg-[#161b22] border border-[#30363d] p-4 sm:p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
         <div class="flex items-center gap-2">
           <Sparkles class="w-4 h-4 text-amber-500" />
-          <h3 class="font-bold text-sm text-amber-400">
+          <h3 class="font-bold text-base text-amber-400">
             核心觀念與公式精要
           </h3>
         </div>
@@ -317,33 +317,33 @@ const chapterResources = computed(() => {
       </div>
 
       <!-- 由上而下單欄排列 -->
-      <div class="space-y-3.5">
+      <div class="space-y-4">
         <div 
           v-for="(concept, idx) in displayedConcepts" 
           :key="idx"
-          class="rounded-md bg-[#0d1117] border border-[#30363d] p-4 space-y-3"
+          class="rounded-md bg-[#0d1117] border border-[#30363d] p-4 sm:p-5 space-y-3"
         >
           <!-- 概念標題與標籤 -->
           <div class="flex items-center justify-between gap-2 border-b border-[#30363d] pb-2">
-            <h4 class="text-sm font-bold text-[#f0f6fc] flex items-center gap-2">
-              <span class="w-1.5 h-1.5 rounded-sm bg-amber-500"></span>
+            <h4 class="text-sm sm:text-base font-bold text-[#f0f6fc] flex items-center gap-2">
+              <span class="w-2 h-2 rounded-sm bg-amber-500"></span>
               <span>{{ concept.title }}</span>
             </h4>
             <span 
               v-if="concept.track === 'mathA'"
-              class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#161b22] text-amber-400 border border-amber-500/40 shrink-0"
+              class="px-2 py-0.5 rounded-md text-xs font-semibold bg-[#161b22] text-amber-400 border border-amber-500/40 shrink-0"
             >
               數A專屬
             </span>
             <span 
               v-else-if="concept.track === 'mathB'"
-              class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#161b22] text-amber-400 border border-amber-500/40 shrink-0"
+              class="px-2 py-0.5 rounded-md text-xs font-semibold bg-[#161b22] text-amber-400 border border-amber-500/40 shrink-0"
             >
               數B專屬
             </span>
             <span 
               v-else-if="concept.track === 'common'"
-              class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#161b22] text-[#8b949e] border border-[#30363d] shrink-0"
+              class="px-2 py-0.5 rounded-md text-xs font-semibold bg-[#161b22] text-[#8b949e] border border-[#30363d] shrink-0"
             >
               共同核心
             </span>
@@ -382,7 +382,7 @@ const chapterResources = computed(() => {
                   {{ renderFormulaItem(fItem).label }}
                 </span>
                 <span 
-                  class="text-[#f0f6fc] select-all font-sans text-xs sm:text-sm"
+                  class="text-[#f0f6fc] select-all font-sans text-sm sm:text-base leading-none py-0.5"
                   v-html="renderFormulaItem(fItem).mathHtml"
                 />
                 <span 
@@ -426,7 +426,7 @@ const chapterResources = computed(() => {
                   {{ renderFormulaItem(fItem).label }}
                 </span>
                 <span 
-                  class="text-[#f0f6fc] select-all font-sans text-xs sm:text-sm"
+                  class="text-[#f0f6fc] select-all font-sans text-sm sm:text-base leading-none py-0.5"
                   v-html="renderFormulaItem(fItem).mathHtml"
                 />
                 <span 
@@ -454,7 +454,7 @@ const chapterResources = computed(() => {
                   {{ renderFormulaItem(fItem).label }}
                 </span>
                 <span 
-                  class="text-[#f0f6fc] select-all font-sans text-xs sm:text-sm"
+                  class="text-[#f0f6fc] select-all font-sans text-sm sm:text-base leading-none py-0.5"
                   v-html="renderFormulaItem(fItem).mathHtml"
                 />
                 <span 
@@ -473,11 +473,11 @@ const chapterResources = computed(() => {
     <!-- ========================================================================= -->
     <!-- 第二大板塊：經典範例 (Problem Solving Mindset & Integrated Examples) -->
     <!-- ========================================================================= -->
-    <section v-if="displayedSopModules && displayedSopModules.length > 0" class="rounded-md bg-[#161b22] border border-[#30363d] p-4 space-y-3.5">
-      <div class="flex items-center justify-between border-b border-[#30363d] pb-2.5">
+    <section v-if="displayedSopModules && displayedSopModules.length > 0" class="rounded-md bg-[#161b22] border border-[#30363d] p-4 sm:p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
         <div class="flex items-center gap-2">
           <Compass class="w-4 h-4 text-amber-500" />
-          <h3 class="font-bold text-sm text-amber-400">
+          <h3 class="font-bold text-base text-amber-400">
             經典題型與破題核心
           </h3>
         </div>
@@ -493,23 +493,23 @@ const chapterResources = computed(() => {
         </div>
       </div>
 
-      <div class="space-y-3.5">
+      <div class="space-y-4">
         <div 
           v-for="(mod, mIdx) in displayedSopModules"
           :key="mIdx"
-          class="rounded-md bg-[#0d1117] border border-[#30363d] p-4 space-y-3"
+          class="rounded-md bg-[#0d1117] border border-[#30363d] p-4 sm:p-5 space-y-3.5"
         >
           <!-- 模組標題 -->
           <div class="flex items-center justify-between gap-2 border-b border-[#30363d] pb-2">
             <div class="flex items-center gap-2">
-              <span class="w-1.5 h-1.5 rounded-sm bg-amber-500"></span>
-              <h4 class="text-sm font-bold text-[#f0f6fc]">
+              <span class="w-2 h-2 rounded-sm bg-amber-500"></span>
+              <h4 class="text-sm sm:text-base font-extrabold text-amber-200">
                 {{ mod.moduleName }}
               </h4>
             </div>
             <span 
               v-if="mod.track"
-              class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#161b22] text-[#8b949e] border border-[#30363d]"
+              class="px-2 py-0.5 rounded-md text-xs font-semibold bg-[#161b22] text-[#8b949e] border border-[#30363d]"
             >
               {{ mod.track === 'mathA' ? '數A專屬' : mod.track === 'mathB' ? '數B專屬' : '共同核心' }}
             </span>
@@ -518,7 +518,7 @@ const chapterResources = computed(() => {
           <!-- 先有題目：具體範例題目置頂 -->
           <div 
             v-if="mod.question"
-            class="p-3.5 rounded-md bg-[#161b22] border border-[#30363d] text-xs sm:text-sm text-[#f0f6fc] leading-relaxed"
+            class="p-3.5 sm:p-4 rounded-md bg-[#161b22] border border-[#30363d] text-xs sm:text-sm text-[#f0f6fc] leading-relaxed"
           >
             <span v-html="renderRichMathText(mod.question)"></span>
           </div>
@@ -536,14 +536,14 @@ const chapterResources = computed(() => {
           <button 
             type="button"
             @click="toggleSopSteps(mIdx)"
-            class="w-full flex items-center justify-between px-3.5 py-2 rounded-md bg-[#161b22] border border-[#30363d] hover:border-amber-500/50 transition-colors text-xs cursor-pointer"
+            class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-md bg-[#161b22] border border-[#30363d] hover:border-amber-500/50 transition-colors text-xs sm:text-sm cursor-pointer"
           >
             <span class="flex items-center gap-2 text-amber-400 font-semibold">
-              <Target class="w-3.5 h-3.5" />
+              <Target class="w-4 h-4" />
               <span>{{ openSopSteps[mIdx] ? '收合步驟解析與圖形' : '展開步驟解析與圖形' }}</span>
-              <span class="text-[#8b949e] font-normal">（共 {{ mod.steps.length }} 步{{ mod.diagramType ? '，含圖形判定' : '' }}）</span>
+              <span class="text-xs text-[#8b949e] font-normal">（共 {{ mod.steps.length }} 步{{ mod.diagramType ? '，含圖形判定' : '' }}）</span>
             </span>
-            <component :is="openSopSteps[mIdx] ? ChevronUp : ChevronDown" class="w-3.5 h-3.5 text-[#8b949e]" />
+            <component :is="openSopSteps[mIdx] ? ChevronUp : ChevronDown" class="w-4 h-4 text-[#8b949e]" />
           </button>
 
           <!-- 折疊區域：圖形視覺化 + 步驟 1, 2, 3 垂直單欄排列（由上而下） + 結論答案 -->
@@ -561,10 +561,10 @@ const chapterResources = computed(() => {
               <div 
                 v-for="(step, sIdx) in mod.steps"
                 :key="sIdx"
-                class="p-3.5 rounded-md bg-[#161b22] border border-[#30363d] space-y-2"
+                class="p-3.5 sm:p-4 rounded-md bg-[#161b22] border border-[#30363d] space-y-2"
               >
-                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 font-bold text-xs border border-amber-500/30">
-                  <Target class="w-3 h-3 text-amber-400 shrink-0" />
+                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 font-bold text-xs sm:text-sm border border-amber-500/30">
+                  <Target class="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span v-html="renderRichMathText(step.label)"></span>
                 </div>
                 <div class="text-xs sm:text-sm text-[#c9d1d9] pl-3 border-l-2 border-[#30363d] leading-relaxed whitespace-pre-line" v-html="renderRichMathText(step.text)"></div>
@@ -574,12 +574,12 @@ const chapterResources = computed(() => {
             <!-- 結論答案 -->
             <div 
               v-if="mod.answer"
-              class="px-3.5 py-2.5 rounded-md bg-[#161b22] border border-amber-500/40 text-xs sm:text-sm text-[#f0f6fc] flex items-center gap-2"
+              class="px-3.5 py-2.5 rounded-md bg-[#161b22] border border-amber-500/40 text-xs sm:text-sm text-[#f0f6fc] flex flex-wrap items-center gap-2"
             >
-              <span class="px-2 py-0.5 rounded-md bg-amber-500 text-black font-bold text-xs">
+              <span class="px-2 py-0.5 rounded-md bg-amber-500 text-black font-bold text-xs sm:text-sm">
                 結論答案
               </span>
-              <span class="text-amber-300 font-sans" v-html="renderRichMathText(mod.answer)"></span>
+              <span class="text-amber-300 font-sans text-sm sm:text-base" v-html="renderRichMathText(mod.answer)"></span>
             </div>
           </div>
 
@@ -590,11 +590,11 @@ const chapterResources = computed(() => {
     <!-- ========================================================================= -->
     <!-- 第三大板塊：常見迷思 (Common Pitfalls & Misconceptions) -->
     <!-- ========================================================================= -->
-    <section v-if="displayedPitfalls && displayedPitfalls.length > 0" class="rounded-md bg-[#161b22] border border-[#30363d] p-4 space-y-3">
-      <div class="flex items-center justify-between border-b border-[#30363d] pb-2.5">
+    <section v-if="displayedPitfalls && displayedPitfalls.length > 0" class="rounded-md bg-[#161b22] border border-[#30363d] p-4 sm:p-5 space-y-3.5">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
         <div class="flex items-center gap-2">
           <AlertTriangle class="w-4 h-4 text-amber-500" />
-          <h3 class="font-bold text-sm text-amber-400">
+          <h3 class="font-bold text-base text-amber-400">
             常見解題盲點與避坑提醒
           </h3>
         </div>
@@ -607,7 +607,7 @@ const chapterResources = computed(() => {
         <div 
           v-for="(pitfall, idx) in displayedPitfalls" 
           :key="idx"
-          class="p-3.5 rounded-md bg-[#0d1117] border border-[#30363d] text-xs sm:text-sm text-[#c9d1d9] flex items-start gap-3"
+          class="p-3.5 sm:p-4 rounded-md bg-[#0d1117] border border-[#30363d] text-xs sm:text-sm text-[#c9d1d9] flex items-start gap-3"
         >
           <span class="w-5 h-5 rounded-md bg-[#161b22] border border-[#30363d] text-amber-400 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 font-mono">
             {{ idx + 1 }}
@@ -620,11 +620,11 @@ const chapterResources = computed(() => {
     <!-- ========================================================================= -->
     <!-- 第四大板塊：課後練習 (Practice Quiz Questions) -->
     <!-- ========================================================================= -->
-    <section v-if="displayedQuizQuestions && displayedQuizQuestions.length > 0" class="rounded-md bg-[#161b22] border border-[#30363d] p-4 space-y-3.5">
-      <div class="flex items-center justify-between border-b border-[#30363d] pb-2.5">
+    <section v-if="displayedQuizQuestions && displayedQuizQuestions.length > 0" class="rounded-md bg-[#161b22] border border-[#30363d] p-4 sm:p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
         <div class="flex items-center gap-2">
           <HelpCircle class="w-4 h-4 text-amber-500" />
-          <h3 class="font-bold text-sm text-amber-400">
+          <h3 class="font-bold text-base text-amber-400">
             自我挑戰
           </h3>
         </div>
@@ -633,17 +633,17 @@ const chapterResources = computed(() => {
         </span>
       </div>
 
-      <div class="grid grid-cols-1 gap-3">
+      <div class="grid grid-cols-1 gap-3.5">
         <div 
           v-for="(q, qIdx) in displayedQuizQuestions"
           :key="qIdx"
-          class="rounded-md bg-[#0d1117] border border-[#30363d] p-4 space-y-3"
+          class="rounded-md bg-[#0d1117] border border-[#30363d] p-4 sm:p-5 space-y-3"
         >
           <div class="flex items-center gap-2">
             <span class="px-2 py-0.5 rounded-md bg-[#161b22] text-amber-400 border border-[#30363d] text-xs font-bold">
               第 {{ q.questionNumber || qIdx + 1 }} 題
             </span>
-            <h4 class="text-sm font-bold text-[#f0f6fc]">
+            <h4 class="text-sm sm:text-base font-bold text-[#f0f6fc]">
               {{ q.title }}
             </h4>
           </div>
@@ -653,7 +653,7 @@ const chapterResources = computed(() => {
           <div v-if="q.hint">
             <button
               @click="toggleHint(qIdx)"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors bg-[#161b22] hover:bg-[#21262d] text-amber-400 border border-[#30363d]"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold transition-colors bg-[#161b22] hover:bg-[#21262d] text-amber-400 border border-[#30363d]"
             >
               <span>{{ openHints[qIdx] ? '收起思考提示' : '查看思考提示' }}</span>
               <component :is="openHints[qIdx] ? ChevronUp : ChevronDown" class="w-3.5 h-3.5" />
@@ -661,7 +661,7 @@ const chapterResources = computed(() => {
 
             <div 
               v-if="openHints[qIdx]"
-              class="mt-2.5 p-3.5 rounded-md bg-[#161b22] border border-amber-500/40 text-xs sm:text-sm text-[#c9d1d9] leading-relaxed whitespace-pre-line space-y-3"
+              class="mt-2.5 p-3.5 sm:p-4 rounded-md bg-[#161b22] border border-amber-500/40 text-xs sm:text-sm text-[#c9d1d9] leading-relaxed whitespace-pre-line space-y-3"
             >
               <div v-html="renderRichMathText(q.hint)"></div>
               <div 
@@ -679,11 +679,11 @@ const chapterResources = computed(() => {
     <!-- ========================================================================= -->
     <!-- 第五大板塊：單元資源 (Attached Resources) -->
     <!-- ========================================================================= -->
-    <section class="rounded-md bg-[#161b22] border border-[#30363d] p-4 space-y-3.5">
-      <div class="flex items-center justify-between border-b border-[#30363d] pb-2.5">
+    <section class="rounded-md bg-[#161b22] border border-[#30363d] p-4 sm:p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
         <div class="flex items-center gap-2">
           <FileText class="w-4 h-4 text-amber-500" />
-          <h3 class="font-bold text-sm text-amber-400">
+          <h3 class="font-bold text-base text-amber-400">
             本單元實戰補充資源
           </h3>
         </div>
