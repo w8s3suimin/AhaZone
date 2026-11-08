@@ -60,41 +60,41 @@ const downloadUrl = computed(() => {
   <Teleport to="body">
     <div 
       v-if="resource"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-200"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4 font-mono"
     >
-    <div class="w-full h-full max-w-6xl bg-slate-900 border border-slate-700/80 rounded-2xl overflow-hidden flex flex-col shadow-2xl">
+    <div class="w-full h-full max-w-6xl bg-[#161b22] border border-[#30363d] rounded-md overflow-hidden flex flex-col shadow-2xl">
       
       <!-- Top Header -->
-      <div class="px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center">
-            <FileText class="w-4 h-4 text-amber-400" />
+      <div class="px-3.5 py-2.5 bg-[#0d1117] border-b border-[#30363d] flex items-center justify-between gap-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-md bg-[#161b22] border border-[#30363d] flex items-center justify-center">
+            <FileText class="w-3.5 h-3.5 text-amber-500" />
           </div>
           <div>
-            <h2 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
-              <span>{{ resource.title }}</span>
-              <span class="text-xs font-normal text-slate-400 px-2 py-0.5 rounded bg-slate-800 border border-slate-700">
-                {{ resource.gradeLabel }} · {{ resource.chapter }}
+            <h2 class="text-xs sm:text-sm font-bold text-[#f0f6fc] flex items-center gap-2">
+              <span class="font-sans">{{ resource.title }}</span>
+              <span class="text-[10px] text-[#8b949e] px-1.5 py-0.2 rounded-md bg-[#161b22] border border-[#30363d]">
+                {{ resource.gradeLabel }} // {{ resource.chapter }}
               </span>
             </h2>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 text-xs">
           <!-- Question / Answer Tab Switcher -->
-          <div v-if="resource.answerPath" class="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
+          <div v-if="resource.answerPath" class="flex bg-[#161b22] p-0.5 rounded-md border border-[#30363d]">
             <button
               @click="activeTab = 'question'"
-              class="px-3 py-1 rounded text-xs font-semibold flex items-center gap-1.5 transition-colors"
-              :class="activeTab === 'question' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
+              class="px-2.5 py-1 rounded-md text-xs font-mono flex items-center gap-1 transition-colors"
+              :class="activeTab === 'question' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
             >
               <FileText class="w-3.5 h-3.5" />
               <span>題目卷</span>
             </button>
             <button
               @click="activeTab = 'answer'"
-              class="px-3 py-1 rounded text-xs font-semibold flex items-center gap-1.5 transition-colors"
-              :class="activeTab === 'answer' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
+              class="px-2.5 py-1 rounded-md text-xs font-mono flex items-center gap-1 transition-colors"
+              :class="activeTab === 'answer' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
             >
               <CheckCircle class="w-3.5 h-3.5" />
               <span>詳解卷</span>
@@ -105,53 +105,55 @@ const downloadUrl = computed(() => {
           <a
             :href="downloadUrl"
             download
-            class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-colors"
+            class="px-2.5 py-1 rounded-md bg-[#0d1117] hover:bg-[#21262d] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] flex items-center gap-1.5 transition-colors"
+            title="下載 PDF 檔案"
           >
-            <Download class="w-3.5 h-3.5 text-sky-400" />
-            <span class="hidden sm:inline">下載 PDF</span>
+            <Download class="w-3.5 h-3.5 text-amber-500" />
+            <span class="hidden sm:inline">DOWNLOAD</span>
           </a>
 
-          <!-- Open in new tab -->
+          <!-- External open -->
           <a
-            :href="downloadUrl"
+            :href="currentPdfUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition-colors"
-            title="在新分頁開啟"
+            class="p-1 rounded-md bg-[#0d1117] hover:bg-[#21262d] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] transition-colors"
+            title="另開全螢幕分頁"
           >
-            <ExternalLink class="w-4 h-4" />
+            <ExternalLink class="w-3.5 h-3.5" />
           </a>
 
-          <!-- Close Button -->
+          <!-- Close -->
           <button
             @click="emit('close')"
-            class="p-1.5 rounded-lg bg-rose-950/50 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-800 transition-colors"
+            class="p-1 rounded-md bg-[#0d1117] hover:bg-[#21262d] text-[#8b949e] hover:text-amber-500 border border-[#30363d] transition-colors"
             title="關閉"
           >
-            <X class="w-4 h-4" />
+            <X class="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      <!-- Aha Callout Ribbon -->
+      <!-- Aha Insight Banner -->
       <div 
         v-if="resource.ahaInsight"
-        class="px-4 py-2 bg-amber-950/30 border-b border-amber-900/40 text-amber-200 text-xs flex items-center gap-2"
+        class="bg-[#0d1117] px-3.5 py-2 border-b border-[#30363d] text-xs text-[#c9d1d9] flex items-center gap-2"
       >
-        <Lightbulb class="w-4 h-4 text-amber-400 shrink-0" />
-        <div class="truncate">
-          <span class="font-bold text-amber-300">解題心法：</span>
-          <span>{{ resource.ahaInsight }}</span>
-        </div>
+        <span class="text-amber-400 font-bold">[KEY_INSIGHT]：</span>
+        <span class="text-[#8b949e] font-sans truncate">{{ resource.ahaInsight }}</span>
       </div>
 
-      <!-- PDF Viewer Body -->
-      <div class="flex-1 w-full bg-slate-950 relative">
+      <!-- PDF Embedded Viewer -->
+      <div class="flex-1 w-full h-full bg-[#0d1117] relative">
         <iframe
+          v-if="currentPdfUrl"
           :src="iframeSrc"
           :title="resource.title"
           class="w-full h-full border-0"
         />
+        <div v-else class="flex items-center justify-center h-full text-xs text-[#8b949e]">
+          無法載入 PDF 檔案路徑
+        </div>
       </div>
 
     </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { ChevronDown, ChevronRight, BookOpen, Atom, Calculator, RotateCcw, X, Filter, Calendar } from 'lucide-vue-next';
+import { ChevronDown, ChevronRight, RotateCcw, X, Filter, Folder, FolderOpen, Hash } from 'lucide-vue-next';
 import { CURRICULUM_DATA, ChapterItem } from '../data/curriculum';
 import { EducationStage, ResourceItem } from '../types';
 
@@ -60,7 +60,7 @@ const toggleSemester = (key: string) => {
   expandedSemesters.value[key] = !expandedSemesters.value[key];
 };
 
-// 當外部傳入或網址載入 selectedChapter 時，自動切換該章節的學科並展開對應學期
+// When selectedChapter changes externally, auto expand relevant semester and switch subject
 watch(() => props.selectedChapter, (chName) => {
   if (!chName) return;
   const cleanName = chName.toLowerCase().replace(/\[.*?\]/g, '').trim();
@@ -87,13 +87,13 @@ watch(() => props.selectedChapter, (chName) => {
 const availableSubjects = computed(() => {
   if (currentStage.value === 'junior') {
     return [
-      { id: 'math' as const, name: '國中數學', icon: Calculator },
-      { id: 'science' as const, name: '國中自然', icon: Atom }
+      { id: 'math' as const, name: '國中數學', code: 'J-MATH' },
+      { id: 'science' as const, name: '國中自然', code: 'J-SCI' }
     ];
   } else {
     return [
-      { id: 'math' as const, name: '高中數學', icon: Calculator },
-      { id: 'physics' as const, name: '高中物理', icon: Atom }
+      { id: 'math' as const, name: '高中數學', code: 'S-MATH' },
+      { id: 'physics' as const, name: '高中物理', code: 'S-PHY' }
     ];
   }
 });
@@ -103,14 +103,13 @@ const currentSubjectCurriculum = computed(() => {
   return CURRICULUM_DATA.find(s => s.stage === currentStage.value && s.id === activeSubject.value) || CURRICULUM_DATA[0];
 });
 
-// Filter chapters by math track (僅在高三選修數甲/數乙處進行分流篩選，高一與高二共同課程完整保留)
+// Filter chapters by math track
 const filterChapters = (chapters: ChapterItem[]) => {
   if (currentStage.value !== 'senior' || activeSubject.value !== 'math' || mathTrackFilter.value === 'all') {
     return chapters;
   }
 
   return chapters.filter(c => {
-    // 高一、高二等無分流標記之單元恆常顯示
     if (!c.mathTrack || c.mathTrack === 'none') {
       return true;
     }
@@ -137,275 +136,239 @@ const getResourceCountForChapter = (chapterName: string) => {
 </script>
 
 <template>
-  <!-- ================= Case A: Mobile Slide-over Drawer (Slide in from the RIGHT) ================= -->
+  <!-- Case A: Mobile Slide-over Drawer (Slide in from the LEFT) -->
   <div v-if="mode === 'drawer'">
-    <!-- Backdrop overlay -->
     <div 
       v-if="isOpen"
       @click="emit('close')"
-      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
+      class="fixed inset-0 bg-black/75 z-40 transition-opacity"
     />
 
-    <!-- Slide-over Drawer (Right side) -->
     <aside 
-      class="fixed top-0 right-0 bottom-0 z-50 w-full max-w-sm sm:max-w-md bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out"
-      :class="isOpen ? 'translate-x-0' : 'translate-x-full'"
+      class="fixed top-0 left-0 bottom-0 w-[300px] bg-[#161b22] border-r border-[#30363d] z-50 flex flex-col transition-transform duration-200"
+      :class="isOpen ? 'translate-x-0' : '-translate-x-full'"
     >
-      <!-- Header with Stage Tabs on the Right -->
-      <div class="p-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-2">
+      <!-- Mobile Drawer Header -->
+      <div class="p-3.5 border-b border-[#30363d] flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <BookOpen class="w-4 h-4 text-sky-400" />
-          <h2 class="font-bold text-sm text-slate-100">108 課綱進度地圖</h2>
+          <Hash class="w-4 h-4 text-amber-500" />
+          <span class="font-mono font-bold text-xs text-[#f0f6fc]">TREE // 知識樹導航</span>
         </div>
-
-        <div class="flex items-center gap-2">
-          <!-- Stage Switcher: 國中 vs 高中 -->
-          <div class="flex bg-slate-900 p-0.5 rounded-lg border border-slate-800">
-            <button
-              @click="currentStage = 'junior'"
-              class="px-2.5 py-1 text-xs font-semibold rounded transition-all"
-              :class="currentStage === 'junior' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
-            >
-              國中
-            </button>
-            <button
-              @click="currentStage = 'senior'"
-              class="px-2.5 py-1 text-xs font-semibold rounded transition-all"
-              :class="currentStage === 'senior' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
-            >
-              高中
-            </button>
-          </div>
-
-          <button
-            @click="emit('close')"
-            class="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white transition-colors"
-          >
-            <X class="w-4 h-4" />
-          </button>
-        </div>
+        <button
+          @click="emit('close')"
+          class="w-7 h-7 flex items-center justify-center rounded-md bg-[#0d1117] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d]"
+        >
+          <X class="w-4 h-4" />
+        </button>
       </div>
 
-      <!-- Subject Segmented Buttons -->
-      <div class="px-3.5 py-2.5 bg-slate-950/70 border-b border-slate-800/80 flex items-center gap-2">
-        <span class="text-slate-400 text-xs font-semibold shrink-0">科目：</span>
-        <div class="grid grid-cols-2 gap-1.5 flex-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+      <!-- Drawer Content: Shared Tree Body -->
+      <div class="flex-1 overflow-y-auto p-3.5 space-y-3">
+        <!-- Stage Switcher -->
+        <div class="grid grid-cols-2 bg-[#0d1117] p-1 rounded-md border border-[#30363d] gap-1">
+          <button
+            @click="currentStage = 'junior'"
+            class="py-1 text-xs font-mono font-semibold rounded-md transition-colors"
+            :class="currentStage === 'junior' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
+          >
+            國中 (JUNIOR)
+          </button>
+          <button
+            @click="currentStage = 'senior'"
+            class="py-1 text-xs font-mono font-semibold rounded-md transition-colors"
+            :class="currentStage === 'senior' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
+          >
+            高中 (SENIOR)
+          </button>
+        </div>
+
+        <!-- Subject Switcher -->
+        <div class="grid grid-cols-2 gap-1 bg-[#0d1117] p-1 rounded-md border border-[#30363d]">
           <button
             v-for="subj in availableSubjects"
             :key="subj.id"
             @click="activeSubject = subj.id"
-            class="py-1 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
-            :class="activeSubject === subj.id ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
+            class="py-1 px-2 rounded-md text-xs font-mono transition-colors text-center truncate"
+            :class="activeSubject === subj.id 
+              ? 'border border-amber-500 bg-amber-500/10 text-amber-400 font-bold' 
+              : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#21262d]'"
           >
-            <component :is="subj.icon" class="w-3.5 h-3.5" />
-            <span>{{ subj.name }}</span>
+            {{ subj.name }}
           </button>
         </div>
-      </div>
 
-      <!-- Math Track Filter (Only in Senior Math) -->
-      <div 
-        v-if="currentStage === 'senior' && activeSubject === 'math'"
-        class="px-3.5 py-2 bg-slate-950/40 border-b border-slate-800 flex items-center justify-between text-xs"
-      >
-        <span class="text-slate-400 font-semibold text-[11px] flex items-center gap-1">
-          <Filter class="w-3 h-3 text-sky-400" />
-          數學分流：
-        </span>
-        <div class="flex bg-slate-900 p-0.5 rounded-md border border-slate-800">
-          <button
-            @click="mathTrackFilter = 'all'"
-            class="px-2 py-0.5 rounded text-[11px] font-medium"
-            :class="mathTrackFilter === 'all' ? 'bg-slate-700 text-white' : 'text-slate-400'"
-          >
-            全部
-          </button>
-          <button
-            @click="mathTrackFilter = 'mathA'"
-            class="px-2 py-0.5 rounded text-[11px] font-medium"
-            :class="mathTrackFilter === 'mathA' ? 'bg-indigo-600 text-white' : 'text-slate-400'"
-          >
-            數甲
-          </button>
-          <button
-            @click="mathTrackFilter = 'mathB'"
-            class="px-2 py-0.5 rounded text-[11px] font-medium"
-            :class="mathTrackFilter === 'mathB' ? 'bg-amber-600 text-white' : 'text-slate-400'"
-          >
-            數乙
-          </button>
-          <button
-            @click="mathTrackFilter = 'common'"
-            class="px-2 py-0.5 rounded text-[11px] font-medium"
-            :class="mathTrackFilter === 'common' ? 'bg-emerald-600 text-white' : 'text-slate-400'"
-          >
-            共同
-          </button>
-        </div>
-      </div>
-
-      <!-- Chapter Tree List Organized by Semester & Progression -->
-      <div class="flex-1 overflow-y-auto p-3.5 space-y-3">
+        <!-- Math Track Filter (High School Math) -->
         <div 
-          v-for="grade in currentSubjectCurriculum.grades" 
-          :key="grade.gradeId"
-          class="space-y-2"
+          v-if="currentStage === 'senior' && activeSubject === 'math'"
+          class="px-2.5 py-1.5 bg-[#0d1117] rounded-md border border-[#30363d] flex items-center justify-between text-xs"
         >
-          <!-- Grade Label -->
-          <div class="text-[11px] font-extrabold text-slate-400 tracking-wider uppercase px-1 pt-1 flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-            <span>{{ grade.gradeName }}</span>
-          </div>
-
-          <!-- Semesters / Volumes Accordion -->
-          <div 
-            v-for="(sem, sIdx) in grade.semesters" 
-            :key="sIdx"
-            class="border border-slate-800/80 rounded-xl overflow-hidden bg-slate-950/40"
-          >
+          <span class="text-[#8b949e] font-mono text-[11px] flex items-center gap-1">
+            <Filter class="w-3 h-3 text-amber-500" />
+            TRACK:
+          </span>
+          <div class="flex gap-1 font-mono text-[11px]">
             <button
-              @click="toggleSemester(`${grade.gradeId}-${sIdx}`)"
-              class="w-full px-3 py-2 flex items-center justify-between bg-slate-900/80 text-left hover:bg-slate-850 transition-colors"
+              v-for="t in [
+                { key: 'all', label: 'ALL' },
+                { key: 'mathA', label: '數A' },
+                { key: 'mathB', label: '數B' },
+                { key: 'common', label: '共同' }
+              ]"
+              :key="t.key"
+              @click="mathTrackFilter = (t.key as any)"
+              class="px-1.5 py-0.5 rounded-md transition-colors"
+              :class="mathTrackFilter === t.key ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
             >
-              <div class="flex items-center gap-2">
-                <Calendar class="w-3.5 h-3.5 text-slate-400" />
-                <span class="font-bold text-xs text-slate-200">{{ sem.name }}</span>
-              </div>
-              <component 
-                :is="expandedSemesters[`${grade.gradeId}-${sIdx}`] ? ChevronDown : ChevronRight" 
-                class="w-3.5 h-3.5 text-slate-400" 
-              />
+              {{ t.label }}
             </button>
+          </div>
+        </div>
 
-            <!-- Chapters list -->
+        <!-- Tree Accordions -->
+        <div class="space-y-2.5">
+          <div 
+            v-for="grade in currentSubjectCurriculum.grades" 
+            :key="grade.gradeId"
+            class="space-y-1"
+          >
+            <div class="text-[11px] font-mono text-[#8b949e] px-1 pt-1">
+              // {{ grade.gradeName }}
+            </div>
+
             <div 
-              v-if="expandedSemesters[`${grade.gradeId}-${sIdx}`]"
-              class="p-2 space-y-1 bg-slate-950/60 border-t border-slate-900"
+              v-for="(sem, sIdx) in grade.semesters" 
+              :key="sIdx"
+              class="border border-[#30363d] rounded-md overflow-hidden bg-[#0d1117]"
             >
               <button
-                v-for="chapter in filterChapters(sem.chapters)"
-                :key="chapter.name"
-                @click="emit('selectChapter', selectedChapter === chapter.name ? null : chapter.name); emit('close');"
-                class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-all"
-                :class="selectedChapter === chapter.name 
-                  ? 'bg-sky-600/30 text-sky-200 font-semibold border border-sky-500/50' 
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'"
+                @click="toggleSemester(`${grade.gradeId}-${sIdx}`)"
+                class="w-full px-2.5 py-1.5 flex items-center justify-between bg-[#161b22] hover:bg-[#21262d] transition-colors text-left font-mono"
               >
-                <div class="flex items-center gap-1.5 truncate pr-2">
-                  <span 
-                    v-if="chapter.tagLabel" 
-                    class="text-[9px] px-1 py-0.2 rounded font-bold shrink-0"
-                    :class="chapter.mathTrack === 'mathA' 
-                      ? 'bg-indigo-950 text-indigo-300 border border-indigo-800' 
-                      : chapter.mathTrack === 'mathB' 
-                      ? 'bg-amber-950 text-amber-300 border border-amber-800' 
-                      : 'bg-emerald-950 text-emerald-300 border border-emerald-800'"
-                  >
-                    {{ chapter.tagLabel }}
-                  </span>
-                  <span class="truncate">{{ chapter.name }}</span>
+                <div class="flex items-center gap-1.5 truncate">
+                  <component 
+                    :is="expandedSemesters[`${grade.gradeId}-${sIdx}`] ? FolderOpen : Folder" 
+                    class="w-3.5 h-3.5 text-amber-500 shrink-0" 
+                  />
+                  <span class="text-xs text-[#f0f6fc] truncate">{{ sem.name }}</span>
                 </div>
-
-                <span 
-                  v-if="getResourceCountForChapter(chapter.name) > 0"
-                  class="px-1.5 py-0.2 rounded-full text-[10px] font-bold shrink-0"
-                  :class="selectedChapter === chapter.name ? 'bg-sky-500 text-white' : 'bg-slate-800 text-slate-300 border border-slate-700'"
-                >
-                  {{ getResourceCountForChapter(chapter.name) }}
-                </span>
+                <component 
+                  :is="expandedSemesters[`${grade.gradeId}-${sIdx}`] ? ChevronDown : ChevronRight" 
+                  class="w-3.5 h-3.5 text-[#8b949e] shrink-0" 
+                />
               </button>
+
+              <div 
+                v-if="expandedSemesters[`${grade.gradeId}-${sIdx}`]"
+                class="p-1 space-y-0.5 bg-[#0d1117] border-t border-[#30363d]"
+              >
+                <button
+                  v-for="chapter in filterChapters(sem.chapters)"
+                  :key="chapter.name"
+                  @click="emit('selectChapter', selectedChapter === chapter.name ? null : chapter.name); emit('close')"
+                  class="w-full text-left px-2 py-1 rounded-md text-xs flex items-center justify-between transition-colors font-mono"
+                  :class="selectedChapter === chapter.name 
+                    ? 'border-l-2 border-amber-500 bg-amber-500/10 text-amber-400 font-semibold pl-2' 
+                    : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#161b22]'"
+                >
+                  <div class="flex items-center gap-1.5 truncate pr-2">
+                    <span 
+                      v-if="chapter.tagLabel" 
+                      class="text-[9px] px-1 py-0.2 rounded-md bg-[#161b22] border border-[#30363d] text-[#8b949e] shrink-0"
+                    >
+                      {{ chapter.tagLabel }}
+                    </span>
+                    <span class="truncate font-sans">{{ chapter.name }}</span>
+                  </div>
+                  <span 
+                    v-if="getResourceCountForChapter(chapter.name) > 0"
+                    class="px-1.5 py-0.2 rounded-md text-[10px] font-mono shrink-0"
+                    :class="selectedChapter === chapter.name ? 'bg-amber-500 text-black font-bold' : 'bg-[#161b22] text-[#8b949e] border border-[#30363d]'"
+                  >
+                    {{ getResourceCountForChapter(chapter.name) }}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
       </div>
     </aside>
   </div>
 
-  <!-- ================= Case B: Desktop Embedded Right Sidebar ================= -->
+  <!-- Case B: Desktop 300px Left Workbench Column -->
   <aside 
     v-else
-    class="w-full bg-slate-900/70 border border-slate-800/80 rounded-3xl p-4 sm:p-5 flex flex-col gap-3.5 shadow-xl"
+    class="w-[300px] min-w-[300px] max-w-[300px] bg-[#161b22] border border-[#30363d] rounded-md p-3.5 flex flex-col gap-3 shadow-none"
   >
-    <!-- Header with Title & Stage Switcher (國中 / 高中) -->
-    <div class="flex items-center justify-between border-b border-slate-800 pb-3 gap-2">
-      <div class="flex items-center gap-2">
-        <BookOpen class="w-4 h-4 text-sky-400" />
-        <h2 class="font-bold text-sm text-slate-200">108 課綱進度地圖</h2>
+    <!-- Header: Knowledge Tree Label -->
+    <div class="flex items-center justify-between border-b border-[#30363d] pb-2.5">
+      <div class="flex items-center gap-1.5">
+        <Hash class="w-3.5 h-3.5 text-amber-500" />
+        <span class="font-mono font-bold text-xs text-[#f0f6fc]">KNOWLEDGE_TREE</span>
       </div>
+      <span class="font-mono text-[10px] text-[#8b949e] px-1.5 py-0.5 rounded-md bg-[#0d1117] border border-[#30363d]">
+        108課綱
+      </span>
+    </div>
 
-      <!-- Stage Switcher Tabs (國中 vs 高中) -->
-      <div class="flex bg-slate-950/80 p-0.5 rounded-lg border border-slate-800">
-        <button
-          @click="currentStage = 'junior'"
-          class="px-2.5 py-0.5 text-[11px] font-semibold rounded transition-all"
-          :class="currentStage === 'junior' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
-        >
-          國中
-        </button>
-        <button
-          @click="currentStage = 'senior'"
-          class="px-2.5 py-0.5 text-[11px] font-semibold rounded transition-all"
-          :class="currentStage === 'senior' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
-        >
-          高中
-        </button>
-      </div>
+    <!-- Stage Switcher Tabs (國中 vs 高中) -->
+    <div class="grid grid-cols-2 bg-[#0d1117] p-1 rounded-md border border-[#30363d] gap-1">
+      <button
+        @click="currentStage = 'junior'"
+        class="py-1 text-xs font-mono font-semibold rounded-md transition-colors text-center"
+        :class="currentStage === 'junior' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
+      >
+        國中 (JUNIOR)
+      </button>
+      <button
+        @click="currentStage = 'senior'"
+        class="py-1 text-xs font-mono font-semibold rounded-md transition-colors text-center"
+        :class="currentStage === 'senior' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
+      >
+        高中 (SENIOR)
+      </button>
     </div>
 
     <!-- Subject Selector Buttons -->
-    <div class="grid grid-cols-2 gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800/80">
+    <div class="grid grid-cols-2 gap-1 bg-[#0d1117] p-1 rounded-md border border-[#30363d]">
       <button
         v-for="subj in availableSubjects"
         :key="subj.id"
         @click="activeSubject = subj.id"
-        class="py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all"
+        class="py-1 px-2 rounded-md text-xs font-mono transition-colors text-center truncate"
         :class="activeSubject === subj.id 
-          ? 'bg-sky-600 text-white shadow-sm' 
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'"
+          ? 'border border-amber-500 bg-amber-500/10 text-amber-400 font-bold' 
+          : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#21262d]'"
       >
-        <component :is="subj.icon" class="w-3.5 h-3.5" />
-        <span>{{ subj.name }}</span>
+        {{ subj.name }}
       </button>
     </div>
 
-    <!-- High School Math Track Filter (Only in Senior Math) -->
+    <!-- Math Track Filter (Only in Senior Math) -->
     <div 
       v-if="currentStage === 'senior' && activeSubject === 'math'"
-      class="px-3 py-1.5 bg-slate-950/60 rounded-xl border border-slate-800/70 flex items-center justify-between text-xs"
+      class="px-2.5 py-1.5 bg-[#0d1117] rounded-md border border-[#30363d] flex items-center justify-between text-xs"
     >
-      <span class="text-slate-400 font-semibold text-[11px] flex items-center gap-1">
-        <Filter class="w-3 h-3 text-sky-400" />
+      <span class="text-[#8b949e] font-mono text-[11px] flex items-center gap-1">
+        <Filter class="w-3 h-3 text-amber-500" />
         分流：
       </span>
 
-      <div class="flex bg-slate-900 p-0.5 rounded-md border border-slate-800">
+      <div class="flex gap-1 font-mono text-[11px]">
         <button
-          @click="mathTrackFilter = 'all'"
-          class="px-2 py-0.5 rounded text-[11px] font-medium transition-colors"
-          :class="mathTrackFilter === 'all' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-slate-200'"
+          v-for="t in [
+            { key: 'all', label: '全部' },
+            { key: 'mathA', label: '數A' },
+            { key: 'mathB', label: '數B' },
+            { key: 'common', label: '共同' }
+          ]"
+          :key="t.key"
+          @click="mathTrackFilter = (t.key as any)"
+          class="px-1.5 py-0.5 rounded-md transition-colors"
+          :class="mathTrackFilter === t.key ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
         >
-          全部
-        </button>
-        <button
-          @click="mathTrackFilter = 'mathA'"
-          class="px-2 py-0.5 rounded text-[11px] font-medium transition-colors"
-          :class="mathTrackFilter === 'mathA' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'"
-        >
-          數甲
-        </button>
-        <button
-          @click="mathTrackFilter = 'mathB'"
-          class="px-2 py-0.5 rounded text-[11px] font-medium transition-colors"
-          :class="mathTrackFilter === 'mathB' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-slate-200'"
-        >
-          數乙
-        </button>
-        <button
-          @click="mathTrackFilter = 'common'"
-          class="px-2 py-0.5 rounded text-[11px] font-medium transition-colors"
-          :class="mathTrackFilter === 'common' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-slate-200'"
-        >
-          共同
+          {{ t.label }}
         </button>
       </div>
     </div>
@@ -413,88 +376,85 @@ const getResourceCountForChapter = (chapterName: string) => {
     <!-- Active Selected Chapter Indicator -->
     <div 
       v-if="selectedChapter"
-      class="px-3 py-2 bg-sky-950/50 border border-sky-800/60 rounded-xl flex items-center justify-between text-xs text-sky-300"
+      class="px-2.5 py-1.5 bg-[#0d1117] border border-[#30363d] rounded-md flex items-center justify-between text-xs font-mono"
     >
-      <div class="truncate">
-        <span class="text-slate-400 text-[10px] block">目前閱讀單元：</span>
-        <span class="font-bold">{{ selectedChapter }}</span>
+      <div class="truncate pr-2">
+        <span class="text-[#8b949e] text-[10px] block">ACTIVE:</span>
+        <span class="font-bold text-amber-400 truncate block font-sans">{{ selectedChapter }}</span>
       </div>
       <button
         @click="emit('selectChapter', null)"
-        class="text-sky-400 hover:text-white px-1.5 py-0.5 rounded bg-sky-900/40 text-[11px] font-semibold flex items-center gap-1"
+        class="text-[#8b949e] hover:text-amber-500 p-1 rounded-md hover:bg-[#21262d] transition-colors shrink-0"
+        title="清除單元選擇，檢視全部資源"
       >
-        <RotateCcw class="w-3 h-3" />
-        <span>重置</span>
+        <RotateCcw class="w-3.5 h-3.5" />
       </button>
     </div>
 
-    <!-- Chapter List Accordion (Organized by progression) -->
-    <div class="space-y-3 overflow-y-auto max-h-[calc(100vh-320px)] pr-1">
+    <!-- Chapter List Accordion (Scrollable Area) -->
+    <div class="space-y-2 overflow-y-auto max-h-[calc(100vh-280px)] pr-1">
       <div 
         v-for="grade in currentSubjectCurriculum.grades" 
         :key="grade.gradeId"
-        class="space-y-1.5"
+        class="space-y-1"
       >
         <!-- Grade Subtitle -->
-        <div class="text-[11px] font-extrabold text-slate-400 tracking-wider px-1 pt-1 flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-          <span>{{ grade.gradeName }}</span>
+        <div class="text-[11px] font-mono text-[#8b949e] px-1 pt-1">
+          // {{ grade.gradeName }}
         </div>
 
         <!-- Semesters / Volumes Accordion -->
         <div 
           v-for="(sem, sIdx) in grade.semesters" 
           :key="sIdx"
-          class="border border-slate-800/70 rounded-xl overflow-hidden bg-slate-950/40"
+          class="border border-[#30363d] rounded-md overflow-hidden bg-[#0d1117]"
         >
           <!-- Semester Header -->
           <button
             @click="toggleSemester(`${grade.gradeId}-${sIdx}`)"
-            class="w-full px-3 py-2 flex items-center justify-between bg-slate-900/80 hover:bg-slate-850 transition-colors text-left"
+            class="w-full px-2.5 py-1.5 flex items-center justify-between bg-[#161b22] hover:bg-[#21262d] transition-colors text-left font-mono"
           >
-            <div class="flex items-center gap-1.5">
-              <Calendar class="w-3.5 h-3.5 text-slate-400" />
-              <span class="font-bold text-xs text-slate-200">{{ sem.name }}</span>
+            <div class="flex items-center gap-1.5 truncate">
+              <component 
+                :is="expandedSemesters[`${grade.gradeId}-${sIdx}`] ? FolderOpen : Folder" 
+                class="w-3.5 h-3.5 text-amber-500 shrink-0" 
+              />
+              <span class="text-xs text-[#f0f6fc] truncate">{{ sem.name }}</span>
             </div>
             <component 
               :is="expandedSemesters[`${grade.gradeId}-${sIdx}`] ? ChevronDown : ChevronRight" 
-              class="w-3.5 h-3.5 text-slate-400" 
+              class="w-3.5 h-3.5 text-[#8b949e] shrink-0" 
             />
           </button>
 
           <!-- Chapters list -->
           <div 
             v-if="expandedSemesters[`${grade.gradeId}-${sIdx}`]"
-            class="p-1.5 space-y-0.5 bg-slate-950/60 border-t border-slate-900"
+            class="p-1 space-y-0.5 bg-[#0d1117] border-t border-[#30363d]"
           >
             <button
               v-for="chapter in filterChapters(sem.chapters)"
               :key="chapter.name"
               @click="emit('selectChapter', selectedChapter === chapter.name ? null : chapter.name)"
-              class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-all"
+              class="w-full text-left px-2 py-1 rounded-md text-xs flex items-center justify-between transition-colors font-mono"
               :class="selectedChapter === chapter.name 
-                ? 'bg-sky-600/30 text-sky-200 font-semibold border border-sky-500/50' 
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'"
+                ? 'border-l-2 border-amber-500 bg-amber-500/10 text-amber-400 font-semibold pl-2' 
+                : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#161b22]'"
             >
               <div class="flex items-center gap-1.5 truncate pr-2">
                 <span 
                   v-if="chapter.tagLabel" 
-                  class="text-[9px] px-1 py-0.2 rounded font-bold shrink-0"
-                  :class="chapter.mathTrack === 'mathA' 
-                    ? 'bg-indigo-950 text-indigo-300 border border-indigo-800' 
-                    : chapter.mathTrack === 'mathB' 
-                    ? 'bg-amber-950 text-amber-300 border border-amber-800' 
-                    : 'bg-emerald-950 text-emerald-300 border border-emerald-800'"
+                  class="text-[9px] px-1 py-0.2 rounded-md bg-[#161b22] border border-[#30363d] text-[#8b949e] shrink-0"
                 >
                   {{ chapter.tagLabel }}
                 </span>
-                <span class="truncate">{{ chapter.name }}</span>
+                <span class="truncate font-sans">{{ chapter.name }}</span>
               </div>
 
               <span 
                 v-if="getResourceCountForChapter(chapter.name) > 0"
-                class="px-1.5 py-0.2 rounded-full text-[10px] font-bold shrink-0"
-                :class="selectedChapter === chapter.name ? 'bg-sky-500 text-white' : 'bg-slate-800 text-slate-300 border border-slate-700'"
+                class="px-1.5 py-0.2 rounded-md text-[10px] font-mono shrink-0"
+                :class="selectedChapter === chapter.name ? 'bg-amber-500 text-black font-bold' : 'bg-[#161b22] text-[#8b949e] border border-[#30363d]'"
               >
                 {{ getResourceCountForChapter(chapter.name) }}
               </span>

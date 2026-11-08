@@ -3,31 +3,35 @@
 @tailwind utilities;
 
 @layer base {
-  /* 電腦版本（1024px 以上桌機與筆電環境）全站基準尺寸修正為 125% 舒適比例 */
-  @media (min-width: 1024px) {
-    html {
-      font-size: 125%; /* 預設 16px 放大為 20px (125%) */
-    }
-  }
-
   body {
-    @apply bg-slate-950 text-slate-100 antialiased;
+    background-color: #0d1117;
+    color: #c9d1d9;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
-/* Custom modern scrollbar */
+/* Custom workbench scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: #0d1117;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #30363d;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #484f58;
+}
+
+/* KaTeX custom styling inside dark workbench */
+.katex {
+  font-size: 1.05em;
+  color: #f0f6fc;
+}
+
+.katex .mord, .katex .mbin, .katex .mrel, .katex .mopen, .katex .mclose, .katex .mpunct {
+  color: inherit;
 }

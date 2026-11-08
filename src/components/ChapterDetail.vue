@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { Lightbulb, AlertTriangle, BookOpen, Sparkles, FileText, ArrowLeft, CheckCircle2, Layers, Share2, Check, Compass, Target, HelpCircle, ChevronDown, ChevronUp } from 'lucide-vue-next';
+import { 
+  ArrowLeft, Share2, Check, Target, ChevronDown, ChevronUp, 
+  Terminal, Activity, Compass, AlertTriangle, HelpCircle, FileText, ExternalLink
+} from 'lucide-vue-next';
 import { getChapterSummary, ChapterSummary, SopModule, ClassicExample } from '../data/chapterSummaries';
 import { renderFormulaItem, renderRichMathText } from '../utils/mathRenderer';
 import { ResourceItem } from '../types';
@@ -89,10 +92,7 @@ const displayedAhaInsight = computed(() => {
   return summary.value.ahaInsight;
 });
 
-// Dynamically displayed concepts:
-// 數A: 顯示 共同 + 數A專屬內容
-// 數B: 顯示 共同 + 數B專屬內容
-// 全部: 顯示全部
+// Dynamically displayed concepts
 const displayedConcepts = computed(() => {
   const allConcepts = summary.value.coreConcepts || [];
   if (!hasTrackVariants.value || activeTrackTab.value === 'all') {
@@ -138,7 +138,7 @@ const toggleHint = (idx: number) => {
   openHints.value[idx] = !openHints.value[idx];
 };
 
-// SOP steps folding state (破題思維步驟折疊控制，預設全部折疊以供先思考破題)
+// SOP steps folding state
 const openSopSteps = ref<Record<number, boolean>>({});
 const toggleSopSteps = (idx: number) => {
   openSopSteps.value[idx] = !openSopSteps.value[idx];
@@ -155,7 +155,7 @@ const toggleAllSopSteps = () => {
   });
 };
 
-// Dynamically displayed classic examples (舊格式資料，渲染時併入「經典題型與破題核心」)
+// Dynamically displayed classic examples
 const displayedClassicExamples = computed<ClassicExample[]>(() => {
   if (hasTrackVariants.value && activeTrackTab.value === 'mathB' && summary.value.trackVariants?.mathB?.classicExamples) {
     return summary.value.trackVariants.mathB.classicExamples;
@@ -163,7 +163,7 @@ const displayedClassicExamples = computed<ClassicExample[]>(() => {
   return summary.value.classicExamples || [];
 });
 
-// Dynamically displayed SOP modules：破題思維模組 + 經典範例合併為單一「經典題型與破題核心」區塊
+// Dynamically displayed SOP modules
 const displayedSopModules = computed<SopModule[]>(() => {
   const sop = (hasTrackVariants.value && activeTrackTab.value === 'mathB' && summary.value.trackVariants?.mathB?.sopModules)
     ? summary.value.trackVariants.mathB.sopModules
@@ -205,522 +205,476 @@ const chapterResources = computed(() => {
     return norm.includes(rNorm) || rNorm.includes(norm);
   });
 });
+
+// =========================================================================
+// 函數坐標互動區 (Coordinate Workspace) 數據與視圖管理
+// =========================================================================
+interface DiagramOption {
+  id: string;
+  label: string;
+  type: string;
+}
+
+const availableDiagrams = computed<DiagramOption[]>(() => {
+  const list: DiagramOption[] = [];
+  (displayedConcepts.value || []).forEach((c, idx) => {
+    if (c.diagramType && !list.some(d => d.type === c.diagramType)) {
+      list.push({ id: `concept-${idx}`, label: c.title, type: c.diagramType });
+    }
+  });
+  (displayedSopModules.value || []).forEach((m, idx) => {
+    if (m.diagramType && !list.some(d => d.type === m.diagramType)) {
+      list.push({ id: `sop-${idx}`, label: m.moduleName, type: m.diagramType });
+    }
+  });
+
+  // 如果該單元未指定幾何圖形，預設使用通用函數變換坐標系
+  if (list.length === 0) {
+    list.push({ id: 'default', label: '函數坐標分析', type: 'function-transformation' });
+  }
+  return list;
+});
+
+const selectedDiagramType = ref<string>('');
+
+watch(availableDiagrams, (newDiagrams) => {
+  if (newDiagrams.length > 0) {
+    selectedDiagramType.value = newDiagrams[0].type;
+  } else {
+    selectedDiagramType.value = 'function-transformation';
+  }
+}, { immediate: true });
 </script>
 
 <template>
-  <div class="space-y-6 animate-in fade-in duration-200">
+  <div class="space-y-4">
     
-    <!-- Top Action Bar -->
-    <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+    <!-- Top Action & Telemetry Toolbar -->
+    <div class="flex flex-wrap items-center justify-between gap-2.5 pb-2.5 border-b border-[#30363d]">
       <div class="flex items-center gap-2">
         <button
           @click="emit('back')"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-semibold transition-colors"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#161b22] hover:bg-[#21262d] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] font-mono text-xs transition-colors"
         >
           <ArrowLeft class="w-3.5 h-3.5" />
-          <span>返回全部資源清單</span>
+          <span>LIST // 資源列表</span>
         </button>
 
-        <!-- 一鍵複製章節專屬分享連結 -->
         <button
           @click="copyShareLink"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all shadow-sm"
-          :class="isCopied ? 'bg-emerald-950/80 border-emerald-500/80 text-emerald-300' : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'"
-          title="複製此章節的專屬分享網址，可直接傳送給學生開啟"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border font-mono text-xs transition-colors"
+          :class="isCopied ? 'bg-amber-500/10 border-amber-500/80 text-amber-400' : 'bg-[#161b22] hover:bg-[#21262d] border-[#30363d] text-[#8b949e] hover:text-[#f0f6fc]'"
+          title="複製章節分享網址"
         >
-          <component :is="isCopied ? Check : Share2" class="w-3.5 h-3.5" :class="isCopied ? 'text-emerald-400' : 'text-sky-400'" />
-          <span>{{ isCopied ? '已複製章節分享網址！' : '複製章節分享網址' }}</span>
+          <component :is="isCopied ? Check : Share2" class="w-3.5 h-3.5" :class="isCopied ? 'text-amber-500' : 'text-[#8b949e]'" />
+          <span>{{ isCopied ? 'URL_COPIED' : 'SHARE_URL' }}</span>
         </button>
       </div>
 
-      <!-- Scope Badge -->
-      <div class="flex items-center gap-2">
-        <span 
-          v-if="hasTrackVariants"
-          class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-950/70 text-indigo-300 border border-indigo-700/60"
+      <!-- High School Track Switcher (數A / 數B / 全部) -->
+      <div v-if="hasTrackVariants" class="flex items-center gap-1 bg-[#161b22] p-0.5 rounded-md border border-[#30363d] font-mono text-xs">
+        <span class="text-[#8b949e] text-[11px] px-1.5">TRACK:</span>
+        <button
+          @click="activeTrackTab = 'all'"
+          class="px-2 py-0.5 rounded-md transition-colors font-mono"
+          :class="activeTrackTab === 'all' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
         >
-          【高二 數A / 數B 分流單元】
-        </span>
-        <span 
-          v-else-if="summary.mathTrack === 'mathA'"
-          class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-950/70 text-indigo-300 border border-indigo-700/60"
+          ALL
+        </button>
+        <button
+          @click="activeTrackTab = 'mathA'"
+          class="px-2 py-0.5 rounded-md transition-colors font-mono"
+          :class="activeTrackTab === 'mathA' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
         >
-          【數甲 專屬單元】
-        </span>
-        <span 
-          v-else-if="summary.mathTrack === 'mathB'"
-          class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-950/70 text-amber-300 border border-amber-700/60"
+          MATH_A
+        </button>
+        <button
+          @click="activeTrackTab = 'mathB'"
+          class="px-2 py-0.5 rounded-md transition-colors font-mono"
+          :class="activeTrackTab === 'mathB' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
         >
-          【數乙 專屬單元】
-        </span>
-        <span 
-          v-else-if="summary.mathTrack === 'common'"
-          class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-950/70 text-emerald-300 border border-emerald-700/60"
-        >
-          【共同核心單元】
+          MATH_B
+        </button>
+      </div>
+      <div v-else class="font-mono text-xs text-[#8b949e]">
+        <span class="px-2 py-0.5 rounded-md bg-[#161b22] border border-[#30363d]">
+          {{ summary.mathTrack === 'mathA' ? '【數甲專屬】' : summary.mathTrack === 'mathB' ? '【數乙專屬】' : '【共同核心】' }}
         </span>
       </div>
     </div>
 
-    <!-- Chapter Header Box -->
-    <div class="p-6 rounded-3xl bg-gradient-to-br from-slate-900/90 via-slate-900/60 to-slate-950/90 border border-slate-800 shadow-xl">
-      <div class="flex items-center gap-2 text-xs text-sky-400 font-semibold mb-2">
-        <BookOpen class="w-4 h-4 text-sky-400" />
-        <span>單元深度解析筆記</span>
-      </div>
-      <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-3">
-        {{ chapterName }}
-      </h2>
-
-      <!-- Math A / Math B Track Switcher (模式切換: 全部 / 數A / 數B) -->
-      <div v-if="hasTrackVariants" class="mb-4 pt-3 border-t border-slate-800/80">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs text-slate-400 font-semibold flex items-center gap-1.5 mr-1">
-            <Layers class="w-3.5 h-3.5 text-sky-400" />
-            <span>模式切換：</span>
-          </span>
-          <div class="flex flex-wrap bg-slate-950 p-1 rounded-xl border border-slate-800/90 gap-1">
-            <button
-              @click="activeTrackTab = 'all'"
-              class="px-3 py-1 rounded-lg text-xs font-semibold transition-all"
-              :class="activeTrackTab === 'all' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
-            >
-              全部
-            </button>
-            <button
-              @click="activeTrackTab = 'mathA'"
-              class="px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
-              :class="activeTrackTab === 'mathA' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-              <span>數A (共同 + 專屬)</span>
-            </button>
-            <button
-              @click="activeTrackTab = 'mathB'"
-              class="px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
-              :class="activeTrackTab === 'mathB' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-              <span>數B (共同 + 專屬)</span>
-            </button>
-          </div>
+    <!-- Chapter Header Box: Compact High-Density Header -->
+    <div class="p-3.5 rounded-md bg-[#161b22] border border-[#30363d] space-y-2">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <Terminal class="w-4 h-4 text-amber-500" />
+          <h2 class="text-lg sm:text-xl font-bold font-mono text-[#f0f6fc] tracking-tight">
+            {{ chapterName }}
+          </h2>
         </div>
+        <span class="font-mono text-[11px] text-[#8b949e] px-2 py-0.5 rounded-md bg-[#0d1117] border border-[#30363d]">
+          STATUS: VERIFIED
+        </span>
       </div>
 
       <!-- Scope notice -->
       <div 
         v-if="displayedScopeNotice"
-        class="px-4 py-2.5 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-300 text-xs leading-relaxed flex items-start gap-2.5 mb-4"
+        class="px-3 py-1.5 rounded-md bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-xs font-mono leading-relaxed"
       >
-        <CheckCircle2 class="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-        <div>
-          <span class="font-bold text-sky-300">課綱範圍說明：</span>
-          <span>{{ displayedScopeNotice }}</span>
-        </div>
+        <span class="text-amber-500 font-bold">[SCOPE]：</span>
+        <span>{{ displayedScopeNotice }}</span>
       </div>
 
       <!-- Aha! Insight Box -->
-      <div class="p-4 rounded-2xl bg-amber-950/25 border border-amber-500/30 text-amber-200 text-xs sm:text-sm leading-relaxed flex items-start gap-3">
-        <Lightbulb class="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-        <div>
-          <span class="font-bold text-amber-300 block mb-1">訣竅 (Aha! Moment)：</span>
-          <span class="text-amber-100/90 leading-relaxed">{{ displayedAhaInsight }}</span>
-        </div>
+      <div 
+        v-if="displayedAhaInsight"
+        class="px-3 py-2 rounded-md bg-[#0d1117] border border-amber-500/40 text-[#c9d1d9] text-xs font-mono leading-relaxed"
+      >
+        <span class="text-amber-400 font-bold">[KEY_INSIGHT]：</span>
+        <span class="text-[#f0f6fc]">{{ displayedAhaInsight }}</span>
       </div>
     </div>
 
-    <!-- Core Concepts Section -->
-    <div class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
-          <Sparkles class="w-4 h-4 text-sky-400" />
-          <span>核心觀念與公式精要</span>
-        </h3>
-        <span v-if="hasTrackVariants" class="text-xs text-slate-400">
-          目前顯示：<strong class="text-sky-300 font-semibold">{{ activeTrackTab === 'all' ? '全部 (共同 + 數A + 數B)' : activeTrackTab === 'mathA' ? '數A (共同 + 數A專屬)' : '數B (共同 + 數B專屬)' }}</strong>
-        </span>
-      </div>
-
-      <!-- 由上而下 1 2 3 4 單欄卡片整齊排列 -->
-      <div class="space-y-4">
-        <div 
-          v-for="(concept, idx) in displayedConcepts" 
-          :key="idx"
-          class="p-5 sm:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700/80 transition-colors flex flex-col justify-between"
-        >
-          <div>
-            <div class="flex items-center justify-between gap-2 mb-2">
-              <h4 class="text-sm sm:text-base font-bold text-sky-300 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
-                <span>{{ concept.title }}</span>
-              </h4>
-              <span 
-                v-if="concept.track === 'mathA'"
-                class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-950 text-indigo-300 border border-indigo-700/60 shrink-0"
-              >
-                數A專屬
-              </span>
-              <span 
-                v-else-if="concept.track === 'mathB'"
-                class="px-2 py-0.5 rounded text-xs font-bold bg-amber-950 text-amber-300 border border-amber-700/60 shrink-0"
-              >
-                數B專屬
-              </span>
-              <span 
-                v-else-if="concept.track === 'common'"
-                class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-700/60 shrink-0"
-              >
-                共同核心
-              </span>
-            </div>
-
-            <!-- 佈局分支：若設定 diagramPosition === 'top'，在說明/表格最上方呈現圖形 -->
-            <div 
-              v-if="concept.diagramPosition === 'top' && concept.diagramType"
-              class="my-3 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
-            >
-              <ConceptDiagram :type="concept.diagramType" />
-            </div>
-
-            <div class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3 whitespace-pre-line" v-html="renderRichMathText(concept.description)"></div>
-          </div>
-
-          <!-- 佈局分支：若設定 diagramPosition === 'right'，在寬螢幕將短公式置於左、圖形置於右 -->
-          <div 
-            v-if="concept.diagramPosition === 'right' && concept.diagramType"
-            class="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-4 items-center"
-          >
-            <!-- 左欄：公式列表 -->
-            <div 
-              v-if="concept.formulas && concept.formulas.length > 0"
-              class="space-y-2.5"
-            >
-              <div 
-                v-for="(fItem, fIdx) in concept.formulas"
-                :key="fIdx"
-                class="px-4 py-3 rounded-xl bg-slate-950/90 border border-slate-800/90 text-slate-100 text-sm tracking-wide flex flex-wrap items-center gap-2 overflow-x-auto shadow-inner"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
-                <span 
-                  v-if="renderFormulaItem(fItem).label" 
-                  class="font-bold text-sky-400 shrink-0"
-                >
-                  {{ renderFormulaItem(fItem).label }}
-                </span>
-                <span 
-                  class="text-sky-100 select-all font-sans text-sm sm:text-base leading-none py-0.5"
-                  v-html="renderFormulaItem(fItem).mathHtml"
-                />
-                <span 
-                  v-if="renderFormulaItem(fItem).note" 
-                  class="text-xs text-slate-400 font-sans ml-1"
-                >
-                  {{ renderFormulaItem(fItem).note }}
-                </span>
-              </div>
-            </div>
-
-            <!-- 右欄：視覺圖解 -->
-            <div 
-              class="w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner h-full justify-center"
-            >
-              <ConceptDiagram :type="concept.diagramType" />
-            </div>
-          </div>
-
-          <!-- 預設垂直單欄佈局：若不是 top 且不是 right，圖形在說明下方，公式在最下 -->
-          <template v-else-if="concept.diagramPosition !== 'top'">
-            <!-- Visual Illustration Diagram (若單元具幾何圖解則動態呈現) -->
-            <div 
-              v-if="concept.diagramType"
-              class="my-2.5 w-full flex flex-col items-center"
-              :class="concept.diagramType === 'lens-optics' ? '' : 'rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner'"
-            >
-              <ConceptDiagram :type="concept.diagramType" />
-            </div>
-
-            <!-- Formulas list: 以 KaTeX 數學排版引擎渲染真實分數、上下標與希臘字母 -->
-            <div 
-              v-if="concept.formulas && concept.formulas.length > 0"
-              class="mt-2 space-y-2.5"
-            >
-              <div 
-                v-for="(fItem, fIdx) in concept.formulas"
-                :key="fIdx"
-                class="px-4 py-3 rounded-xl bg-slate-950/90 border border-slate-800/90 text-slate-100 text-sm tracking-wide flex flex-wrap items-center gap-2 overflow-x-auto shadow-inner"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
-                <!-- 前置中文名稱標籤 -->
-                <span 
-                  v-if="renderFormulaItem(fItem).label" 
-                  class="font-bold text-sky-400 shrink-0"
-                >
-                  {{ renderFormulaItem(fItem).label }}
-                </span>
-                <!-- KaTeX 渲染之高畫質數學公式（含真實垂直分數線、精緻下標） -->
-                <span 
-                  class="text-sky-100 select-all font-sans text-sm sm:text-base leading-none py-0.5"
-                  v-html="renderFormulaItem(fItem).mathHtml"
-                />
-                <!-- 後置補充備註說明 -->
-                <span 
-                  v-if="renderFormulaItem(fItem).note" 
-                  class="text-xs text-slate-400 font-sans ml-1"
-                >
-                  {{ renderFormulaItem(fItem).note }}
-                </span>
-              </div>
-            </div>
-          </template>
-
-          <!-- 若 diagramPosition === 'top' 但有填寫 formulas，在下方呈現公式卡片 -->
-          <template v-else-if="concept.formulas && concept.formulas.length > 0">
-            <div class="mt-2 space-y-2.5">
-              <div 
-                v-for="(fItem, fIdx) in concept.formulas"
-                :key="fIdx"
-                class="px-4 py-3 rounded-xl bg-slate-950/90 border border-slate-800/90 text-slate-100 text-sm tracking-wide flex flex-wrap items-center gap-2 overflow-x-auto shadow-inner"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
-                <span 
-                  v-if="renderFormulaItem(fItem).label" 
-                  class="font-bold text-sky-400 shrink-0"
-                >
-                  {{ renderFormulaItem(fItem).label }}
-                </span>
-                <span 
-                  class="text-sky-100 select-all font-sans text-sm sm:text-base leading-none py-0.5"
-                  v-html="renderFormulaItem(fItem).mathHtml"
-                />
-                <span 
-                  v-if="renderFormulaItem(fItem).note" 
-                  class="text-xs text-slate-400 font-sans ml-1"
-                >
-                  {{ renderFormulaItem(fItem).note }}
-                </span>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
-    </div>
-
-    <!-- Problem Solving Mindset & Integrated Examples Section -->
-    <div v-if="displayedSopModules && displayedSopModules.length > 0" class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
-          <Compass class="w-4 h-4 text-amber-400" />
-          <span>經典題型與破題核心</span>
-        </h3>
+    <!-- ========================================================================= -->
+    <!-- 右側上方：函數坐標互動區 (Interactive Coordinate & Function Workspace) -->
+    <!-- ========================================================================= -->
+    <section class="rounded-md bg-[#161b22] border border-[#30363d] overflow-hidden">
+      <!-- Upper Section Header Bar -->
+      <div class="px-3.5 py-2 border-b border-[#30363d] bg-[#161b22] flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2">
-          <button 
-            type="button"
-            @click="toggleAllSopSteps"
-            class="text-xs text-slate-400 hover:text-amber-400 font-medium px-2.5 py-1 rounded-lg bg-slate-800/60 border border-slate-700/60 hover:border-amber-500/40 transition-colors flex items-center gap-1.5 cursor-pointer"
-          >
-            <span>{{ areAllSopStepsOpen ? '全部折疊步驟' : '全部展開步驟' }}</span>
-          </button>
-          <span class="text-xs text-amber-400/90 font-semibold px-2.5 py-0.5 rounded-full bg-amber-950/60 border border-amber-800/50">
-            解題關鍵
+          <Activity class="w-3.5 h-3.5 text-amber-500" />
+          <span class="font-mono font-bold text-xs text-amber-500">
+            [COORDINATE_WORKSPACE // 函數坐標互動區]
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2 font-mono text-[11px] text-[#8b949e]">
+          <span class="px-1.5 py-0.5 rounded-md bg-[#0d1117] border border-[#30363d]">
+            CANVAS: 2D_CARTESIAN
+          </span>
+          <span class="px-1.5 py-0.5 rounded-md bg-[#0d1117] border border-[#30363d] text-amber-400">
+            STATUS: INTERACTIVE
           </span>
         </div>
       </div>
 
-      <div class="space-y-6">
+      <!-- Diagram Selector Tabs (If multiple coordinate views available) -->
+      <div 
+        v-if="availableDiagrams.length > 1" 
+        class="px-3 py-1.5 border-b border-[#30363d] bg-[#0d1117] flex items-center gap-1.5 overflow-x-auto font-mono text-xs"
+      >
+        <span class="text-[#8b949e] text-[11px] shrink-0">VIEW:</span>
+        <button
+          v-for="diag in availableDiagrams"
+          :key="diag.id"
+          @click="selectedDiagramType = diag.type"
+          class="px-2 py-0.5 rounded-md transition-colors shrink-0 font-mono"
+          :class="selectedDiagramType === diag.type 
+            ? 'bg-amber-500 text-black font-bold' 
+            : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#161b22] border border-[#30363d]'"
+        >
+          [{{ diag.label }}]
+        </button>
+      </div>
+
+      <!-- Interactive Canvas Body -->
+      <div class="p-3 sm:p-4 flex flex-col items-center justify-center bg-[#0d1117]">
+        <ConceptDiagram :type="selectedDiagramType" />
+      </div>
+
+      <!-- Bottom Coordinate Telemetry Strip -->
+      <div class="px-3.5 py-1.5 border-t border-[#30363d] bg-[#161b22] flex flex-wrap items-center justify-between text-[11px] font-mono text-[#8b949e]">
+        <span>AXES: 1:1 SQUARE ASPECT // SCALE: DYNAMIC</span>
+        <span>CONTROLS: DRAG TO PAN // WHEEL TO ZOOM // AMBER ACCENTS</span>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 右側下方：步驟解題與診斷數據表 (Step-by-step Solving & Diagnostic Data Table) -->
+    <!-- ========================================================================= -->
+
+    <!-- Section 1: 步驟解題與破題核心 (SOP Derivation & Problem Solving Modules) -->
+    <section v-if="displayedSopModules && displayedSopModules.length > 0" class="rounded-md bg-[#161b22] border border-[#30363d] p-3.5 space-y-3">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-2">
+        <div class="flex items-center gap-2">
+          <Compass class="w-3.5 h-3.5 text-amber-500" />
+          <h3 class="font-mono font-bold text-xs text-amber-500">
+            [SOP_DERIVATION // 經典題型與步驟解題]
+          </h3>
+        </div>
+
+        <button 
+          type="button"
+          @click="toggleAllSopSteps"
+          class="text-xs font-mono text-[#8b949e] hover:text-amber-400 px-2 py-0.5 rounded-md bg-[#0d1117] border border-[#30363d] hover:border-amber-500/50 transition-colors"
+        >
+          {{ areAllSopStepsOpen ? '[折疊全部步驟]' : '[展開全部步驟]' }}
+        </button>
+      </div>
+
+      <div class="space-y-3">
         <div 
           v-for="(mod, mIdx) in displayedSopModules"
           :key="mIdx"
-          class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-slate-950/90 border border-amber-500/30 shadow-lg space-y-4"
+          class="rounded-md bg-[#0d1117] border border-[#30363d] p-3 space-y-2.5"
         >
-          <!-- 模組標題 -->
-          <div class="flex items-center justify-between gap-2 border-b border-amber-500/20 pb-2.5">
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-              <h4 class="text-sm sm:text-base font-extrabold text-amber-200 tracking-wide">
+          <!-- Module Title & Track Badge -->
+          <div class="flex items-center justify-between gap-2 border-b border-[#30363d] pb-2">
+            <div class="flex items-center gap-2 font-mono">
+              <span class="w-1.5 h-1.5 rounded-sm bg-amber-500"></span>
+              <h4 class="text-xs sm:text-sm font-bold text-[#f0f6fc]">
                 {{ mod.moduleName }}
               </h4>
             </div>
             <span 
-              v-if="mod.track === 'mathA'"
-              class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-950 text-indigo-300 border border-indigo-700/60 shrink-0"
+              v-if="mod.track"
+              class="px-1.5 py-0.2 rounded-md text-[10px] font-mono bg-[#161b22] border border-[#30363d] text-[#8b949e]"
             >
-              數A專屬
-            </span>
-            <span 
-              v-else-if="mod.track === 'mathB'"
-              class="px-2 py-0.5 rounded text-xs font-bold bg-amber-950 text-amber-300 border border-amber-700/60 shrink-0"
-            >
-              數B專屬
-            </span>
-            <span 
-              v-else-if="mod.track === 'common'"
-              class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-700/60 shrink-0"
-            >
-              共同核心
+              {{ mod.track === 'mathA' ? '數A專屬' : mod.track === 'mathB' ? '數B專屬' : '共同核心' }}
             </span>
           </div>
 
-          <!-- 先有題目：具體範例題目置頂 -->
+          <!-- Question Statement -->
           <div 
             v-if="mod.question"
-            class="p-4 rounded-xl bg-slate-950/90 border border-amber-500/30 text-xs sm:text-sm text-slate-100 leading-relaxed shadow-inner"
+            class="p-2.5 rounded-md bg-[#161b22] border border-[#30363d] text-xs leading-relaxed text-[#f0f6fc]"
           >
             <span v-html="renderRichMathText(mod.question)"></span>
           </div>
 
-          <!-- 直覺心法提示 -->
+          <!-- Mindset callout -->
           <div 
             v-if="mod.mindset"
-            class="px-3.5 py-2.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-xs sm:text-sm text-amber-200 font-medium leading-relaxed"
-            v-html="renderRichMathText(mod.mindset)"
-          />
+            class="px-3 py-1.5 rounded-md bg-[#161b22] border border-amber-500/30 text-xs font-mono text-amber-300 leading-relaxed"
+          >
+            <span class="text-amber-500 font-bold">[MINDSET]：</span>
+            <span v-html="renderRichMathText(mod.mindset)"></span>
+          </div>
 
-          <!-- 折疊步驟開關按鈕（預設折疊圖形與解題步驟，讓學生先看題目自主思考） -->
+          <!-- Foldable Step-by-Step Toggle -->
           <button 
             type="button"
             @click="toggleSopSteps(mIdx)"
-            class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-900/80 transition-all cursor-pointer group"
+            class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md bg-[#161b22] border border-[#30363d] hover:border-amber-500/50 transition-colors text-xs font-mono cursor-pointer"
           >
-            <span class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-amber-400 group-hover:text-amber-300">
-              <Target class="w-4 h-4" />
-              <span>{{ openSopSteps[mIdx] ? '收合步驟解析與圖形' : '展開步驟解析與圖形' }}</span>
-              <span class="text-xs text-slate-400 font-normal">（共 {{ mod.steps.length }} 步{{ mod.diagramType ? '，含圖形判定' : '' }}）</span>
+            <span class="flex items-center gap-1.5 text-amber-400">
+              <Target class="w-3.5 h-3.5" />
+              <span>{{ openSopSteps[mIdx] ? '收合推導步驟' : '展開推導步驟' }}</span>
+              <span class="text-[#8b949e]">（{{ mod.steps.length }} STEPS）</span>
             </span>
-            <span class="flex items-center gap-1.5 text-xs text-slate-400 group-hover:text-amber-400 font-medium">
-              <span>{{ openSopSteps[mIdx] ? '點擊收合' : '點擊查看詳解' }}</span>
-              <ChevronDown 
-                class="w-4 h-4 text-slate-400 group-hover:text-amber-400 transition-transform duration-200" 
-                :class="{ 'rotate-180': openSopSteps[mIdx] }" 
-              />
-            </span>
+            <component :is="openSopSteps[mIdx] ? ChevronUp : ChevronDown" class="w-3.5 h-3.5 text-[#8b949e]" />
           </button>
 
-          <!-- 折疊區域：圖形視覺化 + 步驟 1, 2, 3 垂直單欄排列（由上而下） + 結論答案 -->
-          <div v-if="openSopSteps[mIdx]" class="space-y-4 pt-1 transition-all duration-300">
-            <!-- 函數圖形視覺化（作為解題關鍵步驟呈現） -->
+          <!-- Derivation Steps Body -->
+          <div v-if="openSopSteps[mIdx]" class="space-y-2 pt-1 font-mono">
             <div 
-              v-if="mod.diagramType"
-              class="my-2 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
+              v-for="(step, sIdx) in mod.steps"
+              :key="sIdx"
+              class="p-2.5 rounded-md bg-[#161b22] border border-[#30363d] space-y-1.5"
             >
-              <ConceptDiagram :type="mod.diagramType" />
-            </div>
-
-            <div class="flex flex-col space-y-3">
-              <div 
-                v-for="(step, sIdx) in mod.steps"
-                :key="sIdx"
-                class="p-4 sm:p-5 rounded-xl bg-slate-950/80 border border-slate-800/80 hover:border-amber-500/40 transition-colors flex flex-col justify-start space-y-2.5 shadow-inner"
-              >
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 text-amber-300 font-bold text-xs sm:text-sm border border-amber-600/50 self-start">
-                  <Target class="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span v-html="renderRichMathText(step.label)"></span>
-                </div>
-                <div class="text-xs sm:text-sm text-slate-200 pl-3.5 border-l-2 border-slate-700/80 leading-relaxed font-sans whitespace-pre-line" v-html="renderRichMathText(step.text)"></div>
+              <div class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-400 font-bold text-xs border border-amber-500/30">
+                <span>STEP_{{ String(sIdx + 1).padStart(2, '0') }}</span>
+                <span>//</span>
+                <span v-html="renderRichMathText(step.label)"></span>
               </div>
+              <div class="text-xs text-[#c9d1d9] pl-2 border-l border-[#30363d] leading-relaxed font-sans whitespace-pre-line" v-html="renderRichMathText(step.text)"></div>
             </div>
 
-            <!-- 結論答案 -->
+            <!-- Conclusion / Result -->
             <div 
               v-if="mod.answer"
-              class="px-4 py-3 rounded-xl bg-amber-950/30 border border-amber-500/40 text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-2 shadow-inner mt-2"
+              class="px-3 py-2 rounded-md bg-[#161b22] border border-amber-500/40 text-xs font-mono text-[#f0f6fc] flex items-center gap-2"
             >
-              <Check class="w-4 h-4 text-amber-400 shrink-0" />
-              <span class="shrink-0">結論答案：</span>
-              <span class="text-amber-100 overflow-x-auto" v-html="renderRichMathText(mod.answer)"></span>
+              <span class="px-1.5 py-0.5 rounded-md bg-amber-500 text-black font-bold text-[10px]">
+                RESULT
+              </span>
+              <span class="text-amber-300 font-sans" v-html="renderRichMathText(mod.answer)"></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: 核心觀念與公式推導數據表 (Core Concepts & Formulas Table) -->
+    <section v-if="displayedConcepts && displayedConcepts.length > 0" class="rounded-md bg-[#161b22] border border-[#30363d] p-3.5 space-y-3">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-2">
+        <h3 class="font-mono font-bold text-xs text-amber-500">
+          [FORMULA_TABLE // 核心觀念與公式精要]
+        </h3>
+        <span class="text-[11px] font-mono text-[#8b949e]">
+          COUNT: {{ displayedConcepts.length }}
+        </span>
+      </div>
+
+      <div class="space-y-3">
+        <div 
+          v-for="(concept, idx) in displayedConcepts" 
+          :key="idx"
+          class="rounded-md bg-[#0d1117] border border-[#30363d] p-3 space-y-2"
+        >
+          <div class="flex items-center justify-between gap-2 border-b border-[#30363d] pb-1.5">
+            <h4 class="text-xs sm:text-sm font-bold font-mono text-[#f0f6fc] flex items-center gap-1.5">
+              <span class="text-amber-500 font-mono">{{ String(idx + 1).padStart(2, '0') }}.</span>
+              <span>{{ concept.title }}</span>
+            </h4>
+            <span 
+              v-if="concept.track"
+              class="px-1.5 py-0.2 rounded-md text-[10px] font-mono bg-[#161b22] border border-[#30363d] text-[#8b949e]"
+            >
+              {{ concept.track === 'mathA' ? '數A' : concept.track === 'mathB' ? '數B' : '共同' }}
+            </span>
+          </div>
+
+          <!-- Description -->
+          <div class="text-xs text-[#c9d1d9] leading-relaxed whitespace-pre-line" v-html="renderRichMathText(concept.description)"></div>
+
+          <!-- Formulas List Table -->
+          <div 
+            v-if="concept.formulas && concept.formulas.length > 0"
+            class="space-y-1.5 pt-1"
+          >
+            <div 
+              v-for="(fItem, fIdx) in concept.formulas"
+              :key="fIdx"
+              class="px-3 py-2 rounded-md bg-[#161b22] border border-[#30363d] flex flex-wrap items-center gap-2 text-xs font-mono"
+            >
+              <span 
+                v-if="renderFormulaItem(fItem).label" 
+                class="font-bold text-amber-400 font-mono text-[11px] px-1 py-0.2 rounded-md bg-[#0d1117] border border-[#30363d]"
+              >
+                {{ renderFormulaItem(fItem).label }}
+              </span>
+              <span 
+                class="text-[#f0f6fc] select-all font-sans text-xs sm:text-sm"
+                v-html="renderFormulaItem(fItem).mathHtml"
+              />
+              <span 
+                v-if="renderFormulaItem(fItem).note" 
+                class="text-[11px] text-[#8b949e] font-mono ml-auto"
+              >
+                // {{ renderFormulaItem(fItem).note }}
+              </span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Pitfalls Section (垂直單欄，由上而下閱讀動線) -->
-    <div v-if="displayedPitfalls && displayedPitfalls.length > 0" class="space-y-3">
-      <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
-        <AlertTriangle class="w-4 h-4 text-rose-400" />
-        <span>常見解題盲點與避坑提醒</span>
-      </h3>
-
-      <div class="flex flex-col space-y-3">
-        <div 
-          v-for="(pitfall, idx) in displayedPitfalls" 
-          :key="idx"
-          class="p-4 rounded-xl bg-rose-950/20 border border-rose-500/20 text-xs sm:text-sm text-rose-200/90 flex items-start gap-3"
-        >
-          <span class="w-5 h-5 rounded-full bg-rose-900/60 text-rose-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
-            {{ idx + 1 }}
-          </span>
-          <span class="leading-relaxed whitespace-pre-line" v-html="renderRichMathText(pitfall)"></span>
+    <!-- Section 3: 常見解題盲點與診斷數據表 (Diagnostic Data Table) -->
+    <section v-if="displayedPitfalls && displayedPitfalls.length > 0" class="rounded-md bg-[#161b22] border border-[#30363d] p-3.5 space-y-3">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-2">
+        <div class="flex items-center gap-2">
+          <AlertTriangle class="w-3.5 h-3.5 text-amber-500" />
+          <h3 class="font-mono font-bold text-xs text-amber-500">
+            [DIAGNOSTIC_LOG // 常見解題盲點與診斷數據表]
+          </h3>
         </div>
-      </div>
-    </div>
-
-    <!-- Practice Quiz Questions Section -->
-    <div v-if="displayedQuizQuestions && displayedQuizQuestions.length > 0" class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
-          <HelpCircle class="w-4 h-4 text-purple-400" />
-          <span>自我挑戰</span>
-        </h3>
-        <span class="text-xs text-purple-400/90 font-semibold px-2.5 py-0.5 rounded-full bg-purple-950/60 border border-purple-800/50">
-          觀念微檢測
+        <span class="text-[11px] font-mono text-[#8b949e]">
+          TOTAL_ANOMALIES: {{ displayedPitfalls.length }}
         </span>
       </div>
 
-      <div class="grid grid-cols-1 gap-4">
+      <!-- High Data Density Diagnostic Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs font-mono border-collapse border border-[#30363d]">
+          <thead>
+            <tr class="bg-[#0d1117] text-[#8b949e] border-b border-[#30363d]">
+              <th class="p-2.5 w-16 border-r border-[#30363d]">ID</th>
+              <th class="p-2.5 border-r border-[#30363d]">DIAGNOSIS_RULE // 診斷盲點與成因</th>
+              <th class="p-2.5 w-32 sm:w-40">SEVERITY</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#30363d]">
+            <tr 
+              v-for="(pitfall, pIdx) in displayedPitfalls"
+              :key="pIdx"
+              class="hover:bg-[#21262d] transition-colors"
+            >
+              <td class="p-2.5 text-amber-500 font-bold border-r border-[#30363d] align-top">
+                ERR_{{ String(pIdx + 1).padStart(2, '0') }}
+              </td>
+              <td class="p-2.5 text-[#c9d1d9] font-sans leading-relaxed border-r border-[#30363d]">
+                <span v-html="renderRichMathText(pitfall)"></span>
+              </td>
+              <td class="p-2.5 text-[#8b949e] font-mono text-[11px] align-top">
+                <span class="px-1.5 py-0.5 rounded-md bg-[#0d1117] border border-[#30363d] text-amber-400">
+                  CRITICAL_FALLACY
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 4: 觀念自我檢測 (Practice Quiz Questions) -->
+    <section v-if="displayedQuizQuestions && displayedQuizQuestions.length > 0" class="rounded-md bg-[#161b22] border border-[#30363d] p-3.5 space-y-3">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-2">
+        <div class="flex items-center gap-2">
+          <HelpCircle class="w-3.5 h-3.5 text-amber-500" />
+          <h3 class="font-mono font-bold text-xs text-amber-500">
+            [SELF_CHECK // 觀念微檢測]
+          </h3>
+        </div>
+      </div>
+
+      <div class="space-y-2.5">
         <div 
           v-for="(q, qIdx) in displayedQuizQuestions"
           :key="qIdx"
-          class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-purple-500/30 transition-all space-y-3 shadow-md"
+          class="rounded-md bg-[#0d1117] border border-[#30363d] p-3 space-y-2 font-mono"
         >
           <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded-md bg-purple-950 text-purple-300 border border-purple-700/60 text-xs font-bold">
-              第 {{ q.questionNumber || qIdx + 1 }} 題
+            <span class="px-1.5 py-0.5 rounded-md bg-[#161b22] text-amber-400 border border-[#30363d] text-[11px] font-bold">
+              Q_{{ String(q.questionNumber || qIdx + 1).padStart(2, '0') }}
             </span>
-            <h4 class="text-sm font-bold text-purple-200">
+            <h4 class="text-xs font-bold text-[#f0f6fc] font-sans">
               {{ q.title }}
             </h4>
           </div>
 
-          <p class="text-xs sm:text-sm text-slate-200 leading-relaxed p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80" v-html="renderRichMathText(q.question)"></p>
+          <p class="text-xs text-[#c9d1d9] leading-relaxed font-sans p-2 rounded-md bg-[#161b22] border border-[#30363d]" v-html="renderRichMathText(q.question)"></p>
 
-          <div v-if="q.hint" class="pt-1">
+          <div v-if="q.hint">
             <button
               @click="toggleHint(qIdx)"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-purple-950/50 hover:bg-purple-900/60 text-purple-300 border border-purple-700/50"
+              class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-mono transition-colors bg-[#161b22] hover:bg-[#21262d] text-amber-400 border border-[#30363d]"
             >
-              <Lightbulb class="w-3.5 h-3.5 text-purple-400" />
-              <span>{{ openHints[qIdx] ? '收起思考提示' : '查看思考提示' }}</span>
+              <span>{{ openHints[qIdx] ? '收起解題提示' : '查看解題提示' }}</span>
               <component :is="openHints[qIdx] ? ChevronUp : ChevronDown" class="w-3.5 h-3.5" />
             </button>
 
             <div 
               v-if="openHints[qIdx]"
-              class="mt-2.5 p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/30 text-xs text-purple-200/90 leading-relaxed whitespace-pre-line animate-in fade-in duration-150 space-y-3"
+              class="mt-2 p-2.5 rounded-md bg-[#161b22] border border-amber-500/40 text-xs font-sans text-[#c9d1d9] leading-relaxed whitespace-pre-line space-y-2"
             >
               <div v-html="renderRichMathText(q.hint)"></div>
-              <!-- 若提示附有幾何圖形解析則動態呈現 -->
-              <div 
-                v-if="q.diagramType"
-                class="my-2 w-full flex flex-col items-center rounded-2xl bg-slate-950/70 border border-slate-800/80 p-2 overflow-hidden shadow-inner"
-              >
+              <div v-if="q.diagramType" class="p-2 rounded-md bg-[#0d1117] border border-[#30363d]">
                 <ConceptDiagram :type="q.diagramType" />
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Attached Resources Section -->
-    <div class="pt-6 border-t border-slate-800 space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
-          <FileText class="w-4 h-4 text-emerald-400" />
-          <span>本單元實戰補充資源 (共 {{ chapterResources.length }} 筆)</span>
-        </h3>
+    <!-- Section 5: 單元附加資源清單 (Attached Resources) -->
+    <section class="rounded-md bg-[#161b22] border border-[#30363d] p-3.5 space-y-3">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-2">
+        <div class="flex items-center gap-2">
+          <FileText class="w-3.5 h-3.5 text-amber-500" />
+          <h3 class="font-mono font-bold text-xs text-amber-500">
+            [ATTACHED_FILES // 本單元實戰補充資源]
+          </h3>
+        </div>
+        <span class="text-[11px] font-mono text-[#8b949e]">
+          COUNT: {{ chapterResources.length }}
+        </span>
       </div>
 
-      <div v-if="chapterResources.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div v-if="chapterResources.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <ResourceCard
           v-for="res in chapterResources"
           :key="res.id"
@@ -730,19 +684,13 @@ const chapterResources = computed(() => {
         />
       </div>
 
-      <!-- No attached files yet for this chapter -->
       <div 
         v-else 
-        class="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 text-center space-y-2"
+        class="p-4 rounded-md bg-[#0d1117] border border-dashed border-[#30363d] text-center font-mono text-xs text-[#8b949e]"
       >
-        <p class="text-xs text-slate-400">
-          本單元目前尚無專屬附加試卷或動態檔案。
-        </p>
-        <p class="text-[11px] text-slate-500">
-          您可以直接將新試卷 PDF 放入 <code class="text-sky-400 font-mono">public/papers/</code>，即可自動在此單元呈現！
-        </p>
+        本單元目前尚無附加實戰試卷或動態模型。
       </div>
-    </div>
+    </section>
 
   </div>
 </template>

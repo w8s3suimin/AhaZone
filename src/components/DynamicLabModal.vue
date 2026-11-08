@@ -36,71 +36,71 @@ onUnmounted(() => {
   <Teleport to="body">
     <div 
       v-if="resource"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-200"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4 font-mono"
     >
     <div 
-      class="w-full h-full max-w-7xl bg-slate-900 border border-slate-700/80 rounded-2xl overflow-hidden flex flex-col shadow-2xl"
+      class="w-full h-full max-w-7xl bg-[#161b22] border border-[#30363d] rounded-md overflow-hidden flex flex-col shadow-2xl"
       :class="isFullscreen ? 'max-w-none rounded-none' : ''"
     >
       
       <!-- Top Header -->
-      <div class="px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center">
-            <component :is="resource.tags.includes('3D') ? Compass : FileText" class="w-4 h-4 text-sky-400" />
+      <div class="px-3.5 py-2.5 bg-[#0d1117] border-b border-[#30363d] flex items-center justify-between gap-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-md bg-[#161b22] border border-[#30363d] flex items-center justify-center">
+            <component :is="resource.tags.includes('3D') ? Compass : FileText" class="w-3.5 h-3.5 text-amber-500" />
           </div>
           <div>
-            <h2 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
-              <span>{{ resource.title }}</span>
-              <span class="text-xs font-normal text-sky-400 px-2 py-0.5 rounded bg-sky-950/60 border border-sky-800/80">
-                {{ resource.gradeLabel }} · {{ resource.chapter }}
+            <h2 class="text-xs sm:text-sm font-bold text-[#f0f6fc] flex items-center gap-2">
+              <span class="font-sans">{{ resource.title }}</span>
+              <span class="text-[10px] text-amber-400 px-1.5 py-0.2 rounded-md bg-[#161b22] border border-[#30363d]">
+                {{ resource.gradeLabel }} // {{ resource.chapter }}
               </span>
             </h2>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 text-xs">
           <button
             @click="showGuide = !showGuide"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border"
-            :class="showGuide ? 'bg-amber-950/40 text-amber-300 border-amber-600/60' : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'"
+            class="px-2.5 py-1 rounded-md text-xs font-mono flex items-center gap-1.5 transition-colors border"
+            :class="showGuide ? 'bg-amber-500 text-black font-bold border-amber-500' : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:text-[#f0f6fc]'"
           >
             <Lightbulb class="w-3.5 h-3.5" />
-            <span class="hidden sm:inline">觀念導引</span>
+            <span class="hidden sm:inline">GUIDE // 操作指引</span>
           </button>
 
           <button
             @click="iframeKey++"
-            class="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition-colors"
+            class="p-1 rounded-md bg-[#161b22] text-[#8b949e] hover:text-amber-500 border border-[#30363d] transition-colors"
             title="重新載入"
           >
-            <RefreshCw class="w-4 h-4" />
+            <RefreshCw class="w-3.5 h-3.5" />
           </button>
 
           <a
             :href="resource.filePath"
             target="_blank"
             rel="noopener noreferrer"
-            class="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition-colors"
+            class="p-1 rounded-md bg-[#161b22] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] transition-colors"
             title="在新分頁開啟"
           >
-            <ExternalLink class="w-4 h-4" />
+            <ExternalLink class="w-3.5 h-3.5" />
           </a>
 
           <button
             @click="isFullscreen = !isFullscreen"
-            class="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition-colors"
+            class="p-1 rounded-md bg-[#161b22] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] transition-colors"
             :title="isFullscreen ? '退出全螢幕' : '全螢幕'"
           >
-            <component :is="isFullscreen ? Minimize2 : Maximize2" class="w-4 h-4" />
+            <component :is="isFullscreen ? Minimize2 : Maximize2" class="w-3.5 h-3.5" />
           </button>
 
           <button
             @click="emit('close')"
-            class="p-1.5 rounded-lg bg-rose-950/50 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-800 transition-colors"
+            class="p-1 rounded-md bg-[#161b22] hover:bg-[#21262d] text-[#8b949e] hover:text-amber-500 border border-[#30363d] transition-colors"
             title="關閉"
           >
-            <X class="w-4 h-4" />
+            <X class="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -109,7 +109,7 @@ onUnmounted(() => {
       <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         
         <!-- Iframe View -->
-        <div class="flex-1 h-full w-full bg-slate-950">
+        <div class="flex-1 h-full w-full bg-[#0d1117]">
           <iframe
             :key="iframeKey"
             :src="resource.filePath"
@@ -122,43 +122,40 @@ onUnmounted(() => {
         <!-- Guide Sidebar -->
         <div 
           v-if="showGuide"
-          class="w-full md:w-80 lg:w-96 bg-slate-900 border-t md:border-t-0 md:border-l border-slate-800 p-4 overflow-y-auto space-y-4 text-xs text-slate-300"
+          class="w-full md:w-80 lg:w-96 bg-[#161b22] border-t md:border-t-0 md:border-l border-[#30363d] p-3.5 overflow-y-auto space-y-3 text-xs text-[#c9d1d9]"
         >
-          <div class="flex items-center gap-2 text-amber-300 font-bold text-sm border-b border-slate-800 pb-2">
-            <Lightbulb class="w-4 h-4 text-amber-400" />
-            <span>悟境觀念指引 (Aha! Guide)</span>
+          <div class="flex items-center gap-1.5 text-amber-400 font-bold text-xs border-b border-[#30363d] pb-2">
+            <Lightbulb class="w-3.5 h-3.5 text-amber-500" />
+            <span>[GUIDE // 操作與目標分析]</span>
           </div>
 
-          <div v-if="resource.ahaInsight" class="bg-amber-950/20 border border-amber-600/30 rounded-xl p-3 text-amber-200/90 leading-relaxed">
-            <div class="font-semibold text-amber-300 mb-1">🎯 探索目標：</div>
-            <div>{{ resource.ahaInsight }}</div>
+          <div v-if="resource.ahaInsight" class="bg-[#0d1117] border border-[#30363d] rounded-md p-2.5 text-[#c9d1d9] leading-relaxed">
+            <div class="font-bold text-amber-400 mb-0.5">[TARGET]：</div>
+            <div class="font-sans text-[#8b949e]">{{ resource.ahaInsight }}</div>
           </div>
 
-          <div v-if="resource.learningGoals && resource.learningGoals.length > 0" class="space-y-2">
-            <span class="font-semibold text-slate-200 block">學習核心任務：</span>
-            <ul class="space-y-1.5 list-disc list-inside text-slate-400">
+          <div v-if="resource.learningGoals && resource.learningGoals.length > 0" class="space-y-1.5">
+            <span class="font-bold text-[#f0f6fc] block">[KEY_TASKS]：</span>
+            <ul class="space-y-1 list-disc list-inside text-[#8b949e] font-sans">
               <li v-for="(goal, idx) in resource.learningGoals" :key="idx" class="leading-relaxed">
                 {{ goal }}
               </li>
             </ul>
           </div>
 
-          <!-- Operation Tips (Dynamic based on resource) -->
-          <div v-if="resource.operationTips && resource.operationTips.length > 0" class="space-y-2 pt-2 border-t border-slate-800">
-            <span class="font-semibold text-slate-200 block">💡 互動操作密技：</span>
-            <div class="space-y-2 text-slate-400">
+          <!-- Operation Tips -->
+          <div v-if="resource.operationTips && resource.operationTips.length > 0" class="space-y-1.5 pt-2 border-t border-[#30363d]">
+            <span class="font-bold text-[#f0f6fc] block">[INTERACTION_TIPS]：</span>
+            <div class="space-y-1.5 text-[#8b949e]">
               <div 
                 v-for="(tip, idx) in resource.operationTips" 
                 :key="idx"
-                class="p-2 rounded bg-slate-950 border border-slate-800"
+                class="p-2 rounded-md bg-[#0d1117] border border-[#30363d]"
               >
-                <strong 
-                  class="block mb-0.5"
-                  :class="tip.color === 'amber' ? 'text-amber-300' : tip.color === 'emerald' ? 'text-emerald-300' : tip.color === 'indigo' ? 'text-indigo-300' : 'text-sky-300'"
-                >
+                <strong class="block mb-0.5 text-amber-400 font-mono">
                   {{ tip.title }}
                 </strong>
-                <span>{{ tip.desc }}</span>
+                <span class="font-sans">{{ tip.desc }}</span>
               </div>
             </div>
           </div>

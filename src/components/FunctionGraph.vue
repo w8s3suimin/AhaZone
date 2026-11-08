@@ -106,13 +106,13 @@ const props = withDefaults(defineProps<{
   showControls: true,
   zoomable: true,
   pannable: true,
-  gridColor: '#1e293b',
-  axisColor: '#64748b',
+  gridColor: '#21262d',
+  axisColor: '#484f58',
   functions: () => [],
   points: () => [],
   lines: () => [],
   badges: () => [],
-  titleColor: '#38bdf8',
+  titleColor: '#f59e0b',
   clipId: () => `clip-${Math.random().toString(36).slice(2, 9)}`
 });
 
@@ -481,22 +481,22 @@ function onTouchEnd() {
 </script>
 
 <template>
-  <div class="relative w-full rounded-2xl bg-[#090d16] border border-slate-800 shadow-xl overflow-hidden flex flex-col group select-none">
+  <div class="relative w-full rounded-md bg-[#0d1117] border border-[#30363d] overflow-hidden flex flex-col group select-none">
     
     <!-- Top Header Bar: Title, Function Legend (圖例), and Toolbar Controls -->
     <div 
       v-if="title || legendFunctions.length > 0 || showControls"
-      class="px-3.5 py-2 sm:px-4 sm:py-2.5 flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm"
+      class="px-3.5 py-2 sm:px-4 sm:py-2 flex flex-wrap items-center justify-between gap-2.5 border-b border-[#30363d] bg-[#161b22]"
     >
       <!-- Left: Title & Legend Items (圖例) -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <!-- Optional Title -->
         <span 
           v-if="title" 
-          class="text-xs sm:text-sm font-bold tracking-wide flex items-center gap-1.5"
+          class="text-xs sm:text-sm font-bold font-mono tracking-wide flex items-center gap-1.5"
           :style="{ color: titleColor }"
         >
-          <span class="w-1.5 h-1.5 rounded-full" :style="{ backgroundColor: titleColor }"></span>
+          <span class="w-1.5 h-1.5 rounded-sm" :style="{ backgroundColor: titleColor }"></span>
           <span v-html="renderRichMathText(title)"></span>
         </span>
 
@@ -508,7 +508,7 @@ function onTouchEnd() {
           <div 
             v-for="(fnItem, fIdx) in legendFunctions" 
             :key="fIdx"
-            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-slate-900/90 border border-slate-800 text-[11px] sm:text-xs text-slate-200 shadow-sm"
+            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0d1117] border border-[#30363d] text-[11px] font-mono text-[#c9d1d9]"
           >
             <!-- Colored line swatch indicating stroke color and style -->
             <svg width="16" height="8" class="shrink-0">
@@ -522,8 +522,8 @@ function onTouchEnd() {
                 :stroke-dasharray="fnItem.dashArray" 
               />
             </svg>
-            <span class="font-bold text-slate-100 flex items-center" v-html="renderFunctionMathLabel(fnItem.label || '')"></span>
-            <span v-if="fnItem.description" class="text-[10px] text-slate-400 font-normal">
+            <span class="font-bold text-[#f0f6fc] flex items-center" v-html="renderFunctionMathLabel(fnItem.label || '')"></span>
+            <span v-if="fnItem.description" class="text-[10px] text-[#8b949e] font-mono font-normal">
               {{ fnItem.description }}
             </span>
           </div>
@@ -533,13 +533,13 @@ function onTouchEnd() {
       <!-- Right: Interactive View Controls -->
       <div 
         v-if="showControls"
-        class="graph-controls flex items-center gap-1 bg-slate-900/90 border border-slate-800 rounded-lg p-0.5 shadow-sm ml-auto"
+        class="graph-controls flex items-center gap-1 bg-[#0d1117] border border-[#30363d] rounded-md p-0.5 ml-auto font-mono"
       >
         <button 
           type="button"
           title="放大視圖"
           @click.stop="zoom(0.85)"
-          class="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          class="w-6 h-6 flex items-center justify-center rounded-md text-[#8b949e] hover:text-amber-500 hover:bg-[#161b22] transition-colors cursor-pointer"
         >
           <ZoomIn class="w-3.5 h-3.5" />
         </button>
@@ -547,7 +547,7 @@ function onTouchEnd() {
           type="button"
           title="縮小視圖"
           @click.stop="zoom(1.18)"
-          class="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          class="w-6 h-6 flex items-center justify-center rounded-md text-[#8b949e] hover:text-amber-500 hover:bg-[#161b22] transition-colors cursor-pointer"
         >
           <ZoomOut class="w-3.5 h-3.5" />
         </button>
@@ -555,7 +555,7 @@ function onTouchEnd() {
           type="button"
           title="重置視圖"
           @click.stop="resetView"
-          class="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          class="w-6 h-6 flex items-center justify-center rounded-md text-[#8b949e] hover:text-amber-500 hover:bg-[#161b22] transition-colors cursor-pointer"
         >
           <RotateCcw class="w-3 h-3" />
         </button>
@@ -591,7 +591,7 @@ function onTouchEnd() {
         </defs>
 
         <!-- Coordinate Area Background -->
-        <rect :width="width" :height="height" fill="#090d16" />
+        <rect :width="width" :height="height" fill="#0d1117" />
 
         <!-- Background Coordinate Grid (Strictly 1:1 Square when squareGrid is true) -->
         <g v-if="showGrid" :stroke="gridColor" stroke-width="0.8" stroke-dasharray="2 2">
@@ -806,7 +806,7 @@ function onTouchEnd() {
 /* Text-halo outline: ensures text is 100% legible even if crossing function curves */
 .chart-halo {
   paint-order: stroke fill;
-  stroke: #090d16;
+  stroke: #0d1117;
   stroke-width: 4px;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -821,6 +821,6 @@ function onTouchEnd() {
   font-size: 12px;
   font-weight: bold;
   white-space: nowrap;
-  text-shadow: 0 0 3px #090d16, 0 0 3px #090d16, 0 0 4px #090d16;
+  text-shadow: 0 0 3px #0d1117, 0 0 3px #0d1117, 0 0 4px #0d1117;
 }
 </style>
