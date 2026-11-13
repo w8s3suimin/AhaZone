@@ -628,15 +628,13 @@ const currentTransConfig = computed(() => {
       color: '#64748b',
       strokeWidth: 1.5,
       dashArray: '3 3',
-      label: initialFamily.value === 'exp' ? 'y = 2^x' : 'y = \\log_2 x',
-      description: '原基準'
+      label: initialFamily.value === 'exp' ? 'y = 2^x' : 'y = \\log_2 x'
     },
     {
       fn: transformedFn,
       color: '#38bdf8',
       strokeWidth: 2.6,
-      label: formulaLatex,
-      description: '變換後'
+      label: formulaLatex
     }
   ];
 

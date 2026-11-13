@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { ZoomIn, ZoomOut, RotateCcw, Move } from 'lucide-vue-next';
+import { ZoomIn, ZoomOut, RotateCcw, Move, Maximize2 } from 'lucide-vue-next';
 import { renderRichMathText, renderFunctionMathLabel } from '../utils/mathRenderer';
 import katex from 'katex';
 
@@ -530,10 +530,10 @@ function onTouchEnd() {
         </div>
       </div>
 
-      <!-- Right: Interactive View Controls -->
+      <!-- Right: Interactive View Controls (桌面版顯示，手機版已刪除放大縮小) -->
       <div 
         v-if="showControls"
-        class="graph-controls flex items-center gap-1 bg-[#0d1117] border border-[#30363d] rounded-md p-0.5 ml-auto font-mono"
+        class="hidden sm:flex graph-controls items-center gap-1 bg-[#0d1117] border border-[#30363d] rounded-md p-0.5 ml-auto font-mono"
       >
         <button 
           type="button"
@@ -564,6 +564,17 @@ function onTouchEnd() {
 
     <!-- SVG Coordinate Plane -->
     <div class="relative w-full overflow-hidden">
+      <!-- 手機版重置比例按鈕 (圓矩形，內部為向四角伸展箭號，置於繪圖區內右上角) -->
+      <button 
+        v-if="showControls"
+        type="button"
+        title="重置比例"
+        @click.stop="resetView"
+        class="sm:hidden absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center rounded-md bg-[#161b22]/90 hover:bg-[#21262d] active:bg-amber-500/20 border border-[#30363d] text-[#8b949e] active:text-amber-400 shadow-md backdrop-blur-sm cursor-pointer transition-colors"
+      >
+        <Maximize2 class="w-4 h-4" />
+      </button>
+
       <svg 
         ref="svgRef"
         :viewBox="`0 0 ${width} ${height}`" 
