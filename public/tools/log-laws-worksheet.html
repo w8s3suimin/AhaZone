@@ -409,7 +409,7 @@
             <span>P1 - 基本題型答案（20 題）</span>
             <span class="text-xs text-slate-500 font-normal">純單一公式演練（1~5 分合 ｜ 6~10 次係 ｜ 11~15 換底倒數 ｜ 16~20 底真消底）</span>
           </h3>
-          <div id="ans-p1-grid" class="grid grid-cols-4 gap-2 text-xs"></div>
+          <div id="ans-p1-grid" class="grid grid-cols-5 gap-1.5 sm:gap-2 text-xs"></div>
         </div>
 
         <!-- Page 2 Answers (20 題) -->
@@ -418,7 +418,7 @@
             <span>P2 - 綜合題型答案（20 題）</span>
             <span class="text-xs text-slate-500 font-normal">教師核對專用：標記難度等級</span>
           </h3>
-          <div id="ans-p2-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs"></div>
+          <div id="ans-p2-grid" class="grid grid-cols-5 gap-1.5 sm:gap-2 text-xs"></div>
         </div>
       </div>
 
@@ -933,7 +933,7 @@
 
       allP1.forEach((item, idx) => {
         const cell = document.createElement('div');
-        cell.className = 'border border-sky-200 rounded p-1.5 bg-white flex items-center justify-between font-mono';
+        cell.className = 'border border-sky-200 rounded px-2 py-1 bg-white flex items-center justify-between font-mono text-xs';
         cell.innerHTML = `<span class="text-slate-400 font-bold">(${idx + 1})</span>`;
         const ansSpan = document.createElement('span');
         ansSpan.className = 'font-bold text-sky-900';
@@ -945,9 +945,9 @@
       // P2 (20 items) - detailed teacher view
       worksheetData.p2.forEach((item, idx) => {
         const cell = document.createElement('div');
-        cell.className = 'border border-sky-200 rounded p-1.5 bg-white flex items-center justify-between font-mono';
+        cell.className = 'border border-sky-200 rounded px-2 py-1 bg-white flex items-center justify-between font-mono text-xs';
         const num = idx + 1;
-        cell.innerHTML = `<div class="flex items-center"><span class="text-slate-400 font-bold mr-1.5">(${num})</span><span class="px-1 py-0.2 rounded bg-sky-100 text-sky-800 font-bold text-[9px] mr-1">${item.t}</span></div>`;
+        cell.innerHTML = `<div class="flex items-center"><span class="text-slate-400 font-bold mr-1">(${num})</span><span class="px-1 py-0.2 rounded bg-sky-100 text-sky-800 font-bold text-[9px] mr-1">${item.t}</span></div>`;
         const ansSpan = document.createElement('span');
         ansSpan.className = 'font-bold text-sky-900';
         renderMath(ansSpan, item.a, false);
