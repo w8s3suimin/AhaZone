@@ -1537,163 +1537,166 @@ const currentFeatureDisplay = computed(() => {
           :lines="currentTransConfig.lines"
         />
 
-        <!-- 2. 手機版專用水平極簡按鈕列 (置於函數圖形繪畫窗正下方，兩排精簡設計) -->
-        <div class="w-full flex flex-col gap-1.5 md:hidden">
-          <!-- Row 1: 單鍵切換基準、X平移、Y平移、復原、重置 -->
-          <div class="flex items-center gap-1 w-full text-xs">
-            <!-- 基準函數單鍵切換 -->
+        <!-- 2. 手機版專用控制面板 (置於圖形正下方，寬鬆舒適之卡片式配置) -->
+        <div class="w-full flex flex-col gap-2 p-2.5 rounded-md bg-[#161b22] border border-[#30363d] md:hidden">
+          <!-- Row 1: 基準切換 (寬版晶片鈕) + 復原與重置 -->
+          <div class="flex items-center justify-between gap-2 w-full">
+            <!-- 基準函數切換鈕 -->
             <button
               type="button"
               @click="toggleInitialFamily"
-              class="flex-1 min-w-0 py-1 px-1 rounded-md bg-[#161b22] border border-amber-500/50 text-[#f0f6fc] active:bg-amber-500/20 font-semibold flex items-center justify-center gap-1 text-center transition-colors cursor-pointer"
+              class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-[#0d1117] border border-amber-500/50 text-[#f0f6fc] active:bg-amber-500/20 text-xs font-semibold cursor-pointer transition-colors"
               title="單擊切換指數 / 對數"
             >
-              <span class="text-[11px] text-[#c9d1d9]">{{ initialFamily === 'exp' ? '指數' : '對數' }}</span>
-              <span class="text-amber-400 font-bold font-mono text-[11px]">{{ initialFamily === 'exp' ? '2ˣ' : 'log₂' }}</span>
-              <span class="text-[9px] text-[#8b949e]">⇄</span>
+              <span class="text-[#8b949e] text-[11px]">基準:</span>
+              <span class="text-amber-400 font-bold font-mono">{{ initialFamily === 'exp' ? 'y = 2ˣ' : 'y = log₂x' }}</span>
+              <span class="text-[10px] text-amber-500 bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/30">切換 ⇄</span>
             </button>
 
-            <!-- X 平移 (極簡化：隱藏「位移」細節) -->
-            <div class="flex items-center rounded-md bg-[#0d1117] border border-[#30363d] overflow-hidden shrink-0">
+            <!-- 復原與重置 -->
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                @click="undoLastStep"
+                :disabled="stepHistory.length === 0 && !activeActionType"
+                class="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-[#0d1117] text-[#8b949e] active:text-[#f0f6fc] border border-[#30363d] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              >
+                復原
+              </button>
+              <button
+                type="button"
+                @click="resetAll"
+                class="px-2.5 py-1.5 rounded-md text-xs font-bold bg-[#0d1117] text-amber-400 active:bg-amber-500/10 border border-amber-500/50 cursor-pointer transition-colors"
+              >
+                重置
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 2: 平移步進控制 (X 平移、Y 平移，雙欄等寬寬敞佈局) -->
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <!-- X 平移 -->
+            <div class="flex items-center justify-between rounded-md bg-[#0d1117] border border-[#30363d] p-0.5">
               <button
                 type="button"
                 @click="handleShiftX(-1)"
-                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                class="w-8 h-8 flex items-center justify-center rounded bg-[#161b22] hover:bg-[#21262d] active:bg-amber-500/20 text-amber-400 font-bold text-sm cursor-pointer transition-colors"
                 title="向左平移"
               >
                 －
               </button>
-              <span class="text-[11px] font-semibold text-[#c9d1d9] px-1 whitespace-nowrap">
-                X平移<span v-if="activeShiftH !== 0" class="text-amber-400 font-mono ml-0.5">{{ activeShiftH > 0 ? `+${activeShiftH}` : activeShiftH }}</span>
+              <span class="text-xs font-bold text-[#c9d1d9] flex items-center gap-1">
+                <span>X平移</span>
+                <span v-if="activeShiftH !== 0" class="text-amber-400 font-mono">{{ activeShiftH > 0 ? `+${activeShiftH}` : activeShiftH }}</span>
               </span>
               <button
                 type="button"
                 @click="handleShiftX(1)"
-                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                class="w-8 h-8 flex items-center justify-center rounded bg-[#161b22] hover:bg-[#21262d] active:bg-amber-500/20 text-amber-400 font-bold text-sm cursor-pointer transition-colors"
                 title="向右平移"
               >
                 ＋
               </button>
             </div>
 
-            <!-- Y 平移 (極簡化：隱藏「位移」細節) -->
-            <div class="flex items-center rounded-md bg-[#0d1117] border border-[#30363d] overflow-hidden shrink-0">
+            <!-- Y 平移 -->
+            <div class="flex items-center justify-between rounded-md bg-[#0d1117] border border-[#30363d] p-0.5">
               <button
                 type="button"
                 @click="handleShiftY(-1)"
-                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                class="w-8 h-8 flex items-center justify-center rounded bg-[#161b22] hover:bg-[#21262d] active:bg-amber-500/20 text-amber-400 font-bold text-sm cursor-pointer transition-colors"
                 title="向下平移"
               >
                 －
               </button>
-              <span class="text-[11px] font-semibold text-[#c9d1d9] px-1 whitespace-nowrap">
-                Y平移<span v-if="activeShiftK !== 0" class="text-amber-400 font-mono ml-0.5">{{ activeShiftK > 0 ? `+${activeShiftK}` : activeShiftK }}</span>
+              <span class="text-xs font-bold text-[#c9d1d9] flex items-center gap-1">
+                <span>Y平移</span>
+                <span v-if="activeShiftK !== 0" class="text-amber-400 font-mono">{{ activeShiftK > 0 ? `+${activeShiftK}` : activeShiftK }}</span>
               </span>
               <button
                 type="button"
                 @click="handleShiftY(1)"
-                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                class="w-8 h-8 flex items-center justify-center rounded bg-[#161b22] hover:bg-[#21262d] active:bg-amber-500/20 text-amber-400 font-bold text-sm cursor-pointer transition-colors"
                 title="向上平移"
               >
                 ＋
               </button>
             </div>
-
-            <!-- 復原 -->
-            <button
-              type="button"
-              @click="undoLastStep"
-              :disabled="stepHistory.length === 0 && !activeActionType"
-              class="py-1 px-1.5 rounded-md text-[11px] font-semibold bg-[#0d1117] text-[#8b949e] active:text-[#f0f6fc] border border-[#30363d] disabled:opacity-30 disabled:cursor-not-allowed text-center transition-colors cursor-pointer shrink-0"
-              title="復原"
-            >
-              復原
-            </button>
-
-            <!-- 重置 -->
-            <button
-              type="button"
-              @click="resetAll"
-              class="py-1 px-1.5 rounded-md text-[11px] font-bold bg-[#0d1117] text-amber-400 active:bg-amber-500/10 border border-amber-500/50 text-center transition-colors cursor-pointer shrink-0"
-              title="重置"
-            >
-              重置
-            </button>
           </div>
 
-          <!-- Row 2: X伸縮、Y伸縮、上下翻轉、左右翻轉、反函數 -->
-          <div class="flex items-center gap-1 w-full text-xs">
-            <!-- X 伸縮 (極簡化：隱藏「倍率」細節) -->
-            <div class="flex items-center rounded-md bg-[#0d1117] border border-[#30363d] overflow-hidden shrink-0">
+          <!-- Row 3: 伸縮步進控制 (X 伸縮、Y 伸縮，雙欄等寬寬敞佈局) -->
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <!-- X 伸縮 -->
+            <div class="flex items-center justify-between rounded-md bg-[#0d1117] border border-[#30363d] p-0.5">
               <button
                 type="button"
                 @click="handleScaleX('down')"
-                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                class="w-8 h-8 flex items-center justify-center rounded bg-[#161b22] hover:bg-[#21262d] active:bg-amber-500/20 text-amber-400 font-bold text-sm cursor-pointer transition-colors"
                 title="水平壓縮"
               >
                 －
               </button>
-              <span class="text-[11px] font-semibold text-[#c9d1d9] px-1 whitespace-nowrap">
-                X伸縮<span v-if="activeScaleXIdx !== 3" class="text-amber-400 font-mono ml-0.5">×{{ scaleLabels[activeScaleXIdx] }}</span>
+              <span class="text-xs font-bold text-[#c9d1d9] flex items-center gap-1">
+                <span>X伸縮</span>
+                <span v-if="activeScaleXIdx !== 3" class="text-amber-400 font-mono">×{{ scaleLabels[activeScaleXIdx] }}</span>
               </span>
               <button
                 type="button"
                 @click="handleScaleX('up')"
-                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                class="w-8 h-8 flex items-center justify-center rounded bg-[#161b22] hover:bg-[#21262d] active:bg-amber-500/20 text-amber-400 font-bold text-sm cursor-pointer transition-colors"
                 title="水平伸長"
               >
                 ＋
               </button>
             </div>
 
-            <!-- Y 伸縮 (極簡化：隱藏「倍率」細節) -->
-            <div class="flex items-center rounded-md bg-[#0d1117] border border-[#30363d] overflow-hidden shrink-0">
+            <!-- Y 伸縮 -->
+            <div class="flex items-center justify-between rounded-md bg-[#0d1117] border border-[#30363d] p-0.5">
               <button
                 type="button"
                 @click="handleScaleY('down')"
-                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                class="w-8 h-8 flex items-center justify-center rounded bg-[#161b22] hover:bg-[#21262d] active:bg-amber-500/20 text-amber-400 font-bold text-sm cursor-pointer transition-colors"
                 title="垂直壓縮"
               >
                 －
               </button>
-              <span class="text-[11px] font-semibold text-[#c9d1d9] px-1 whitespace-nowrap">
-                Y伸縮<span v-if="activeScaleYIdx !== 3" class="text-amber-400 font-mono ml-0.5">×{{ scaleLabels[activeScaleYIdx] }}</span>
+              <span class="text-xs font-bold text-[#c9d1d9] flex items-center gap-1">
+                <span>Y伸縮</span>
+                <span v-if="activeScaleYIdx !== 3" class="text-amber-400 font-mono">×{{ scaleLabels[activeScaleYIdx] }}</span>
               </span>
               <button
                 type="button"
                 @click="handleScaleY('up')"
-                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                class="w-8 h-8 flex items-center justify-center rounded bg-[#161b22] hover:bg-[#21262d] active:bg-amber-500/20 text-amber-400 font-bold text-sm cursor-pointer transition-colors"
                 title="垂直伸長"
               >
                 ＋
               </button>
             </div>
+          </div>
 
-            <!-- 上下翻轉 (極簡化：隱藏「x 軸」細節) -->
+          <!-- Row 4: 對稱動作 (上下翻轉、左右翻轉、反函數，三欄平分) -->
+          <div class="grid grid-cols-3 gap-2 w-full">
             <button
               type="button"
               @click="applyReflectX"
-              class="flex-1 min-w-0 py-1 px-1 rounded-md text-[11px] font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] active:border-amber-500 active:text-amber-400 transition-colors text-center cursor-pointer whitespace-nowrap"
+              class="py-2 px-1 rounded-md text-xs font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] hover:border-amber-500 hover:text-amber-400 active:bg-amber-500/10 transition-colors text-center cursor-pointer"
               title="上下翻轉 (x 軸)"
             >
               上下翻轉
             </button>
-
-            <!-- 左右翻轉 (極簡化：隱藏「y 軸」細節) -->
             <button
               type="button"
               @click="applyReflectY"
-              class="flex-1 min-w-0 py-1 px-1 rounded-md text-[11px] font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] active:border-amber-500 active:text-amber-400 transition-colors text-center cursor-pointer whitespace-nowrap"
+              class="py-2 px-1 rounded-md text-xs font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] hover:border-amber-500 hover:text-amber-400 active:bg-amber-500/10 transition-colors text-center cursor-pointer"
               title="左右翻轉 (y 軸)"
             >
               左右翻轉
             </button>
-
-            <!-- 反函數 (極簡化：隱藏「對稱 y = x」細節) -->
             <button
               type="button"
               @click="applyInverse"
-              class="flex-1 min-w-0 py-1 px-1 rounded-md text-[11px] font-semibold bg-[#0d1117] border border-[#30363d] text-amber-400 active:bg-amber-500/10 active:border-amber-500 transition-colors text-center cursor-pointer whitespace-nowrap"
+              class="py-2 px-1 rounded-md text-xs font-semibold bg-[#0d1117] border border-[#30363d] text-amber-400 hover:border-amber-500 active:bg-amber-500/10 transition-colors text-center cursor-pointer font-bold"
               title="反函數對稱 (對稱 y = x)"
             >
               反函數
