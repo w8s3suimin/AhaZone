@@ -933,11 +933,14 @@
 
       allP1.forEach((item, idx) => {
         const cell = document.createElement('div');
-        cell.className = 'border border-sky-200 rounded px-2 py-1 bg-white flex items-center justify-between font-mono text-xs';
-        cell.innerHTML = `<span class="text-slate-400 font-bold">(${idx + 1})</span>`;
+        cell.className = 'border border-sky-200 rounded px-2 py-1 bg-white flex items-center gap-2 font-mono text-xs';
+        const numSpan = document.createElement('span');
+        numSpan.className = 'text-slate-400 font-bold shrink-0';
+        numSpan.textContent = `(${idx + 1})`;
         const ansSpan = document.createElement('span');
         ansSpan.className = 'font-bold text-sky-900';
         renderMath(ansSpan, item.ans, false);
+        cell.appendChild(numSpan);
         cell.appendChild(ansSpan);
         p1Grid.appendChild(cell);
       });
@@ -947,11 +950,26 @@
         const cell = document.createElement('div');
         cell.className = 'border border-sky-200 rounded px-2 py-1 bg-white flex items-center justify-between font-mono text-xs';
         const num = idx + 1;
-        cell.innerHTML = `<div class="flex items-center"><span class="text-slate-400 font-bold mr-1">(${num})</span><span class="px-1 py-0.2 rounded bg-sky-100 text-sky-800 font-bold text-[9px] mr-1">${item.t}</span></div>`;
+        
+        // 答案跟隨在題號之後
+        const leftDiv = document.createElement('div');
+        leftDiv.className = 'flex items-center gap-1.5';
+        const numSpan = document.createElement('span');
+        numSpan.className = 'text-slate-400 font-bold shrink-0';
+        numSpan.textContent = `(${num})`;
         const ansSpan = document.createElement('span');
         ansSpan.className = 'font-bold text-sky-900';
         renderMath(ansSpan, item.a, false);
-        cell.appendChild(ansSpan);
+        leftDiv.appendChild(numSpan);
+        leftDiv.appendChild(ansSpan);
+
+        // 難度等級改置於該格最後方
+        const tierBadge = document.createElement('span');
+        tierBadge.className = 'px-1 py-0.5 rounded bg-sky-100 text-sky-800 font-bold text-[9px] shrink-0 ml-1';
+        tierBadge.textContent = item.t;
+
+        cell.appendChild(leftDiv);
+        cell.appendChild(tierBadge);
         p2Grid.appendChild(cell);
       });
     }
