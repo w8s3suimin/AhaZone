@@ -88,8 +88,60 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
       }
     ],
     featured: true,
-    date: '2026-11-05',
-    downloads: 856,
+    date: '2026-11-03',
+    downloads: 1420,
+    rating: 4.9
+  },
+
+  // 3. 高一第二章【指數與對數函數】：對數律四大公式動態階梯訓練卷（種子隨機）
+  {
+    id: 'res-dynamic-log-laws-worksheet',
+    title: '對數律動態階梯式訓練卷（種子出題 ｜ 雙頁專卷）',
+    subtitle: 'Page 1 四大基本題型 20 題 ｜ Page 2 綜合階梯 30 題 (C/B/A) ｜ 純對數律演練',
+    description: '依據 AhaZone 對數律四大公式體系設計：第一頁為四大公式單一運算練功（分合、次係、換底倒數、底真對調各 5 題）；第二頁依使用公式數分為 C 級(2式, 15題)、B 級(3式, 10題)、A 級(4式全開, 5題)。嚴格剔除干擾核心的乘法公式，支援自訂種子碼（Seed PRNG），保證同種子試題完全一致，答案皆為簡潔整數或最簡分數。',
+    type: 'dynamic',
+    categoryLabel: '動態隨機出題卷',
+    actionLabel: '開啟對數律訓練卷',
+    stage: 'senior',
+    grade: 's10-math',
+    gradeLabel: '高一數學',
+    subject: 'math',
+    subjectLabel: '高中數學',
+    chapter: '指數與對數函數',
+    tags: ['動態出題', '種子隨機', '指數與對數函數', '高一第二章', '對數律', '階梯訓練', 'A4列印', '純對數律'],
+    filePath: '/tools/log-laws-worksheet.html',
+    ahaInsight: '摒棄乘法公式代數干擾，專注於「分合」、「次係」、「換底倒數」與「底真對調」四大公式的靶向與階梯式融合！',
+    learningGoals: [
+      '透過第一頁 20 道單一公式靶向題，建立肌肉記憶',
+      '經由第二頁 C (2式) → B (3式) → A (4式) 階梯綜合題，循序漸進攻克對數混合運算',
+      '支援雙層對數嵌套題目，深度體會對數運算的本質',
+      '利用種子碼指定全班同一試卷，方便派卷與精準批改'
+    ],
+    operationTips: [
+      {
+        title: '1. 種子碼精準控制 (Seed PRNG)：',
+        desc: '上方輸入框可輸入指定種子（如 LOG-8801），點擊「套用」即可產生固定試卷，全班共享同組題目。',
+        color: 'sky'
+      },
+      {
+        title: '2. 快速換卷 (快捷鍵 R)：',
+        desc: '點擊「換一卷」或按鍵盤 R，即可動態生成全新隨機種子與 50 道運算題。',
+        color: 'indigo'
+      },
+      {
+        title: '3. 題目旁即時核對 (快捷鍵 A)：',
+        desc: '點擊「顯示答案」可在每題等號後方顯示漂亮解答；亦可開啟第 3 頁獨立標準解答頁。',
+        color: 'amber'
+      },
+      {
+        title: '4. 雙頁標準 A4 輸出 (快捷鍵 P)：',
+        desc: '點擊「列印 / PDF」，瀏覽器自動排版為第一頁（基本卷）、第二頁（綜合卷）及第三頁（解答單）。',
+        color: 'emerald'
+      }
+    ],
+    featured: true,
+    date: '2026-11-13',
+    downloads: 980,
     rating: 5.0
   },
 
