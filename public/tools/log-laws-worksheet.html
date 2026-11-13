@@ -171,32 +171,32 @@
       <!-- Action Buttons & Controllers -->
       <div class="flex items-center gap-2 flex-wrap">
         
-        <!-- Difficulty Tier Selector (A / B / C 卷) -->
+        <!-- Difficulty Tier Selector (A / B / C) -->
         <div class="flex items-center bg-slate-800 rounded-lg border border-slate-700 p-0.5 text-xs">
           <span class="text-slate-400 px-2 py-1 font-medium">綜合難度:</span>
           <button 
-            id="btnTierC" 
-            onclick="setTier('C')" 
-            class="px-2.5 py-1 rounded font-bold transition text-slate-400 hover:text-white"
-            title="C卷：20題皆為基礎綜合 (2公式)"
+            id="btnTierA" 
+            onclick="setTier('A')" 
+            class="px-2.5 py-1 rounded font-bold transition bg-sky-600 text-white shadow-sm"
+            title="A：全方位綜合題型（融合 A、B、C 難度）"
           >
-            C 卷
+            A
           </button>
           <button 
             id="btnTierB" 
             onclick="setTier('B')" 
             class="px-2.5 py-1 rounded font-bold transition text-slate-400 hover:text-white"
-            title="B卷：20題由 B 與 C 難度混合組成"
+            title="B：進階綜合題型（融合 B、C 難度）"
           >
-            B 卷
+            B
           </button>
           <button 
-            id="btnTierA" 
-            onclick="setTier('A')" 
-            class="px-2.5 py-1 rounded font-bold transition bg-sky-600 text-white shadow-sm"
-            title="A卷：20題由 A、B、C 三種難度全方位綜合組成"
+            id="btnTierC" 
+            onclick="setTier('C')" 
+            class="px-2.5 py-1 rounded font-bold transition text-slate-400 hover:text-white"
+            title="C：基礎綜合題型（2公式）"
           >
-            A 卷
+            C
           </button>
         </div>
 
@@ -208,14 +208,14 @@
           <input 
             type="text" 
             id="seedInput" 
-            placeholder="自訂種子" 
-            class="bg-transparent border-none outline-none text-sky-200 font-mono w-24 sm:w-28 text-xs placeholder:text-slate-500"
+            placeholder="數字 (如 3991)" 
+            class="bg-transparent border-none outline-none text-sky-200 font-mono w-20 sm:w-24 text-xs placeholder:text-slate-500"
             onkeydown="if(event.key==='Enter') applyCustomSeed()"
           />
           <button 
             onclick="applyCustomSeed()" 
             class="text-xs bg-sky-600 hover:bg-sky-500 text-white px-2 py-0.5 rounded transition"
-            title="套用此種子產生固定考卷"
+            title="套用此種子數字產生考卷"
           >
             套用
           </button>
@@ -431,7 +431,7 @@
   <!-- ==================== SCRIPT: SEED PRNG & GENERATORS ==================== -->
   <script>
     // State Variables
-    let currentSeed = '';
+    let currentSeedNum = '3991';
     let currentTier = 'A'; // 'A' | 'B' | 'C'
     let showInlineAnswers = false;
     let showAnswerPage = true;
@@ -920,7 +920,7 @@
       const p2Grid = document.getElementById('ans-p2-grid');
       p1Grid.innerHTML = ''; p2Grid.innerHTML = '';
 
-      document.getElementById('p3TierLabel').textContent = `${currentTier} 卷`;
+      document.getElementById('p3TierLabel').textContent = `難度 ${currentTier}`;
 
       // Flatten P1 (20 items)
       const allP1 = [
@@ -957,6 +957,10 @@
 
     // ==================== CONTROLLER FUNCTIONS ====================
 
+    function getSerialCode() {
+      return `LOG-${currentTier}-${currentSeedNum}`;
+    }
+
     function setTier(tier) {
       currentTier = tier;
       ['btnTierA', 'btnTierB', 'btnTierC'].forEach(id => {
@@ -966,19 +970,22 @@
       const activeBtn = document.getElementById(`btnTier${tier}`);
       activeBtn.className = 'px-2.5 py-1 rounded font-bold transition bg-sky-600 text-white shadow-sm';
 
-      applySeed(currentSeed);
+      applySeed(currentSeedNum);
     }
 
-    function applySeed(seedStr) {
-      currentSeed = seedStr;
-      rng = initPRNG(currentSeed + '-' + currentTier);
+    function applySeed(seedInputVal) {
+      // 提取純數字作為種子
+      const cleanNum = String(seedInputVal).replace(/\D/g, '');
+      currentSeedNum = cleanNum || String(Math.floor(1000 + Math.random() * 9000));
       
-      const fullSerial = currentSeed + ` (${currentTier}卷)`;
-      document.getElementById('serialBadge').textContent = fullSerial;
-      document.getElementById('p1Serial').textContent = currentSeed;
-      document.getElementById('p2Serial').textContent = fullSerial;
-      document.getElementById('p3Serial').textContent = fullSerial;
-      document.getElementById('seedInput').value = currentSeed;
+      const serialCode = getSerialCode();
+      rng = initPRNG(currentSeedNum + '-' + currentTier);
+      
+      document.getElementById('serialBadge').textContent = serialCode;
+      document.getElementById('p1Serial').textContent = serialCode;
+      document.getElementById('p2Serial').textContent = serialCode;
+      document.getElementById('p3Serial').textContent = serialCode;
+      document.getElementById('seedInput').value = currentSeedNum;
 
       // Generate Data
       worksheetData.p1.sec1 = genP1Sec1();
@@ -1003,8 +1010,9 @@
     }
 
     function regenerateWorksheet() {
-      const randomSeed = 'LOG-' + Math.floor(1000 + Math.random() * 9000);
-      applySeed(randomSeed);
+      // 生成 4 位或 5 位隨機數字
+      const randomSeedNum = Math.floor(1000 + Math.random() * 9000);
+      applySeed(randomSeedNum);
     }
 
     function toggleAnswers() {
