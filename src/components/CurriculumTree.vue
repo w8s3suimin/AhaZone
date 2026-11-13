@@ -298,6 +298,7 @@ const getResourceCountForChapter = (chapterName: string) => {
 
   <!-- Case B: Desktop 300px Left Workbench Column -->
   <aside 
+    v-else-if="mode === 'embedded'"
     class="w-[300px] min-w-[300px] max-w-[300px] bg-[#161b22] border border-[#30363d] rounded-md p-3.5 flex flex-col gap-3 shadow-none"
   >
     <!-- Header: Knowledge Tree Label -->
