@@ -47,14 +47,13 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     rating: 4.9
   },
 
-  // 2. 高一第一章【數與式】：指數律與對數律動態隨機出題卷（無限題庫）
+  // 2. 高一第一章【數與式】：指數律與常用對數 ｜ 動態訓練卷
   {
     id: 'res-dynamic-exp-log-worksheet',
-    title: '指數律與對數律自動化出題訓練卷（無限隨機題庫）',
-    subtitle: '一鍵動態出題 ｜ 仿真 A4 試卷 ｜ 支援即時列印與標準答案頁',
-    description: '依據高一第一章【數與式】運算演算法，一鍵隨機生成 30 道精選指數律與常用對數律基礎運算題。具備仿真標準 A4 試卷排版，點擊重新整理即可產生全新試卷與對應解答，支援瀏覽器一鍵列印成實體紙本測驗卷。',
+    title: '指數律與常用對數 ｜ 動態訓練卷',
+    description: '精熟高一數與式基礎運算：第一部分指數律化簡 (15題)，第二部分常用對數求值 (15題)。支援隨機出題與 A4 列印。',
     type: 'dynamic',
-    categoryLabel: '動態隨機出題卷',
+    categoryLabel: '動態訓練卷',
     actionLabel: '開啟動態訓練卷',
     stage: 'senior',
     grade: 's10-math',
@@ -62,9 +61,9 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     subject: 'math',
     subjectLabel: '高中數學',
     chapter: '數與式',
-    tags: ['動態出題', '無限題庫', '數與式', '高一第一章', '指數律', '常用對數', 'A4列印', '課堂測驗'],
+    tags: ['動態訓練卷', '數與式', '高一數學', '指數律', '常用對數', 'A4列印'],
     filePath: '/tools/exp-log-worksheet.html',
-    ahaInsight: '指數律化簡「底數同次先對消、負次方倒數反轉」；對數律將真數質因數相乘拆解為對數相加減，隨心掌握精準四位小數與符號化簡！',
+    ahaInsight: '指數律化簡「同底相乘指數相加、負次方倒數反轉」；常用對數拆解質因數掌握小數估算與符號化簡！',
     learningGoals: [
       '熟練分數次方與負整數指數的快速化簡互換',
       '精熟常用對數真數相乘除拆解與小數運算估計',
