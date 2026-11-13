@@ -49,7 +49,7 @@
       min-height: 297mm;
       height: 297mm;
       max-height: 297mm;
-      padding: 11mm 14mm 9mm 14mm;
+      padding: 10mm 12mm 8mm 12mm;
       margin: 24px auto;
       background: #ffffff;
       box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -65,7 +65,7 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 6mm 10mm;
+        margin: 8mm 12mm 8mm 12mm;
       }
       *, *::before, *::after {
         box-sizing: border-box !important;
@@ -77,7 +77,6 @@
         padding: 0 !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 0 !important;
       }
       main {
         margin: 0 !important;
@@ -90,18 +89,22 @@
       }
       .a4-page {
         width: 100% !important;
-        height: auto !important;
-        min-height: 0 !important;
-        max-height: none !important;
+        height: 281mm !important;
+        min-height: 281mm !important;
+        max-height: 281mm !important;
         margin: 0 !important;
-        padding: 2mm 0 !important;
+        padding: 0 !important;
         box-shadow: none !important;
         border: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
         page-break-after: always !important;
         break-after: page !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
-        overflow: visible !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
       }
       .a4-page:last-child {
         page-break-after: auto !important;
@@ -110,30 +113,25 @@
       .print-hide-answers .inline-answer {
         display: none !important;
       }
-      .print-hide-answers .answer-placeholder {
-        display: inline-block !important;
-      }
       .question-row {
-        min-height: 44px !important; font-size: 15px !important;
+        min-height: 40px !important;
+        font-size: 15px !important;
         padding-top: 2px !important;
         padding-bottom: 2px !important;
       }
     }
 
     .dashed-divider {
-      border-right: 1.5px dashed #cbd5e1;
+      border-right: 1.5px dashed #e2e8f0;
     }
 
-    /* Enforce at least 12pt (16px) font size for math symbols and text */
-        .katex {
-      font-size: 1.25em !important;
+    .katex {
+      font-size: 1.18em !important;
     }
-
-
 
     .question-row {
-      min-height: 46px !important;
-      font-size: 16px !important; /* >= 12pt */
+      min-height: 42px !important;
+      font-size: 15px !important;
     }
 
     .editable-title:hover {
@@ -145,43 +143,67 @@
     /* Smooth pulse transition */
     @keyframes pulseSuccess {
       0% { transform: scale(1); }
-      50% { transform: scale(1.02); }
+      50% { transform: scale(1.01); }
       100% { transform: scale(1); }
     }
     .animate-regenerate {
-      animation: pulseSuccess 0.3s ease-out;
+      animation: pulseSuccess 0.25s ease-out;
     }
   </style>
 </head>
 <body class="min-h-screen text-slate-800 antialiased selection:bg-sky-500 selection:text-white">
 
   <!-- Floating Control Bar (Hidden when Printing) -->
-  <header class="no-print sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 text-white px-4 py-3 shadow-xl">
+  <header class="no-print sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white px-4 py-2.5 shadow-xl">
     <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
       <!-- Brand & Document Info -->
       <div class="flex items-center gap-3">
         <span class="p-2 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30">
-          <i data-lucide="file-code-2" class="w-5 h-5"></i>
+          <i data-lucide="calculator" class="w-5 h-5"></i>
         </span>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-base font-bold text-white tracking-wide">指數律與常用對數 ｜ 動態訓練卷</h1>
-            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30" id="serialBadge">#EXP-0000</span>
+            <h1 class="text-sm sm:text-base font-bold text-white tracking-wide">指數律與常用對數 ｜ 動態訓練卷</h1>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30 flex items-center gap-1">
+              <i data-lucide="hash" class="w-3 h-3"></i>
+              <span id="serialBadge">EXP-3991</span>
+            </span>
           </div>
-          <p class="text-xs text-slate-400">高一數學（第一章 數與式） ｜ 30 題標準訓練卷 ｜ 支援即時 A4 列印與答案核對</p>
+          <p class="text-xs text-slate-400">高一數學 ｜ 單元：數與式 ｜ 30 題標準訓練卷</p>
         </div>
       </div>
 
-      <!-- Action Buttons -->
+      <!-- Action Buttons & Controllers -->
       <div class="flex items-center gap-2 flex-wrap">
         
+        <!-- Seed Input Box -->
+        <div class="flex items-center bg-slate-800 rounded-lg border border-slate-700 px-2 py-1 text-xs">
+          <span class="text-slate-400 font-mono mr-1.5 flex items-center gap-1">
+            <i data-lucide="key-round" class="w-3.5 h-3.5 text-sky-400"></i>種子:
+          </span>
+          <input 
+            type="text" 
+            id="seedInput" 
+            placeholder="數字 (如 3991)" 
+            class="bg-transparent border-none outline-none text-sky-200 font-mono w-20 sm:w-24 text-xs placeholder:text-slate-500"
+            onkeydown="if(event.key==='Enter') applyCustomSeed()"
+          />
+          <button 
+            onclick="applyCustomSeed()" 
+            class="text-xs bg-sky-600 hover:bg-sky-500 text-white px-2 py-0.5 rounded transition"
+            title="套用此種子數字產生考卷"
+          >
+            套用
+          </button>
+        </div>
+
         <!-- Toggle Answer View -->
         <button 
           id="btnToggleAnswers" 
           onclick="toggleAnswers()"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors shadow-sm"
-          title="在題目旁即時呈現答案（適合課堂投影或快速批改）"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition shadow-sm"
+          title="在題目等號後方顯示答案（快捷鍵：A）"
         >
           <i data-lucide="eye" class="w-4 h-4 text-amber-400"></i>
           <span id="toggleAnswerText">顯示答案</span>
@@ -191,31 +213,31 @@
         <button 
           id="btnToggleAnswerPage" 
           onclick="toggleAnswerPage()"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors shadow-sm"
-          title="顯示/隱藏第 2 頁獨立標準解答頁"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition shadow-sm"
+          title="顯示/隱藏第 2 頁標準解答頁"
         >
           <i data-lucide="file-check" class="w-4 h-4 text-emerald-400"></i>
-          <span id="toggleAnswerPageText">解答頁：開啟</span>
+          <span id="toggleAnswerPageText">解答頁: 開</span>
         </button>
 
         <!-- Regenerate Button -->
         <button 
           onclick="regenerateWorksheet()"
-          class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white shadow-md shadow-sky-950/40 transition-all active:scale-95"
-          title="按此立即重新亂數生成 30 道全新題目（快捷鍵：R）"
+          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white shadow-md transition active:scale-95"
+          title="按此立即亂數產生全新考卷（快捷鍵：R）"
         >
           <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-          <span>重新出題 (R)</span>
+          <span>換一卷 (R)</span>
         </button>
 
         <!-- Print PDF Button -->
         <button 
-          onclick="triggerPrint()"
-          class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/40 transition-all active:scale-95"
-          title="以標準 A4 尺寸直接列印或另存為 PDF（快捷鍵：P）"
+          onclick="window.print()"
+          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition active:scale-95"
+          title="以標準 A4 尺寸列印或存為 PDF（快捷鍵：P）"
         >
           <i data-lucide="printer" class="w-4 h-4"></i>
-          <span>列印 / 另存 PDF (P)</span>
+          <span>列印 / PDF</span>
         </button>
 
       </div>
@@ -225,7 +247,7 @@
   <!-- Document View Area -->
   <main class="py-4 px-2">
 
-    <!-- PAGE 1: 試題卷 (Test Paper) -->
+    <!-- ==================== PAGE 1: 試題卷 ==================== -->
     <div id="page1" class="a4-page">
       
       <!-- Exam Header -->
@@ -235,39 +257,31 @@
             <div 
               class="editable-title text-xs font-bold text-sky-800 tracking-wider inline-block px-1 py-0.5 rounded cursor-pointer" 
               contenteditable="true" 
-              title="點擊可自訂抬頭（如：XX高中 數學隨堂測驗）"
+              title="點擊可自訂抬頭"
             >
-              高中數學（高一上 第一章 數與式）核心素養課堂訓練卷
+              高一數學 ｜ 單元：數與式
             </div>
-            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-              單元：數與式 ｜ 指數律與常用對數運算演練試卷
+            <h2 class="text-xl font-black text-slate-900 tracking-tight mt-0.5">
+              指數律與常用對數 ｜ 動態訓練卷
             </h2>
           </div>
-          <div class="text-right text-sm text-slate-500 font-mono">
-            <div>卷號：<span id="headerSerial" class="font-bold text-slate-800 text-base">#EXP-0000</span></div>
-          </div>
-        </div>
-
-        <!-- Student Info Fields (No score box, no time limit) -->
-        <div class="mt-2.5 pt-2 border-t border-slate-300 flex items-center justify-between text-sm font-medium text-slate-700">
-          <div class="flex items-center gap-8">
-            <span>班級：<span class="inline-block w-28 border-b border-slate-700"></span></span>
-            <span>姓名：<span class="inline-block w-32 border-b border-slate-700"></span></span>
-            <span>座號：<span class="inline-block w-20 border-b border-slate-700"></span></span>
-          </div>
-          <div class="flex items-center gap-4">
-            <span>日期：____ 年 ____ 月 ____ 日</span>
+          <div class="text-right text-xs text-slate-500 font-mono shrink-0">
+            <div>卷號：<span id="headerSerial" class="font-bold text-slate-800 text-sm">EXP-3991</span></div>
+            <div>班級：______ 座號：___ 姓名：________</div>
           </div>
         </div>
       </div>
 
       <!-- Questions Grid (2 Columns: Left = 題型1, Right = 題型2) -->
-      <div class="grid grid-cols-2 gap-4 flex-1">
+      <div class="grid grid-cols-2 gap-4 flex-1 mb-auto">
         
         <!-- Left Column: 題型一 (指數律 15 題) -->
         <div class="dashed-divider pr-3 flex flex-col justify-between">
-          <div class="bg-sky-50 border-l-4 border-sky-600 px-2 py-1 mb-1 flex items-center justify-between rounded-r">
-            <span class="text-sm sm:text-base font-bold text-sky-950">一、指數律化簡與求值（共 15 題）</span>
+          <div class="border-b border-sky-200 pb-0.5 mb-1 flex items-center justify-between">
+            <span class="text-xs font-bold text-sky-950 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>
+              一、指數律化簡與求值（共 15 題）
+            </span>
           </div>
 
           <!-- Type 1 Question List (15 items) -->
@@ -276,10 +290,13 @@
           </div>
         </div>
 
-        <!-- Right Column: 題型二 (對數律 15 題) -->
+        <!-- Right Column: 題型二 (常用對數 15 題) -->
         <div class="pl-1 flex flex-col justify-between">
-          <div class="bg-indigo-50 border-l-4 border-indigo-600 px-2 py-1 mb-1 flex items-center justify-between rounded-r">
-            <span class="text-sm sm:text-base font-bold text-indigo-950">二、常用對數求值（共 15 題）</span>
+          <div class="border-b border-sky-200 pb-0.5 mb-1 flex items-center justify-between">
+            <span class="text-xs font-bold text-sky-950 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>
+              二、常用對數求值（共 15 題）
+            </span>
           </div>
 
           <!-- Type 2 Question List (15 items) -->
@@ -291,43 +308,43 @@
       </div>
 
       <!-- Page 1 Footer -->
-      <div class="pt-1.5 mt-1 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-400">
-        <span>AhaZone 核心數理智能教具 ｜ 本試題卷由演算法動態亂數生成，版權所有</span>
-        <span>第 1 頁，共 <span id="totalPagesSpan">2</span> 頁</span>
+      <div class="border-t border-slate-200 pt-1.5 mt-2 flex justify-between text-[11px] text-slate-400">
+        <div>AhaZone ｜ 高一數學：數與式</div>
+        <div class="font-mono font-medium">1</div>
       </div>
 
     </div>
 
-    <!-- PAGE 2: 標準解答頁 (Answer Key Sheet) -->
+    <!-- ==================== PAGE 2: 標準解答頁 ==================== -->
     <div id="page2" class="a4-page">
       
       <!-- Answer Header -->
       <div class="border-b-2 border-slate-900 pb-2 mb-2">
         <div class="flex justify-between items-start">
           <div>
-            <span class="text-xs font-bold text-emerald-800 tracking-wider">【教師用 ｜ 自修對卷專用】</span>
-            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-              單元：數與式 ｜ 指數律與常用對數運算演練試卷【標準解答與解析】
+            <div class="text-xs font-bold text-sky-800 tracking-wider">高一數學 ｜ 單元：數與式</div>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight mt-0.5">
+              標準答案
             </h2>
           </div>
           <div class="text-right text-xs text-slate-500 font-mono">
-            <div>對應卷號：<span id="answerSerial" class="font-bold text-slate-800">#EXP-0000</span></div>
-            <div>生成時間：<span id="answerTimestamp" class="font-medium text-slate-700">2026-11-05</span></div>
+            <div>卷號：<span id="answerSerial" class="font-bold text-slate-800 text-sm">EXP-3991</span></div>
+            <div id="answerTimestamp">2026-11-13</div>
           </div>
         </div>
-        <p class="text-[11px] text-slate-500 mt-1">
-          ※ 題型一數值皆已化為最簡整數或真/假分數；題型二提供四位小數（依常用對數定義）及質因數對數分解式以供教學參考。
-        </p>
       </div>
 
       <!-- Answers Grid (Side by side comparison) -->
-      <div class="grid grid-cols-2 gap-4 flex-1">
+      <div class="grid grid-cols-2 gap-4 flex-1 mb-auto">
         
         <!-- Type 1 Answers -->
         <div class="dashed-divider pr-3 flex flex-col justify-between">
-          <div class="bg-emerald-50 border-l-4 border-emerald-600 px-2 py-1 mb-1.5 rounded-r flex items-center justify-between">
-            <span class="text-sm sm:text-base font-bold text-emerald-950">一、指數律解答（15 題）</span>
-            <span class="text-[10px] text-emerald-700 font-medium">最簡分數 / 整數</span>
+          <div class="border-b border-sky-200 pb-0.5 mb-1 flex items-center justify-between">
+            <span class="text-xs font-bold text-sky-950 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>
+              一、指數律解答（共 15 題）
+            </span>
+            <span class="text-[10px] text-slate-500">最簡分數 / 整數</span>
           </div>
 
           <div id="type1AnswerList" class="flex-1 flex flex-col justify-between text-xs">
@@ -337,9 +354,12 @@
 
         <!-- Type 2 Answers -->
         <div class="pl-1 flex flex-col justify-between">
-          <div class="bg-emerald-50 border-l-4 border-emerald-600 px-2 py-1 mb-1.5 rounded-r flex items-center justify-between">
-            <span class="text-sm sm:text-base font-bold text-emerald-950">二、常用對數解答（15 題）</span>
-            <span class="text-[10px] text-emerald-700 font-medium">小數四位 ｜ 質因數對數展開</span>
+          <div class="border-b border-sky-200 pb-0.5 mb-1 flex items-center justify-between">
+            <span class="text-xs font-bold text-sky-950 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>
+              二、常用對數解答（共 15 題）
+            </span>
+            <span class="text-[10px] text-slate-500">小數四位 ｜ 質因數對數展開</span>
           </div>
 
           <div id="type2AnswerList" class="flex-1 flex flex-col justify-between text-xs">
@@ -350,21 +370,54 @@
       </div>
 
       <!-- Page 2 Footer -->
-      <div class="pt-1.5 mt-1 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-400">
-        <span>AhaZone 核心數理智能教具 ｜ 考卷解答頁</span>
-        <span>第 2 頁，共 2 頁</span>
+      <div class="border-t border-slate-200 pt-1.5 mt-2 flex justify-between text-[11px] text-slate-400">
+        <div>AhaZone ｜ 高一數學：數與式（標準解答）</div>
+        <div class="font-mono font-medium">2</div>
       </div>
 
     </div>
 
   </main>
 
-  <!-- Script: Exact Excel Random Generator & Render Logic -->
+  <!-- ==================== SCRIPT: SEED PRNG & GENERATORS ==================== -->
   <script>
     // State
+    let currentSeedNum = '3991';
     let currentQuestions = { type1: [], type2: [] };
     let showInlineAnswers = false;
     let showAnswerPage = true;
+
+    // Fast 32-bit PRNG (Mulberry32)
+    function cyrb53(str, seed = 0) {
+      let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+      for (let i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+      }
+      h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+      h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+      return (h1 >>> 0);
+    }
+
+    let rng = null;
+    function initPRNG(seedStr) {
+      let s = cyrb53(String(seedStr));
+      return function() {
+        s |= 0; s = s + 0x6D2B79F5 | 0;
+        let t = Math.imul(s ^ s >>> 15, 1 | s);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    function rand() {
+      return rng ? rng() : Math.random();
+    }
+
+    function randInt(min, max) {
+      return Math.floor(rand() * (max - min + 1)) + min;
+    }
 
     // Greatest Common Divisor helper
     function gcd(a, b) {
@@ -376,11 +429,6 @@
         a = t;
       }
       return a;
-    }
-
-    // Random integer between min and max inclusive
-    function randInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     // Prime factorization for numbers with factors 2, 3, 5, 7
@@ -398,14 +446,6 @@
 
     /*
      * Generate Type 1 Questions (指數律 15 題)
-     * Exact replication of Excel Sheet1 formula:
-     * - base1 in [1..3], base2 in [4..6]
-     * - D_num in [1..5]
-     * - D_den in [1..5], D_den != D_num (MOD lookup table)
-     * - sign in {1, -1}
-     * - F_num = base1 ^ D_den, F_den = base2 ^ D_den
-     * - Question: (F_num / F_den) ^ (sign * D_num / D_den) = 
-     * - Answer: (base1 / base2) ^ (sign * D_num)
      */
     function generateType1Questions() {
       const list = [];
@@ -420,7 +460,7 @@
         const modVal = (dNum + randInt(1, 4)) % 5;
         const dDen = lookupTable[modVal];
 
-        const sign = Math.random() > 0.5 ? 1 : -1;
+        const sign = rand() > 0.5 ? 1 : -1;
 
         const fNum = Math.pow(base1, dDen);
         const fDen = Math.pow(base2, dDen);
@@ -482,12 +522,6 @@
 
     /*
      * Generate Type 2 Questions (常用對數律 15 題)
-     * Exact replication of Excel Sheet1 formula:
-     * - B1, C1, D1 in [1..10], P1 = B1 * C1 * D1
-     * - B2, C2, D2 in [1..10], P2 = B2 * C2 * D2
-     * - G1 = P1 / gcd(P1, P2), G2 = P2 / gcd(P1, P2)
-     * - Question: log(G1 / G2) = 
-     * - Answer: log10(G1 / G2) formatted to 4 decimals (e.g. -1.5563)
      */
     function generateType2Questions() {
       const list = [];
@@ -568,17 +602,26 @@
       }
     }
 
-    // Refresh entire worksheet
-    function regenerateWorksheet() {
-      // Generate Serial
+    function getSerialCode() {
+      return `EXP-${currentSeedNum}`;
+    }
+
+    function applySeed(seedInputVal) {
+      const cleanNum = String(seedInputVal).replace(/\D/g, '');
+      currentSeedNum = cleanNum || String(Math.floor(1000 + Math.random() * 9000));
+      
+      const serialCode = getSerialCode();
+      rng = initPRNG(currentSeedNum);
+
+      document.getElementById('serialBadge').textContent = serialCode;
+      document.getElementById('headerSerial').textContent = serialCode;
+      document.getElementById('answerSerial').textContent = serialCode;
+      document.getElementById('seedInput').value = currentSeedNum;
+
       const now = new Date();
-      const serial = '#EXP-' + now.getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
-      document.getElementById('serialBadge').textContent = serial;
-      document.getElementById('headerSerial').textContent = serial;
-      document.getElementById('answerSerial').textContent = serial;
-      document.getElementById('answerTimestamp').textContent = now.toLocaleDateString('zh-TW', {
-        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
-      });
+      const dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+      const timestampEl = document.getElementById('answerTimestamp');
+      if (timestampEl) timestampEl.textContent = dateStr;
 
       // Generate Questions
       currentQuestions.type1 = generateType1Questions();
@@ -590,16 +633,27 @@
       // Render Answer Sheet (Page 2)
       renderPage2();
 
-      // Re-initialize Lucide icons
       if (window.lucide) {
         window.lucide.createIcons();
       }
 
-      // Add feedback animation to page
       const p1 = document.getElementById('page1');
-      p1.classList.remove('animate-regenerate');
-      void p1.offsetWidth; // trigger reflow
-      p1.classList.add('animate-regenerate');
+      if (p1) {
+        p1.classList.remove('animate-regenerate');
+        void p1.offsetWidth;
+        p1.classList.add('animate-regenerate');
+      }
+    }
+
+    function applyCustomSeed() {
+      const val = document.getElementById('seedInput').value.trim();
+      if (!val) return;
+      applySeed(val);
+    }
+
+    function regenerateWorksheet() {
+      const randomSeedNum = Math.floor(1000 + Math.random() * 9000);
+      applySeed(randomSeedNum);
     }
 
     function renderPage1() {
@@ -608,22 +662,22 @@
       t1Container.innerHTML = '';
       t2Container.innerHTML = '';
 
-      // Render Type 1 (指數律 15 題) - No underlines, clean table rows!
+      // Render Type 1 (指數律 15 題)
       currentQuestions.type1.forEach((q, idx) => {
         const item = document.createElement('div');
-        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center text-base hover:bg-slate-50 transition-colors';
+        item.className = 'question-row py-0.5 px-1 border-b border-slate-100 last:border-b-0 flex items-center text-sm sm:text-base hover:bg-slate-50 transition-colors';
         
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base shrink-0 mr-1.5';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-xs sm:text-sm shrink-0 mr-1.5';
         numSpan.textContent = `(${idx + 1})`;
         
         const mathSpan = document.createElement('span');
-        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg whitespace-nowrap flex items-center';
+        mathSpan.className = 'font-serif text-slate-900 text-sm sm:text-base whitespace-nowrap flex items-center';
         renderMath(mathSpan, q.questionLatex, false);
 
         // Answer badge right after equal sign when toggled on
         const answerSpan = document.createElement('span');
-        answerSpan.className = `inline-answer font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-300 text-base ml-2.5 ${showInlineAnswers ? '' : 'hidden'}`;
+        answerSpan.className = `inline-answer font-bold font-mono text-sky-800 bg-sky-50 px-2 py-0.5 rounded border border-sky-300 text-xs sm:text-sm ml-2 ${showInlineAnswers ? '' : 'hidden'}`;
         renderMath(answerSpan, q.ansLatex, false);
         
         item.appendChild(numSpan);
@@ -632,21 +686,21 @@
         t1Container.appendChild(item);
       });
 
-      // Render Type 2 (對數律 15 題) - No underlines, clean table rows!
+      // Render Type 2 (對數律 15 題)
       currentQuestions.type2.forEach((q, idx) => {
         const item = document.createElement('div');
-        item.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center text-base hover:bg-slate-50 transition-colors';
+        item.className = 'question-row py-0.5 px-1 border-b border-slate-100 last:border-b-0 flex items-center text-sm sm:text-base hover:bg-slate-50 transition-colors';
 
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-sm sm:text-base shrink-0 mr-1.5';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right text-xs sm:text-sm shrink-0 mr-1.5';
         numSpan.textContent = `(${idx + 1})`;
 
         const mathSpan = document.createElement('span');
-        mathSpan.className = 'font-serif text-slate-900 text-base sm:text-lg whitespace-nowrap flex items-center';
+        mathSpan.className = 'font-serif text-slate-900 text-sm sm:text-base whitespace-nowrap flex items-center';
         renderMath(mathSpan, q.questionLatex, false);
 
         const answerSpan = document.createElement('span');
-        answerSpan.className = `inline-answer font-bold font-mono text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-300 text-base ml-2.5 ${showInlineAnswers ? '' : 'hidden'}`;
+        answerSpan.className = `inline-answer font-bold font-mono text-sky-800 bg-sky-50 px-2 py-0.5 rounded border border-sky-300 text-xs sm:text-sm ml-2 ${showInlineAnswers ? '' : 'hidden'}`;
         answerSpan.textContent = q.logValStr;
 
         item.appendChild(numSpan);
@@ -662,23 +716,23 @@
       a1Container.innerHTML = '';
       a2Container.innerHTML = '';
 
-      // Render Type 1 Answers: directly next to equal sign!
+      // Render Type 1 Answers: 題目 = 答案
       currentQuestions.type1.forEach((q, idx) => {
         const row = document.createElement('div');
-        row.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center text-base hover:bg-slate-50 transition-colors';
+        row.className = 'question-row py-0.5 px-1 border-b border-slate-100 last:border-b-0 flex items-center text-sm sm:text-base hover:bg-slate-50 transition-colors';
 
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right shrink-0 mr-1.5 text-sm sm:text-base';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right shrink-0 mr-1.5 text-xs sm:text-sm';
         numSpan.textContent = `(${idx + 1})`;
 
         const mathWrap = document.createElement('div');
-        mathWrap.className = 'flex items-center text-slate-800 text-base sm:text-lg';
+        mathWrap.className = 'flex items-center text-slate-800 text-sm sm:text-base';
 
         const qMath = document.createElement('span');
-        renderMath(qMath, q.questionLatex, false); // Contains '=' at the end
+        renderMath(qMath, q.questionLatex, false);
 
         const aMath = document.createElement('span');
-        aMath.className = 'font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300 ml-2 text-base';
+        aMath.className = 'font-bold font-mono text-sky-900 ml-2 text-sm sm:text-base';
         renderMath(aMath, q.ansLatex, false);
 
         mathWrap.appendChild(qMath);
@@ -689,27 +743,27 @@
         a1Container.appendChild(row);
       });
 
-      // Render Type 2 Answers: directly next to equal sign!
+      // Render Type 2 Answers
       currentQuestions.type2.forEach((q, idx) => {
         const row = document.createElement('div');
-        row.className = 'question-row py-1 px-1 border-b border-slate-100 flex items-center text-base hover:bg-slate-50 transition-colors';
+        row.className = 'question-row py-0.5 px-1 border-b border-slate-100 last:border-b-0 flex items-center text-sm sm:text-base hover:bg-slate-50 transition-colors';
 
         const numSpan = document.createElement('span');
-        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right shrink-0 mr-1.5 text-sm sm:text-base';
+        numSpan.className = 'font-bold text-slate-400 font-mono w-7 text-right shrink-0 mr-1.5 text-xs sm:text-sm';
         numSpan.textContent = `(${idx + 1})`;
 
         const mathWrap = document.createElement('div');
-        mathWrap.className = 'flex items-center text-slate-800 text-base sm:text-lg flex-wrap gap-y-0.5';
+        mathWrap.className = 'flex items-center text-slate-800 text-sm sm:text-base flex-wrap gap-y-0.5';
 
         const qMath = document.createElement('span');
-        renderMath(qMath, q.questionLatex, false); // Contains '=' at the end
+        renderMath(qMath, q.questionLatex, false);
 
         const valSpan = document.createElement('span');
-        valSpan.className = 'font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300 ml-2 text-base';
+        valSpan.className = 'font-mono font-bold text-sky-900 ml-2 text-sm sm:text-base';
         valSpan.textContent = q.logValStr;
 
         const decompSpan = document.createElement('span');
-        decompSpan.className = 'text-xs text-slate-500 ml-2 hidden sm:inline-block';
+        decompSpan.className = 'text-xs text-slate-400 ml-2 hidden sm:inline-block';
         renderMath(decompSpan, `(${q.decompLatex})`, false);
 
         mathWrap.appendChild(qMath);
@@ -739,38 +793,30 @@
       showAnswerPage = !showAnswerPage;
       const p2 = document.getElementById('page2');
       const textSpan = document.getElementById('toggleAnswerPageText');
-      const totalSpan = document.getElementById('totalPagesSpan');
 
       if (showAnswerPage) {
         p2.style.display = 'flex';
-        textSpan.textContent = '解答頁：開啟';
-        totalSpan.textContent = '2';
+        textSpan.textContent = '解答頁: 開';
       } else {
         p2.style.display = 'none';
-        textSpan.textContent = '解答頁：關閉';
-        totalSpan.textContent = '1';
+        textSpan.textContent = '解答頁: 關';
       }
     }
 
-    // Trigger Print
-    function triggerPrint() {
-      window.print();
-    }
-
-    // Keyboard Shortcuts (R: Regenerate, P: Print)
+    // Keyboard Shortcuts (R: Regenerate, P: Print, A: Answer toggle)
     window.addEventListener('keydown', (e) => {
-      // Don't trigger if user is editing title
-      if (document.activeElement && document.activeElement.getAttribute('contenteditable') === 'true') {
+      if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.getAttribute('contenteditable') === 'true')) {
         return;
       }
       if (e.key === 'r' || e.key === 'R') {
         e.preventDefault();
         regenerateWorksheet();
-      } else if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
-        // native print is fine
       } else if (e.key === 'p' || e.key === 'P') {
         e.preventDefault();
-        triggerPrint();
+        window.print();
+      } else if (e.key === 'a' || e.key === 'A') {
+        e.preventDefault();
+        toggleAnswers();
       }
     });
 
@@ -780,18 +826,27 @@
         window.lucide.createIcons();
       }
       
-      // Wait for KaTeX to load if needed
+      const urlParams = new URLSearchParams(window.location.search);
+      const seedParam = urlParams.get('seed');
+      
       const checkKatex = setInterval(() => {
         if (window.katex) {
           clearInterval(checkKatex);
-          regenerateWorksheet();
+          if (seedParam) {
+            applySeed(seedParam);
+          } else {
+            regenerateWorksheet();
+          }
         }
       }, 50);
 
       // Fallback
       setTimeout(() => {
         clearInterval(checkKatex);
-        regenerateWorksheet();
+        if (!rng) {
+          if (seedParam) applySeed(seedParam);
+          else regenerateWorksheet();
+        }
       }, 500);
     });
   </script>
