@@ -204,6 +204,10 @@ function setInitialFamily(fam: 'exp' | 'log') {
   resetAll();
 }
 
+function toggleInitialFamily() {
+  setInitialFamily(initialFamily.value === 'exp' ? 'log' : 'exp');
+}
+
 function getActiveStepLabel(): string {
   if (activeActionType.value === 'shift') {
     const h = activeShiftH.value;
@@ -219,38 +223,34 @@ function getActiveStepLabel(): string {
   return '';
 }
 
-// 計算累積狀態與方程式
-const currentTransConfig = computed(() => {
-  const steps: StepRecord[] = [...stepHistory.value];
-  if (activeActionType.value === 'shift' && (activeShiftH.value !== 0 || activeShiftK.value !== 0)) {
-    steps.push({ id: 0, type: 'shift', h: activeShiftH.value, k: activeShiftK.value, label: '' });
-  } else if (activeActionType.value === 'scaleX' && activeScaleXIdx.value !== 3) {
-    steps.push({ id: 0, type: 'scaleX', val: activeScaleXIdx.value, label: '' });
-  } else if (activeActionType.value === 'scaleY' && activeScaleYIdx.value !== 3) {
-    steps.push({ id: 0, type: 'scaleY', val: activeScaleYIdx.value, label: '' });
-  }
+interface TransformParams {
+  fam: 'exp' | 'log';
+  A: number;
+  B: number;
+  C: number;
+  D: number;
+  px: number;
+  py: number;
+  asymIsHoriz: boolean;
+  asymVal: number;
+}
 
-  // 函數模型參數：y = C * f(A * x + B) + D
-  let fam: 'exp' | 'log' = initialFamily.value;
+function computeTransformParams(stepsList: StepRecord[], initFam: 'exp' | 'log'): TransformParams {
+  let fam: 'exp' | 'log' = initFam;
   let A = 1;
   let B = 0;
   let C = 1;
   let D = 0;
-
-  // 基準錨點追蹤
   let px = fam === 'exp' ? 0 : 1;
   let py = fam === 'exp' ? 1 : 0;
-
-  // 漸近線追蹤
   let asymIsHoriz = fam === 'exp';
   let asymVal = 0;
 
-  for (const st of steps) {
+  for (const st of stepsList) {
     switch (st.type) {
       case 'shift': {
         const h = st.h || 0;
         const k = st.k || 0;
-        // x -> x - h, y -> y + k
         B = B - A * h;
         D = D + k;
         px += h;
@@ -297,7 +297,6 @@ const currentTransConfig = computed(() => {
         C = 1 / oldA;
         D = -oldB / oldA;
         fam = fam === 'exp' ? 'log' : 'exp';
-
         const tmpP = px;
         px = py;
         py = tmpP;
@@ -306,8 +305,11 @@ const currentTransConfig = computed(() => {
       }
     }
   }
+  return { fam, A, B, C, D, px, py, asymIsHoriz, asymVal };
+}
 
-  // 格式化自變數 u = Ax + B
+function formatStateFormula(state: { fam: 'exp' | 'log', A: number, B: number, C: number, D: number }) {
+  const { fam, A, B, C, D } = state;
   let uStr = '';
   const absA = Math.abs(A);
   const signA = A < 0 ? '-' : '';
@@ -346,7 +348,6 @@ const currentTransConfig = computed(() => {
     }
   }
 
-  // 格式化係數 C:
   let prefixC = '';
   const absC = Math.abs(C);
   const signC = C < 0 ? '-' : '';
@@ -365,7 +366,6 @@ const currentTransConfig = computed(() => {
     prefixC = `${signC}${cStr} ` + (fam === 'exp' ? '\\cdot ' : '');
   }
 
-  // 格式化常數項 D:
   let suffixD = '';
   if (Math.abs(D) > 0.001) {
     const dSign = D > 0 ? '+' : '-';
@@ -379,6 +379,177 @@ const currentTransConfig = computed(() => {
   } else {
     formulaLatex = `y = ${prefixC}\\log_2(${uStr})${suffixD}`;
   }
+
+  return { formulaLatex, uStr, prefixC, suffixD };
+}
+
+function computeActionFormulaLatex(steps: StepRecord[], initFam: 'exp' | 'log'): string {
+  if (steps.length === 0) {
+    return initFam === 'exp' ? 'y = 2^x' : 'y = \\log_2 x';
+  }
+  const lastStep = steps[steps.length - 1];
+  const prevSteps = steps.slice(0, steps.length - 1);
+  const prevState = computeTransformParams(prevSteps, initFam);
+  const prevFmt = formatStateFormula(prevState);
+
+  if (lastStep.type === 'shift') {
+    const h = lastStep.h || 0;
+    const k = lastStep.k || 0;
+    let uAction = prevFmt.uStr;
+
+    if (h !== 0) {
+      const hPart = h > 0 ? `\\boldsymbol{-${h}}` : `\\boldsymbol{+${Math.abs(h)}}`;
+      const absA = Math.abs(prevState.A);
+      const signA = prevState.A < 0 ? '-' : '';
+
+      if (Math.abs(absA - 1) < 0.001) {
+        if (Math.abs(prevState.B) < 0.001) {
+          uAction = signA === '-' ? `-(x ${hPart})` : `(x ${hPart})`;
+        } else {
+          const bSign = prevState.B > 0 ? '+' : '-';
+          const absB = Math.abs(prevState.B);
+          const bStr = Number.isInteger(absB) ? `${absB}` : absB.toFixed(1);
+          uAction = signA === '-' ? `-(x ${hPart}) ${bSign} ${bStr}` : `(x ${hPart}) ${bSign} ${bStr}`;
+        }
+      } else {
+        let aStr = '';
+        if (Math.abs(absA - 0.5) < 0.001) aStr = '\\frac{1}{2}';
+        else if (Math.abs(absA - 1 / 3) < 0.001) aStr = '\\frac{1}{3}';
+        else if (Math.abs(absA - 0.25) < 0.001) aStr = '\\frac{1}{4}';
+        else aStr = Number.isInteger(absA) ? `${absA}` : absA.toFixed(1);
+
+        let baseA = '';
+        if (aStr.startsWith('\\frac')) {
+          const denom = Math.abs(absA - 0.5) < 0.001 ? 2 : Math.abs(absA - 1 / 3) < 0.001 ? 3 : 4;
+          baseA = `${signA}\\frac{x ${hPart}}{${denom}}`;
+        } else {
+          baseA = `${signA}${aStr}(x ${hPart})`;
+        }
+
+        if (Math.abs(prevState.B) < 0.001) {
+          uAction = baseA;
+        } else {
+          const bSign = prevState.B > 0 ? '+' : '-';
+          const absB = Math.abs(prevState.B);
+          const bStr = Number.isInteger(absB) ? `${absB}` : absB.toFixed(1);
+          uAction = `${baseA} ${bSign} ${bStr}`;
+        }
+      }
+    }
+
+    let suffixDAction = prevFmt.suffixD;
+    if (k !== 0) {
+      const kPart = k > 0 ? `\\boldsymbol{+${k}}` : `\\boldsymbol{-${Math.abs(k)}}`;
+      suffixDAction = `${prevFmt.suffixD} ${kPart}`.trimStart();
+      suffixDAction = ` ${suffixDAction}`;
+    }
+
+    if (prevState.fam === 'exp') {
+      return `y = ${prevFmt.prefixC}2^{${uAction}}${suffixDAction}`;
+    } else {
+      return `y = ${prevFmt.prefixC}\\log_2(${uAction})${suffixDAction}`;
+    }
+  }
+
+  if (lastStep.type === 'scaleX') {
+    const s = scaleValues[lastStep.val ?? 3];
+    let xSub = '';
+    if (s === 2) xSub = '\\boldsymbol{\\frac{x}{2}}';
+    else if (s === 3) xSub = '\\boldsymbol{\\frac{x}{3}}';
+    else if (s === 4) xSub = '\\boldsymbol{\\frac{x}{4}}';
+    else if (s === 0.5) xSub = '\\boldsymbol{2x}';
+    else if (Math.abs(s - 1 / 3) < 0.001) xSub = '\\boldsymbol{3x}';
+    else if (s === 0.25) xSub = '\\boldsymbol{4x}';
+    else xSub = 'x';
+
+    let uAction = '';
+    if (Math.abs(prevState.A - 1) < 0.001 && Math.abs(prevState.B) < 0.001) {
+      uAction = xSub;
+    } else {
+      const absA = Math.abs(prevState.A);
+      const signA = prevState.A < 0 ? '-' : '';
+      const aStr = Number.isInteger(absA) ? `${absA}` : absA.toFixed(1);
+      const aPart = Math.abs(absA - 1) < 0.001 ? signA : `${signA}${aStr}`;
+      const bPart = Math.abs(prevState.B) > 0.001 ? ` ${prevState.B > 0 ? '+' : '-'} ${Math.abs(prevState.B)}` : '';
+      uAction = `${aPart}\\left(${xSub}\\right)${bPart}`;
+    }
+
+    if (prevState.fam === 'exp') {
+      return `y = ${prevFmt.prefixC}2^{${uAction}}${prevFmt.suffixD}`;
+    } else {
+      return `y = ${prevFmt.prefixC}\\log_2(${uAction})${prevFmt.suffixD}`;
+    }
+  }
+
+  if (lastStep.type === 'scaleY') {
+    const s = scaleValues[lastStep.val ?? 3];
+    let sBold = '';
+    if (s === 2) sBold = '\\boldsymbol{2}';
+    else if (s === 3) sBold = '\\boldsymbol{3}';
+    else if (s === 4) sBold = '\\boldsymbol{4}';
+    else if (s === 0.5) sBold = '\\boldsymbol{\\frac{1}{2}}';
+    else if (Math.abs(s - 1 / 3) < 0.001) sBold = '\\boldsymbol{\\frac{1}{3}}';
+    else if (s === 0.25) sBold = '\\boldsymbol{\\frac{1}{4}}';
+    else sBold = `\\boldsymbol{${s}}`;
+
+    const prevRHS = prevFmt.formulaLatex.replace(/^y\s*=\s*/, '');
+    if (Math.abs(prevState.D) > 0.001 || Math.abs(Math.abs(prevState.C) - 1) > 0.001) {
+      return `y = ${sBold} \\cdot \\left( ${prevRHS} \\right)`;
+    } else {
+      const mainTerm = prevState.fam === 'exp' ? `2^{${prevFmt.uStr}}` : `\\log_2(${prevFmt.uStr})`;
+      return `y = ${sBold} \\cdot ${mainTerm}`;
+    }
+  }
+
+  if (lastStep.type === 'reflectX') {
+    const prevRHS = prevFmt.formulaLatex.replace(/^y\s*=\s*/, '');
+    if (Math.abs(prevState.D) > 0.001) {
+      return `y = \\boldsymbol{-}\\left( ${prevRHS} \\right)`;
+    } else {
+      return `y = \\boldsymbol{-}${prevRHS.startsWith('-') ? `(${prevRHS})` : prevRHS}`;
+    }
+  }
+
+  if (lastStep.type === 'reflectY') {
+    let uAction = '';
+    if (Math.abs(prevState.A - 1) < 0.001 && Math.abs(prevState.B) < 0.001) {
+      uAction = '\\boldsymbol{-x}';
+    } else {
+      const bPart = Math.abs(prevState.B) > 0.001 ? ` ${prevState.B > 0 ? '+' : '-'} ${Math.abs(prevState.B)}` : '';
+      const aStr = Number.isInteger(Math.abs(prevState.A)) ? `${Math.abs(prevState.A)}` : Math.abs(prevState.A).toFixed(1);
+      const signA = prevState.A < 0 ? '-' : '';
+      uAction = `${signA}${aStr}(\\boldsymbol{-x})${bPart}`;
+    }
+    const mainTerm = prevState.fam === 'exp' ? `2^{${uAction}}` : `\\log_2(${uAction})`;
+    return `y = ${prevFmt.prefixC}${mainTerm}${prevFmt.suffixD}`;
+  }
+
+  if (lastStep.type === 'inverse') {
+    const currState = computeTransformParams(steps, initFam);
+    const currFmt = formatStateFormula(currState);
+    return `x \\leftrightarrow y \\implies y = ${currFmt.formulaLatex.replace(/^y\s*=\s*/, '')}`;
+  }
+
+  return formatStateFormula(computeTransformParams(steps, initFam)).formulaLatex;
+}
+
+// 計算累積狀態與方程式
+const currentTransConfig = computed(() => {
+  const steps: StepRecord[] = [...stepHistory.value];
+  if (activeActionType.value === 'shift' && (activeShiftH.value !== 0 || activeShiftK.value !== 0)) {
+    steps.push({ id: 0, type: 'shift', h: activeShiftH.value, k: activeShiftK.value, label: '' });
+  } else if (activeActionType.value === 'scaleX' && activeScaleXIdx.value !== 3) {
+    steps.push({ id: 0, type: 'scaleX', val: activeScaleXIdx.value, label: '' });
+  } else if (activeActionType.value === 'scaleY' && activeScaleYIdx.value !== 3) {
+    steps.push({ id: 0, type: 'scaleY', val: activeScaleYIdx.value, label: '' });
+  }
+
+  const transState = computeTransformParams(steps, initialFamily.value);
+  const formatted = formatStateFormula(transState);
+  const actionFormulaLatex = computeActionFormulaLatex(steps, initialFamily.value);
+
+  const { fam, A, B, C, D, px, py, asymIsHoriz, asymVal } = transState;
+  const formulaLatex = formatted.formulaLatex;
 
   const transformedFn = (x: number) => {
     const u = A * x + B;
@@ -469,9 +640,8 @@ const currentTransConfig = computed(() => {
     }
   ];
 
-  const desc = `**目前方程式**：$${formulaLatex}$。<br/>` +
-    `**幾何特徵**：基準錨點移至 $(${pxR}, ${pyR})$，${asymText}。<br/>` +
-    `<span class="text-amber-400 font-semibold">💡 順序心法</span>：先平移後伸縮 ≠ 先伸縮後平移！觀察上方歷程鏈與各項係數變化。`;
+  const desc = `**方程式結論**：$${formulaLatex}$。<br/>` +
+    `**幾何特徵**：基準錨點移至 $(${pxR}, ${pyR})$，${asymText}。`;
 
   return {
     xRange: [xMin, xMax] as [number, number],
@@ -481,9 +651,14 @@ const currentTransConfig = computed(() => {
     lines: [asymptoteLine, guideLine],
     description: desc,
     formula: formulaLatex,
+    actionFormula: actionFormulaLatex,
     pointText: `${pxR}, ${pyR}`,
     asymText: asymText
   };
+});
+
+const actionFormulaDisplay = computed(() => {
+  return renderRichMathText(`$\\Large ${currentTransConfig.value.actionFormula}$`);
 });
 
 const currentFormulaDisplay = computed(() => {
@@ -1141,10 +1316,10 @@ const currentFeatureDisplay = computed(() => {
     <!-- ========================================================================= -->
     <div 
       v-else-if="type === 'function-transformation'" 
-      class="w-full max-w-5xl flex flex-col md:flex-row items-start justify-center gap-3.5 select-none"
+      class="w-full max-w-5xl flex flex-col md:flex-row items-start justify-center gap-3 select-none"
     >
-      <!-- Left Column: 控制面板 -->
-      <div class="w-full md:w-80 lg:w-84 shrink-0 flex flex-col gap-2 p-3 rounded-md bg-[#161b22] border border-[#30363d]">
+      <!-- Left Column: 控制面板 (桌面版呈現，手機版隱藏) -->
+      <div class="hidden md:flex md:w-60 lg:w-64 shrink-0 flex-col gap-2 p-2.5 rounded-md bg-[#161b22] border border-[#30363d]">
         <!-- 基準函數切換 -->
         <div class="flex flex-col gap-1.5 pb-2 border-b border-[#30363d]">
           <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-[#f0f6fc]">
@@ -1157,14 +1332,14 @@ const currentFeatureDisplay = computed(() => {
             <button
               type="button"
               @click="setInitialFamily('exp')"
-              class="px-2.5 py-2 rounded-md text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center justify-center text-center"
+              class="px-2 py-1.5 rounded-md text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center justify-center text-center"
               :class="initialFamily === 'exp' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
               v-html="renderRichMathText('指數 $y = 2^x$')"
             />
             <button
               type="button"
               @click="setInitialFamily('log')"
-              class="px-2.5 py-2 rounded-md text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center justify-center text-center"
+              class="px-2 py-1.5 rounded-md text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center justify-center text-center"
               :class="initialFamily === 'log' ? 'bg-amber-500 text-black font-bold' : 'text-[#8b949e] hover:text-[#f0f6fc]'"
               v-html="renderRichMathText('對數 $y = \\log_2 x$')"
             />
@@ -1172,21 +1347,21 @@ const currentFeatureDisplay = computed(() => {
         </div>
 
         <!-- 4 組步進按鈕 -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1.5">
           <!-- 1. X 平移 -->
-          <div class="flex items-center justify-between p-1.5 px-3 rounded-md bg-[#0d1117] border border-[#30363d]">
+          <div class="flex items-center justify-between p-1.5 px-2 rounded-md bg-[#0d1117] border border-[#30363d]">
             <button
               type="button"
               @click="handleShiftX(-1)"
-              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-base cursor-pointer transition-colors shrink-0"
+              class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-sm sm:text-base cursor-pointer transition-colors shrink-0"
               title="向左平移 1 單位"
             >
               －
             </button>
-            <div class="flex items-center justify-between flex-1 px-3">
-              <span class="text-[13px] sm:text-sm font-bold text-[#c9d1d9]">X 平移</span>
+            <div class="flex items-center justify-between flex-1 px-2 min-w-0">
+              <span class="text-xs sm:text-[13px] font-bold text-[#c9d1d9] whitespace-nowrap">X 平移</span>
               <span 
-                class="text-xs font-mono"
+                class="text-[11px] sm:text-xs font-mono"
                 :class="activeShiftH !== 0 ? 'text-amber-400 font-bold' : 'text-[#8b949e]'"
               >
                 位移: {{ activeShiftH !== 0 ? (activeShiftH > 0 ? `+${activeShiftH}` : `${activeShiftH}`) : '0' }}
@@ -1195,7 +1370,7 @@ const currentFeatureDisplay = computed(() => {
             <button
               type="button"
               @click="handleShiftX(1)"
-              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-base cursor-pointer transition-colors shrink-0"
+              class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-sm sm:text-base cursor-pointer transition-colors shrink-0"
               title="向右平移 1 單位"
             >
               ＋
@@ -1203,19 +1378,19 @@ const currentFeatureDisplay = computed(() => {
           </div>
 
           <!-- 2. Y 平移 -->
-          <div class="flex items-center justify-between p-1.5 px-3 rounded-md bg-[#0d1117] border border-[#30363d]">
+          <div class="flex items-center justify-between p-1.5 px-2 rounded-md bg-[#0d1117] border border-[#30363d]">
             <button
               type="button"
               @click="handleShiftY(-1)"
-              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-base cursor-pointer transition-colors shrink-0"
+              class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-sm sm:text-base cursor-pointer transition-colors shrink-0"
               title="向下平移 1 單位"
             >
               －
             </button>
-            <div class="flex items-center justify-between flex-1 px-3">
-              <span class="text-[13px] sm:text-sm font-bold text-[#c9d1d9]">Y 平移</span>
+            <div class="flex items-center justify-between flex-1 px-2 min-w-0">
+              <span class="text-xs sm:text-[13px] font-bold text-[#c9d1d9] whitespace-nowrap">Y 平移</span>
               <span 
-                class="text-xs font-mono"
+                class="text-[11px] sm:text-xs font-mono"
                 :class="activeShiftK !== 0 ? 'text-amber-400 font-bold' : 'text-[#8b949e]'"
               >
                 位移: {{ activeShiftK !== 0 ? (activeShiftK > 0 ? `+${activeShiftK}` : `${activeShiftK}`) : '0' }}
@@ -1224,7 +1399,7 @@ const currentFeatureDisplay = computed(() => {
             <button
               type="button"
               @click="handleShiftY(1)"
-              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-base cursor-pointer transition-colors shrink-0"
+              class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-sm sm:text-base cursor-pointer transition-colors shrink-0"
               title="向上平移 1 單位"
             >
               ＋
@@ -1234,26 +1409,26 @@ const currentFeatureDisplay = computed(() => {
           <!-- 平移向量指示標籤 -->
           <div 
             v-if="activeShiftH !== 0 || activeShiftK !== 0"
-            class="px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/40 flex items-center justify-between text-xs text-amber-300 font-mono"
+            class="px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/40 flex items-center justify-between text-[11px] text-amber-300 font-mono"
           >
             <span>累計向量:</span>
             <span class="font-bold">平移 ({{ activeShiftH > 0 ? `+${activeShiftH}` : activeShiftH }}, {{ activeShiftK > 0 ? `+${activeShiftK}` : activeShiftK }})</span>
           </div>
 
           <!-- 3. X 伸縮 -->
-          <div class="flex items-center justify-between p-1.5 px-3 rounded-md bg-[#0d1117] border border-[#30363d]">
+          <div class="flex items-center justify-between p-1.5 px-2 rounded-md bg-[#0d1117] border border-[#30363d]">
             <button
               type="button"
               @click="handleScaleX('down')"
-              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-base cursor-pointer transition-colors shrink-0"
+              class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-sm sm:text-base cursor-pointer transition-colors shrink-0"
               title="水平壓縮"
             >
               －
             </button>
-            <div class="flex items-center justify-between flex-1 px-3">
-              <span class="text-[13px] sm:text-sm font-bold text-[#c9d1d9]">X 伸縮</span>
+            <div class="flex items-center justify-between flex-1 px-2 min-w-0">
+              <span class="text-xs sm:text-[13px] font-bold text-[#c9d1d9] whitespace-nowrap">X 伸縮</span>
               <span 
-                class="text-xs font-mono"
+                class="text-[11px] sm:text-xs font-mono"
                 :class="activeScaleXIdx !== 3 ? 'text-amber-400 font-bold' : 'text-[#8b949e]'"
               >
                 倍率: × {{ scaleLabels[activeScaleXIdx] }}
@@ -1262,7 +1437,7 @@ const currentFeatureDisplay = computed(() => {
             <button
               type="button"
               @click="handleScaleX('up')"
-              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-base cursor-pointer transition-colors shrink-0"
+              class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-sm sm:text-base cursor-pointer transition-colors shrink-0"
               title="水平伸長"
             >
               ＋
@@ -1270,19 +1445,19 @@ const currentFeatureDisplay = computed(() => {
           </div>
 
           <!-- 4. Y 伸縮 -->
-          <div class="flex items-center justify-between p-1.5 px-3 rounded-md bg-[#0d1117] border border-[#30363d]">
+          <div class="flex items-center justify-between p-1.5 px-2 rounded-md bg-[#0d1117] border border-[#30363d]">
             <button
               type="button"
               @click="handleScaleY('down')"
-              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-base cursor-pointer transition-colors shrink-0"
+              class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-sm sm:text-base cursor-pointer transition-colors shrink-0"
               title="垂直壓縮"
             >
               －
             </button>
-            <div class="flex items-center justify-between flex-1 px-3">
-              <span class="text-[13px] sm:text-sm font-bold text-[#c9d1d9]">Y 伸縮</span>
+            <div class="flex items-center justify-between flex-1 px-2 min-w-0">
+              <span class="text-xs sm:text-[13px] font-bold text-[#c9d1d9] whitespace-nowrap">Y 伸縮</span>
               <span 
-                class="text-xs font-mono"
+                class="text-[11px] sm:text-xs font-mono"
                 :class="activeScaleYIdx !== 3 ? 'text-amber-400 font-bold' : 'text-[#8b949e]'"
               >
                 倍率: × {{ scaleLabels[activeScaleYIdx] }}
@@ -1291,7 +1466,7 @@ const currentFeatureDisplay = computed(() => {
             <button
               type="button"
               @click="handleScaleY('up')"
-              class="w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-base cursor-pointer transition-colors shrink-0"
+              class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md bg-[#161b22] hover:bg-[#21262d] text-amber-500 hover:text-amber-400 border border-[#30363d] font-bold text-sm sm:text-base cursor-pointer transition-colors shrink-0"
               title="垂直伸長"
             >
               ＋
@@ -1299,26 +1474,24 @@ const currentFeatureDisplay = computed(() => {
           </div>
         </div>
 
-        <!-- 對稱動作 -->
-        <div class="flex flex-col gap-1 pt-1.5 border-t border-[#30363d]">
-          <div class="grid grid-cols-2 gap-1.5">
-            <button
-              type="button"
-              @click="applyReflectX"
-              class="py-1.5 px-2 rounded-md text-xs sm:text-sm font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] hover:border-amber-500 hover:text-amber-400 transition-colors cursor-pointer text-center"
-              title="對稱 x 軸翻轉"
-            >
-              上下翻轉 (x 軸)
-            </button>
-            <button
-              type="button"
-              @click="applyReflectY"
-              class="py-1.5 px-2 rounded-md text-xs sm:text-sm font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] hover:border-amber-500 hover:text-amber-400 transition-colors cursor-pointer text-center"
-              title="對稱 y 軸翻轉"
-            >
-              左右翻轉 (y 軸)
-            </button>
-          </div>
+        <!-- 對稱動作 (上下排列，統一寬度) -->
+        <div class="flex flex-col gap-1.5 pt-1.5 border-t border-[#30363d]">
+          <button
+            type="button"
+            @click="applyReflectX"
+            class="w-full py-1.5 px-2 rounded-md text-xs sm:text-sm font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] hover:border-amber-500 hover:text-amber-400 transition-colors cursor-pointer text-center"
+            title="對稱 x 軸翻轉"
+          >
+            上下翻轉 (x 軸)
+          </button>
+          <button
+            type="button"
+            @click="applyReflectY"
+            class="w-full py-1.5 px-2 rounded-md text-xs sm:text-sm font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] hover:border-amber-500 hover:text-amber-400 transition-colors cursor-pointer text-center"
+            title="對稱 y 軸翻轉"
+          >
+            左右翻轉 (y 軸)
+          </button>
           <button
             type="button"
             @click="applyInverse"
@@ -1337,57 +1510,21 @@ const currentFeatureDisplay = computed(() => {
             :disabled="stepHistory.length === 0 && !activeActionType"
             class="py-1.5 rounded-md text-xs sm:text-sm bg-[#0d1117] text-[#8b949e] hover:text-[#f0f6fc] border border-[#30363d] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors text-center"
           >
-            復原上步
+            復原
           </button>
           <button
             type="button"
             @click="resetAll"
             class="py-1.5 rounded-md text-xs sm:text-sm bg-[#0d1117] text-amber-400 hover:bg-amber-500/10 border border-amber-500/50 cursor-pointer transition-colors text-center font-bold"
           >
-            快速重置
+            重置
           </button>
         </div>
       </div>
 
-      <!-- Right Column: 動作歷程鏈、函數圖形與即時方程式 -->
-      <div class="flex-1 min-w-0 flex flex-col items-center gap-3 w-full">
-        <!-- 做了哪些動作的履歷鏈 -->
-        <div class="w-full p-3 rounded-md bg-[#161b22] border border-[#30363d] text-xs sm:text-sm">
-          <div class="flex items-center justify-between pb-1.5 border-b border-[#30363d] mb-2">
-            <div class="flex items-center gap-1.5 font-bold text-[#f0f6fc]">
-              <span class="w-2 h-2 rounded-sm bg-amber-500"></span>
-              <span>變換動作歷程（連續平移已累計合併）</span>
-            </div>
-            <span class="text-xs font-mono text-[#8b949e]">
-              已累計 {{ stepHistory.length + (activeActionType ? 1 : 0) }} 個步驟
-            </span>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-1.5">
-            <!-- 基準起點 -->
-            <span class="px-2.5 py-1 rounded-md bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] font-mono">
-              基準: {{ initialFamily === 'exp' ? 'y = 2^x' : 'y = log_2 x' }}
-            </span>
-
-            <!-- 歷史步驟清單 -->
-            <template v-for="(st, idx) in stepHistory" :key="st.id">
-              <span class="text-[#484f58] font-bold">→</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#0d1117] border border-[#30363d] text-[#f0f6fc]">
-                <span class="text-amber-500 font-bold">{{ idx + 1 }}.</span> {{ st.label }}
-              </span>
-            </template>
-
-            <!-- 進行中動作提示 -->
-            <template v-if="activeActionType">
-              <span class="text-[#484f58] font-bold">→</span>
-              <span class="px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/50 text-amber-300">
-                <span class="text-amber-400 font-bold">{{ stepHistory.length + 1 }}.</span> {{ getActiveStepLabel() }} (調整中)
-              </span>
-            </template>
-          </div>
-        </div>
-
-        <!-- FunctionGraph 函數圖形 -->
+      <!-- Right Column: 函數圖形、手機版按鈕列、動作歷程鏈與方程式說明 -->
+      <div class="flex-1 min-w-0 flex flex-col items-center gap-2.5 w-full">
+        <!-- 1. FunctionGraph 函數圖形 -->
         <FunctionGraph
           title="函數圖形"
           titleColor="#f59e0b"
@@ -1400,17 +1537,224 @@ const currentFeatureDisplay = computed(() => {
           :lines="currentTransConfig.lines"
         />
 
-        <!-- Dynamic description badge: 目前方程式突出放大，指數清晰好讀 -->
-        <div class="w-full px-4 py-3 rounded-md bg-[#161b22] border border-[#30363d] text-xs sm:text-sm text-[#c9d1d9] text-left leading-relaxed space-y-2">
+        <!-- 2. 手機版專用水平極簡按鈕列 (置於函數圖形繪畫窗正下方，兩排精簡設計) -->
+        <div class="w-full flex flex-col gap-1.5 md:hidden">
+          <!-- Row 1: 單鍵切換基準、X平移、Y平移、復原、重置 -->
+          <div class="flex items-center gap-1 w-full text-xs">
+            <!-- 基準函數單鍵切換 -->
+            <button
+              type="button"
+              @click="toggleInitialFamily"
+              class="flex-1 min-w-0 py-1 px-1 rounded-md bg-[#161b22] border border-amber-500/50 text-[#f0f6fc] active:bg-amber-500/20 font-semibold flex items-center justify-center gap-1 text-center transition-colors cursor-pointer"
+              title="單擊切換指數 / 對數"
+            >
+              <span class="text-[11px] text-[#c9d1d9]">{{ initialFamily === 'exp' ? '指數' : '對數' }}</span>
+              <span class="text-amber-400 font-bold font-mono text-[11px]">{{ initialFamily === 'exp' ? '2ˣ' : 'log₂' }}</span>
+              <span class="text-[9px] text-[#8b949e]">⇄</span>
+            </button>
+
+            <!-- X 平移 (極簡化：隱藏「位移」細節) -->
+            <div class="flex items-center rounded-md bg-[#0d1117] border border-[#30363d] overflow-hidden shrink-0">
+              <button
+                type="button"
+                @click="handleShiftX(-1)"
+                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                title="向左平移"
+              >
+                －
+              </button>
+              <span class="text-[11px] font-semibold text-[#c9d1d9] px-1 whitespace-nowrap">
+                X平移<span v-if="activeShiftH !== 0" class="text-amber-400 font-mono ml-0.5">{{ activeShiftH > 0 ? `+${activeShiftH}` : activeShiftH }}</span>
+              </span>
+              <button
+                type="button"
+                @click="handleShiftX(1)"
+                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                title="向右平移"
+              >
+                ＋
+              </button>
+            </div>
+
+            <!-- Y 平移 (極簡化：隱藏「位移」細節) -->
+            <div class="flex items-center rounded-md bg-[#0d1117] border border-[#30363d] overflow-hidden shrink-0">
+              <button
+                type="button"
+                @click="handleShiftY(-1)"
+                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                title="向下平移"
+              >
+                －
+              </button>
+              <span class="text-[11px] font-semibold text-[#c9d1d9] px-1 whitespace-nowrap">
+                Y平移<span v-if="activeShiftK !== 0" class="text-amber-400 font-mono ml-0.5">{{ activeShiftK > 0 ? `+${activeShiftK}` : activeShiftK }}</span>
+              </span>
+              <button
+                type="button"
+                @click="handleShiftY(1)"
+                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                title="向上平移"
+              >
+                ＋
+              </button>
+            </div>
+
+            <!-- 復原 -->
+            <button
+              type="button"
+              @click="undoLastStep"
+              :disabled="stepHistory.length === 0 && !activeActionType"
+              class="py-1 px-1.5 rounded-md text-[11px] font-semibold bg-[#0d1117] text-[#8b949e] active:text-[#f0f6fc] border border-[#30363d] disabled:opacity-30 disabled:cursor-not-allowed text-center transition-colors cursor-pointer shrink-0"
+              title="復原"
+            >
+              復原
+            </button>
+
+            <!-- 重置 -->
+            <button
+              type="button"
+              @click="resetAll"
+              class="py-1 px-1.5 rounded-md text-[11px] font-bold bg-[#0d1117] text-amber-400 active:bg-amber-500/10 border border-amber-500/50 text-center transition-colors cursor-pointer shrink-0"
+              title="重置"
+            >
+              重置
+            </button>
+          </div>
+
+          <!-- Row 2: X伸縮、Y伸縮、上下翻轉、左右翻轉、反函數 -->
+          <div class="flex items-center gap-1 w-full text-xs">
+            <!-- X 伸縮 (極簡化：隱藏「倍率」細節) -->
+            <div class="flex items-center rounded-md bg-[#0d1117] border border-[#30363d] overflow-hidden shrink-0">
+              <button
+                type="button"
+                @click="handleScaleX('down')"
+                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                title="水平壓縮"
+              >
+                －
+              </button>
+              <span class="text-[11px] font-semibold text-[#c9d1d9] px-1 whitespace-nowrap">
+                X伸縮<span v-if="activeScaleXIdx !== 3" class="text-amber-400 font-mono ml-0.5">×{{ scaleLabels[activeScaleXIdx] }}</span>
+              </span>
+              <button
+                type="button"
+                @click="handleScaleX('up')"
+                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                title="水平伸長"
+              >
+                ＋
+              </button>
+            </div>
+
+            <!-- Y 伸縮 (極簡化：隱藏「倍率」細節) -->
+            <div class="flex items-center rounded-md bg-[#0d1117] border border-[#30363d] overflow-hidden shrink-0">
+              <button
+                type="button"
+                @click="handleScaleY('down')"
+                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                title="垂直壓縮"
+              >
+                －
+              </button>
+              <span class="text-[11px] font-semibold text-[#c9d1d9] px-1 whitespace-nowrap">
+                Y伸縮<span v-if="activeScaleYIdx !== 3" class="text-amber-400 font-mono ml-0.5">×{{ scaleLabels[activeScaleYIdx] }}</span>
+              </span>
+              <button
+                type="button"
+                @click="handleScaleY('up')"
+                class="w-6 h-7 flex items-center justify-center bg-[#161b22] active:bg-[#21262d] text-amber-500 font-bold text-xs"
+                title="垂直伸長"
+              >
+                ＋
+              </button>
+            </div>
+
+            <!-- 上下翻轉 (極簡化：隱藏「x 軸」細節) -->
+            <button
+              type="button"
+              @click="applyReflectX"
+              class="flex-1 min-w-0 py-1 px-1 rounded-md text-[11px] font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] active:border-amber-500 active:text-amber-400 transition-colors text-center cursor-pointer whitespace-nowrap"
+              title="上下翻轉 (x 軸)"
+            >
+              上下翻轉
+            </button>
+
+            <!-- 左右翻轉 (極簡化：隱藏「y 軸」細節) -->
+            <button
+              type="button"
+              @click="applyReflectY"
+              class="flex-1 min-w-0 py-1 px-1 rounded-md text-[11px] font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] active:border-amber-500 active:text-amber-400 transition-colors text-center cursor-pointer whitespace-nowrap"
+              title="左右翻轉 (y 軸)"
+            >
+              左右翻轉
+            </button>
+
+            <!-- 反函數 (極簡化：隱藏「對稱 y = x」細節) -->
+            <button
+              type="button"
+              @click="applyInverse"
+              class="flex-1 min-w-0 py-1 px-1 rounded-md text-[11px] font-semibold bg-[#0d1117] border border-[#30363d] text-amber-400 active:bg-amber-500/10 active:border-amber-500 transition-colors text-center cursor-pointer whitespace-nowrap"
+              title="反函數對稱 (對稱 y = x)"
+            >
+              反函數
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. 變換動作歷程 (改放到方程式上方，KaTeX排版基準式，刪除累計合併註解) -->
+        <div class="w-full p-2 sm:p-2.5 rounded-md bg-[#161b22] border border-[#30363d] text-xs sm:text-sm">
+          <div class="flex items-center justify-between pb-1 sm:pb-1.5 border-b border-[#30363d] mb-1.5">
+            <div class="flex items-center gap-1.5 font-bold text-[#f0f6fc] text-xs sm:text-sm">
+              <span class="w-2 h-2 rounded-sm bg-amber-500"></span>
+              <span>變換動作歷程</span>
+            </div>
+            <span class="text-[11px] sm:text-xs font-mono text-[#8b949e]">
+              已累計 {{ stepHistory.length + (activeActionType ? 1 : 0) }} 個步驟
+            </span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1 sm:gap-1.5 text-xs">
+            <!-- 基準起點 (使用 KaTeX 格式排版上標) -->
+            <span class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-[11px] sm:text-xs flex items-center gap-1">
+              <span>基準:</span>
+              <span v-html="renderRichMathText(initialFamily === 'exp' ? '$y = 2^x$' : '$y = \\log_2 x$')"></span>
+            </span>
+
+            <!-- 歷史步驟清單 -->
+            <template v-for="(st, idx) in stepHistory" :key="st.id">
+              <span class="text-[#484f58] font-bold text-[10px] sm:text-xs">→</span>
+              <span class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-[#0d1117] border border-[#30363d] text-[#f0f6fc] text-[11px] sm:text-xs">
+                <span class="text-amber-500 font-bold">{{ idx + 1 }}.</span> {{ st.label }}
+              </span>
+            </template>
+
+            <!-- 進行中動作提示 -->
+            <template v-if="activeActionType">
+              <span class="text-[#484f58] font-bold text-[10px] sm:text-xs">→</span>
+              <span class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-amber-500/10 border border-amber-500/50 text-amber-300 text-[11px] sm:text-xs">
+                <span class="text-amber-400 font-bold">{{ stepHistory.length + 1 }}.</span> {{ getActiveStepLabel() }} (調整中)
+              </span>
+            </template>
+          </div>
+        </div>
+
+        <!-- 4. 方程式說明卡片：方程式動作 (未展開前呈現) 與 方程式結論 (展開化簡後) -->
+        <div class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-md bg-[#161b22] border border-[#30363d] text-xs sm:text-sm text-[#c9d1d9] text-left leading-relaxed space-y-2">
+          <!-- 方程式動作 (說明最後一步未展開前的呈現，動作粗體顯示) -->
           <div class="flex items-center gap-2 pb-1.5 border-b border-[#30363d] flex-wrap">
-            <span class="font-bold text-amber-400 text-xs sm:text-sm shrink-0">目前方程式：</span>
+            <span class="font-bold text-sky-400 text-xs sm:text-sm shrink-0">方程式動作：</span>
+            <span class="text-[#f0f6fc] font-bold text-sm sm:text-base" v-html="actionFormulaDisplay"></span>
+          </div>
+
+          <!-- 方程式結論 (展開化簡後的呈現) -->
+          <div class="flex items-center gap-2 pb-1.5 border-b border-[#30363d] flex-wrap">
+            <span class="font-bold text-amber-400 text-xs sm:text-sm shrink-0">方程式結論：</span>
             <span class="text-[#f0f6fc] font-bold text-sm sm:text-base" v-html="currentFormulaDisplay"></span>
           </div>
-          <div class="text-xs sm:text-sm text-[#8b949e] space-y-1">
+
+          <!-- 幾何特徵 -->
+          <div class="text-xs text-[#8b949e]">
             <div v-html="currentFeatureDisplay"></div>
-            <div class="text-xs text-[#8b949e] pt-0.5">
-              <span class="text-amber-400 font-semibold">順序心法</span>：先平移後伸縮 ≠ 先伸縮後平移！觀察上方歷程鏈與各項係數變化。
-            </div>
           </div>
         </div>
       </div>
