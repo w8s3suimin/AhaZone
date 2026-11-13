@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue';
 import { Sparkles, Search, X, Map, PanelLeftClose, PanelLeftOpen } from 'lucide-vue-next';
 
 defineProps<{
@@ -14,10 +15,70 @@ const emit = defineEmits<{
   (e: 'openMobileDrawer'): void;
   (e: 'reset'): void;
 }>();
+
+// 手機版自動隱藏導覽列：上滑翻閱下方資料時隱藏，下滑翻閱上方內容時顯示
+const isNavHidden = ref(false);
+const isInputFocused = ref(false);
+let lastScrollY = 0;
+let ticking = false;
+
+const handleScroll = () => {
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(() => {
+    const currentScrollY = window.scrollY || document.documentElement.scrollTop;
+
+    // 若正在搜尋輸入中，不隱藏導覽列
+    if (isInputFocused.value) {
+      isNavHidden.value = false;
+      lastScrollY = currentScrollY;
+      ticking = false;
+      return;
+    }
+
+    // 接近頁面最頂部時，保持展開
+    if (currentScrollY <= 45) {
+      isNavHidden.value = false;
+      lastScrollY = currentScrollY;
+      ticking = false;
+      return;
+    }
+
+    const diff = currentScrollY - lastScrollY;
+    // 設定 8px 門檻，避免微小位移抖動
+    if (Math.abs(diff) > 8) {
+      if (diff > 0) {
+        // 向上滑動螢幕翻閱下方內容 (頁面向下滾動) -> 隱藏
+        isNavHidden.value = true;
+      } else {
+        // 向下滑動螢幕翻閱上方內容 (頁面向上滾動) -> 顯示
+        isNavHidden.value = false;
+      }
+      lastScrollY = currentScrollY;
+    }
+    ticking = false;
+  });
+};
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    lastScrollY = window.scrollY || document.documentElement.scrollTop;
+    window.addEventListener('scroll', handleScroll, { passive: true });
+  }
+});
+
+onUnmounted(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('scroll', handleScroll);
+  }
+});
 </script>
 
 <template>
-  <header class="sticky top-0 z-30 bg-[#161b22] border-b border-[#30363d]">
+  <header 
+    class="sticky top-0 z-30 bg-[#161b22] border-b border-[#30363d] transition-transform duration-300 ease-in-out will-change-transform"
+    :class="isNavHidden ? '-translate-y-full md:translate-y-0 shadow-none' : 'translate-y-0 shadow-lg md:shadow-none'"
+  >
     <div class="max-w-[1920px] mx-auto px-4 sm:px-6">
       <div class="flex items-center justify-between h-16 gap-4">
         
@@ -111,6 +172,8 @@ const emit = defineEmits<{
             type="text"
             :value="searchQuery"
             @input="emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
+            @focus="isInputFocused = true"
+            @blur="isInputFocused = false"
             placeholder="搜尋單元、試卷或觀念..."
             class="w-full pl-10 pr-9 py-2 bg-[#0d1117] border border-[#30363d] rounded-md text-xs text-[#f0f6fc] placeholder-[#484f58] focus:outline-none focus:border-amber-500"
           />
