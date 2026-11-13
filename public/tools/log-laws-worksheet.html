@@ -295,7 +295,7 @@
       </div>
 
       <!-- Content: 4 Sections in Clean Single-Column Layout -->
-      <div class="flex-1 flex flex-col justify-between py-1 border border-sky-200 rounded-lg px-4 bg-sky-50/15">
+      <div class="border border-sky-200 rounded-lg px-4 py-2 mb-auto space-y-2">
         
         <!-- Section 1: 分合公式 -->
         <div>
@@ -373,7 +373,7 @@
       </div>
 
       <!-- 20 Mixed Questions in Clean Single Column Layout -->
-      <div class="flex-1 flex flex-col justify-between py-1 border border-sky-200 rounded-lg px-4 bg-sky-50/15">
+      <div class="border border-sky-200 rounded-lg px-4 py-2 mb-auto">
         <div id="p2-single-col" class="space-y-0.5"></div>
       </div>
 
@@ -392,7 +392,7 @@
           <div>
             <div class="text-xs font-bold text-sky-800 tracking-wider">AhaZone 快速核對標準解答單</div>
             <h2 class="text-xl font-black text-slate-900 tracking-tight mt-0.5">
-              標準答案與公式對照表（<span id="p3TierLabel">A 卷</span>）
+              標準答案
             </h2>
           </div>
           <div class="text-right text-xs text-slate-500 font-mono">
@@ -404,7 +404,7 @@
 
       <div class="flex-1 space-y-4">
         <!-- Page 1 Answers (20 題) -->
-        <div class="border border-sky-200 rounded-lg p-3 bg-sky-50/20">
+        <div class="border border-sky-200 rounded-lg p-3">
           <h3 class="font-bold text-sm text-sky-950 mb-2 border-b border-sky-200 pb-1 flex items-center justify-between">
             <span>P1 - 基本題型答案（20 題）</span>
             <span class="text-xs text-slate-500 font-normal">純單一公式演練（1~5 分合 ｜ 6~10 次係 ｜ 11~15 換底倒數 ｜ 16~20 底真消底）</span>
@@ -413,10 +413,10 @@
         </div>
 
         <!-- Page 2 Answers (20 題) -->
-        <div class="border border-sky-200 rounded-lg p-3 bg-sky-50/20">
+        <div class="border border-sky-200 rounded-lg p-3">
           <h3 class="font-bold text-sm text-sky-950 mb-2 border-b border-sky-200 pb-1 flex items-center justify-between">
             <span>P2 - 綜合題型答案（20 題）</span>
-            <span class="text-xs text-slate-500 font-normal">教師核對專用：標記難度等級與所用公式組合</span>
+            <span class="text-xs text-slate-500 font-normal">教師核對專用：標記難度等級</span>
           </h3>
           <div id="ans-p2-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs"></div>
         </div>
@@ -922,8 +922,6 @@
       const p1Grid = document.getElementById('ans-p1-grid');
       const p2Grid = document.getElementById('ans-p2-grid');
       p1Grid.innerHTML = ''; p2Grid.innerHTML = '';
-
-      document.getElementById('p3TierLabel').textContent = `難度 ${currentTier}`;
 
       // Flatten P1 (20 items)
       const allP1 = [
