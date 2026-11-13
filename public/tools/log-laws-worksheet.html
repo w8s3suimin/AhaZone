@@ -63,7 +63,7 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 6mm 10mm;
+        margin: 8mm 12mm 8mm 12mm;
       }
       *, *::before, *::after {
         box-sizing: border-box !important;
@@ -75,7 +75,6 @@
         padding: 0 !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 0 !important;
       }
       main {
         margin: 0 !important;
@@ -88,18 +87,22 @@
       }
       .a4-page {
         width: 100% !important;
-        height: auto !important;
-        min-height: 0 !important;
-        max-height: none !important;
+        height: 281mm !important;
+        min-height: 281mm !important;
+        max-height: 281mm !important;
         margin: 0 !important;
-        padding: 2mm 0 !important;
+        padding: 0 !important;
         box-shadow: none !important;
         border: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
         page-break-after: always !important;
         break-after: page !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
-        overflow: visible !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
       }
       .a4-page:last-child {
         page-break-after: auto !important;
@@ -342,8 +345,8 @@
 
       <!-- Page 1 Footer -->
       <div class="border-t border-slate-200 pt-1.5 mt-2 flex justify-between text-[11px] text-slate-400">
-        <div>AhaZone 數理自主研習平台 ｜ 高二數學：指數函數與對數函數</div>
-        <div>P1（共二頁）</div>
+        <div>AhaZone ｜ 高二數學：指數函數與對數函數</div>
+        <div class="font-mono font-medium">1</div>
       </div>
     </div>
 
@@ -376,8 +379,8 @@
 
       <!-- Page 2 Footer -->
       <div class="border-t border-slate-200 pt-1.5 mt-2 flex justify-between text-[11px] text-slate-400">
-        <div>AhaZone 數理自主研習平台 ｜ 高二數學：指數函數與對數函數</div>
-        <div>P2（共二頁）</div>
+        <div>AhaZone ｜ 高二數學：指數函數與對數函數</div>
+        <div class="font-mono font-medium">2</div>
       </div>
     </div>
 
@@ -421,8 +424,8 @@
 
       <!-- Page 3 Footer -->
       <div class="border-t border-slate-200 pt-1.5 mt-2 flex justify-between text-[11px] text-slate-400">
-        <div>答案皆經數論精準回代驗算 ｜ 卷面純淨簡潔 ｜ 專注熟練對數律</div>
-        <div>解答頁（完）</div>
+        <div>AhaZone ｜ 高二數學：指數函數與對數函數（標準解答）</div>
+        <div class="font-mono font-medium">3</div>
       </div>
     </div>
 
