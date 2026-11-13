@@ -392,13 +392,16 @@ function computeActionFormulaLatex(steps: StepRecord[], initFam: 'exp' | 'log'):
   const prevState = computeTransformParams(prevSteps, initFam);
   const prevFmt = formatStateFormula(prevState);
 
+  // 變化動作以標題同色系藍色 (#38bdf8) 粗體高亮突顯
+  const highlight = (s: string) => `\\textcolor{#38bdf8}{\\boldsymbol{${s}}}`;
+
   if (lastStep.type === 'shift') {
     const h = lastStep.h || 0;
     const k = lastStep.k || 0;
     let uAction = prevFmt.uStr;
 
     if (h !== 0) {
-      const hPart = h > 0 ? `\\boldsymbol{-${h}}` : `\\boldsymbol{+${Math.abs(h)}}`;
+      const hPart = h > 0 ? highlight(`-${h}`) : highlight(`+${Math.abs(h)}`);
       const absA = Math.abs(prevState.A);
       const signA = prevState.A < 0 ? '-' : '';
 
@@ -439,7 +442,7 @@ function computeActionFormulaLatex(steps: StepRecord[], initFam: 'exp' | 'log'):
 
     let suffixDAction = prevFmt.suffixD;
     if (k !== 0) {
-      const kPart = k > 0 ? `\\boldsymbol{+${k}}` : `\\boldsymbol{-${Math.abs(k)}}`;
+      const kPart = k > 0 ? highlight(`+${k}`) : highlight(`-${Math.abs(k)}`);
       suffixDAction = `${prevFmt.suffixD} ${kPart}`.trimStart();
       suffixDAction = ` ${suffixDAction}`;
     }
@@ -454,12 +457,12 @@ function computeActionFormulaLatex(steps: StepRecord[], initFam: 'exp' | 'log'):
   if (lastStep.type === 'scaleX') {
     const s = scaleValues[lastStep.val ?? 3];
     let xSub = '';
-    if (s === 2) xSub = '\\boldsymbol{\\frac{x}{2}}';
-    else if (s === 3) xSub = '\\boldsymbol{\\frac{x}{3}}';
-    else if (s === 4) xSub = '\\boldsymbol{\\frac{x}{4}}';
-    else if (s === 0.5) xSub = '\\boldsymbol{2x}';
-    else if (Math.abs(s - 1 / 3) < 0.001) xSub = '\\boldsymbol{3x}';
-    else if (s === 0.25) xSub = '\\boldsymbol{4x}';
+    if (s === 2) xSub = highlight('\\frac{x}{2}');
+    else if (s === 3) xSub = highlight('\\frac{x}{3}');
+    else if (s === 4) xSub = highlight('\\frac{x}{4}');
+    else if (s === 0.5) xSub = highlight('2x');
+    else if (Math.abs(s - 1 / 3) < 0.001) xSub = highlight('3x');
+    else if (s === 0.25) xSub = highlight('4x');
     else xSub = 'x';
 
     let uAction = '';
@@ -484,13 +487,13 @@ function computeActionFormulaLatex(steps: StepRecord[], initFam: 'exp' | 'log'):
   if (lastStep.type === 'scaleY') {
     const s = scaleValues[lastStep.val ?? 3];
     let sBold = '';
-    if (s === 2) sBold = '\\boldsymbol{2}';
-    else if (s === 3) sBold = '\\boldsymbol{3}';
-    else if (s === 4) sBold = '\\boldsymbol{4}';
-    else if (s === 0.5) sBold = '\\boldsymbol{\\frac{1}{2}}';
-    else if (Math.abs(s - 1 / 3) < 0.001) sBold = '\\boldsymbol{\\frac{1}{3}}';
-    else if (s === 0.25) sBold = '\\boldsymbol{\\frac{1}{4}}';
-    else sBold = `\\boldsymbol{${s}}`;
+    if (s === 2) sBold = highlight('2');
+    else if (s === 3) sBold = highlight('3');
+    else if (s === 4) sBold = highlight('4');
+    else if (s === 0.5) sBold = highlight('\\frac{1}{2}');
+    else if (Math.abs(s - 1 / 3) < 0.001) sBold = highlight('\\frac{1}{3}');
+    else if (s === 0.25) sBold = highlight('\\frac{1}{4}');
+    else sBold = highlight(`${s}`);
 
     const prevRHS = prevFmt.formulaLatex.replace(/^y\s*=\s*/, '');
     if (Math.abs(prevState.D) > 0.001 || Math.abs(Math.abs(prevState.C) - 1) > 0.001) {
@@ -504,21 +507,21 @@ function computeActionFormulaLatex(steps: StepRecord[], initFam: 'exp' | 'log'):
   if (lastStep.type === 'reflectX') {
     const prevRHS = prevFmt.formulaLatex.replace(/^y\s*=\s*/, '');
     if (Math.abs(prevState.D) > 0.001) {
-      return `y = \\boldsymbol{-}\\left( ${prevRHS} \\right)`;
+      return `y = ${highlight('-')}\\left( ${prevRHS} \\right)`;
     } else {
-      return `y = \\boldsymbol{-}${prevRHS.startsWith('-') ? `(${prevRHS})` : prevRHS}`;
+      return `y = ${highlight('-')}${prevRHS.startsWith('-') ? `(${prevRHS})` : prevRHS}`;
     }
   }
 
   if (lastStep.type === 'reflectY') {
     let uAction = '';
     if (Math.abs(prevState.A - 1) < 0.001 && Math.abs(prevState.B) < 0.001) {
-      uAction = '\\boldsymbol{-x}';
+      uAction = highlight('-x');
     } else {
       const bPart = Math.abs(prevState.B) > 0.001 ? ` ${prevState.B > 0 ? '+' : '-'} ${Math.abs(prevState.B)}` : '';
       const aStr = Number.isInteger(Math.abs(prevState.A)) ? `${Math.abs(prevState.A)}` : Math.abs(prevState.A).toFixed(1);
       const signA = prevState.A < 0 ? '-' : '';
-      uAction = `${signA}${aStr}(\\boldsymbol{-x})${bPart}`;
+      uAction = `${signA}${aStr}(${highlight('-x')})${bPart}`;
     }
     const mainTerm = prevState.fam === 'exp' ? `2^{${uAction}}` : `\\log_2(${uAction})`;
     return `y = ${prevFmt.prefixC}${mainTerm}${prevFmt.suffixD}`;
@@ -527,7 +530,7 @@ function computeActionFormulaLatex(steps: StepRecord[], initFam: 'exp' | 'log'):
   if (lastStep.type === 'inverse') {
     const currState = computeTransformParams(steps, initFam);
     const currFmt = formatStateFormula(currState);
-    return `x \\leftrightarrow y \\implies y = ${currFmt.formulaLatex.replace(/^y\s*=\s*/, '')}`;
+    return `${highlight('x \\leftrightarrow y')} \\implies y = ${currFmt.formulaLatex.replace(/^y\s*=\s*/, '')}`;
   }
 
   return formatStateFormula(computeTransformParams(steps, initFam)).formulaLatex;
@@ -1493,7 +1496,7 @@ const currentFeatureDisplay = computed(() => {
           <button
             type="button"
             @click="applyInverse"
-            class="w-full py-1.5 px-2 rounded-md text-xs sm:text-sm font-semibold bg-[#0d1117] border border-[#30363d] text-amber-400 hover:bg-amber-500/10 hover:border-amber-500 transition-colors cursor-pointer text-center"
+            class="w-full py-1.5 px-2 rounded-md text-xs sm:text-sm font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] hover:border-amber-500 hover:text-amber-400 transition-colors cursor-pointer text-center"
             title="對稱 y = x (反函數)"
           >
             反函數對稱 (對稱 y = x)
@@ -1694,7 +1697,7 @@ const currentFeatureDisplay = computed(() => {
             <button
               type="button"
               @click="applyInverse"
-              class="py-2 px-1 rounded-md text-xs font-semibold bg-[#0d1117] border border-[#30363d] text-amber-400 hover:border-amber-500 active:bg-amber-500/10 transition-colors text-center cursor-pointer font-bold"
+              class="py-2 px-1 rounded-md text-xs font-semibold bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] hover:border-amber-500 hover:text-amber-400 active:bg-amber-500/10 transition-colors text-center cursor-pointer"
               title="反函數對稱 (對稱 y = x)"
             >
               反函數
