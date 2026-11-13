@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>指數函數與對數函數：對數律動態階梯式訓練卷 - AhaZone</title>
+  <title>指數函數與對數函數：對數律訓練卷 - AhaZone</title>
   
   <!-- KaTeX for pristine math rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -48,7 +48,7 @@
       min-height: 297mm;
       height: 297mm;
       max-height: 297mm;
-      padding: 9.5mm 13mm 7.5mm 13mm;
+      padding: 10mm 14mm 8mm 14mm;
       margin: 20px auto;
       background: #ffffff;
       box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -63,7 +63,7 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 5mm 10mm;
+        margin: 6mm 10mm;
       }
       *, *::before, *::after {
         box-sizing: border-box !important;
@@ -110,13 +110,23 @@
       }
     }
 
+    /* KaTeX & Math formatting - strictly avoid scrollbars */
     .katex {
-      font-size: 1.12em !important;
+      font-size: 1.15em !important;
+    }
+    .math-content {
+      overflow: visible !important;
+      white-space: nowrap;
     }
 
-    .question-card {
-      min-height: 37px;
-      font-size: 14px;
+    .question-card-p1 {
+      min-height: 42px;
+      font-size: 15px;
+    }
+
+    .question-card-p2 {
+      min-height: 45px;
+      font-size: 15.5px;
     }
 
     .editable-title:hover {
@@ -127,11 +137,11 @@
 
     @keyframes pulseSuccess {
       0% { transform: scale(1); }
-      50% { transform: scale(1.015); }
+      50% { transform: scale(1.012); }
       100% { transform: scale(1); }
     }
     .animate-regenerate {
-      animation: pulseSuccess 0.25s ease-out;
+      animation: pulseSuccess 0.2s ease-out;
     }
   </style>
 </head>
@@ -148,19 +158,48 @@
         </span>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-sm sm:text-base font-bold text-white tracking-wide">對數律動態階梯式訓練卷</h1>
+            <h1 class="text-sm sm:text-base font-bold text-white tracking-wide">對數律動態訓練卷</h1>
             <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30 flex items-center gap-1">
               <i data-lucide="hash" class="w-3 h-3"></i>
-              <span id="serialBadge">LOG-2026-8801</span>
+              <span id="serialBadge">LOG-2917</span>
             </span>
           </div>
-          <p class="text-xs text-slate-400">章節：指數函數與對數函數 ｜ 第 1 頁基本 20 題 ｜ 第 2 頁綜合 30 題（題型徹底打散）</p>
+          <p class="text-xs text-slate-400">高中數學 ｜ 單元：指數函數與對數函數 ｜ P1 基本題型 (20題) ＋ P2 綜合題型 (20題)</p>
         </div>
       </div>
 
-      <!-- Action Buttons & Seed Controller -->
+      <!-- Action Buttons & Controllers -->
       <div class="flex items-center gap-2 flex-wrap">
         
+        <!-- Difficulty Tier Selector (A / B / C 卷) -->
+        <div class="flex items-center bg-slate-800 rounded-lg border border-slate-700 p-0.5 text-xs">
+          <span class="text-slate-400 px-2 py-1 font-medium">綜合難度:</span>
+          <button 
+            id="btnTierC" 
+            onclick="setTier('C')" 
+            class="px-2.5 py-1 rounded font-bold transition text-slate-400 hover:text-white"
+            title="C卷：20題皆為基礎綜合 (2公式)"
+          >
+            C 卷
+          </button>
+          <button 
+            id="btnTierB" 
+            onclick="setTier('B')" 
+            class="px-2.5 py-1 rounded font-bold transition text-slate-400 hover:text-white"
+            title="B卷：20題由 B 與 C 難度混合組成"
+          >
+            B 卷
+          </button>
+          <button 
+            id="btnTierA" 
+            onclick="setTier('A')" 
+            class="px-2.5 py-1 rounded font-bold transition bg-sky-600 text-white shadow-sm"
+            title="A卷：20題由 A、B、C 三種難度全方位綜合組成"
+          >
+            A 卷
+          </button>
+        </div>
+
         <!-- Seed Input Box -->
         <div class="flex items-center bg-slate-800 rounded-lg border border-slate-700 px-2 py-1 text-xs">
           <span class="text-slate-400 font-mono mr-1.5 flex items-center gap-1">
@@ -198,17 +237,17 @@
           id="btnToggleAnswerPage" 
           onclick="toggleAnswerPage()"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition shadow-sm"
-          title="顯示/隱藏第 3 頁獨立解答頁"
+          title="顯示/隱藏第 3 頁解答頁"
         >
           <i data-lucide="file-check" class="w-4 h-4 text-emerald-400"></i>
-          <span id="toggleAnswerPageText">第3頁解答: 開</span>
+          <span id="toggleAnswerPageText">解答頁: 開</span>
         </button>
 
         <!-- Regenerate Button -->
         <button 
           onclick="regenerateWorksheet()"
           class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white shadow-md transition active:scale-95"
-          title="按此立即亂數產生全新 50 題（快捷鍵：R）"
+          title="按此立即亂數產生全新考卷（快捷鍵：R）"
         >
           <i data-lucide="refresh-cw" class="w-4 h-4"></i>
           <span>換一卷 (R)</span>
@@ -231,84 +270,79 @@
   <!-- Document View Area -->
   <main class="py-4 px-2">
 
-    <!-- ==================== PAGE 1: 基本題型（四大對數律單一公式練功） ==================== -->
+    <!-- ==================== PAGE 1: P1 - 基本題型 ==================== -->
     <div id="page1" class="a4-page">
       
       <!-- Exam Header -->
-      <div class="border-b-2 border-slate-900 pb-2 mb-2">
+      <div class="border-b-2 border-slate-900 pb-2 mb-3">
         <div class="flex justify-between items-start">
           <div class="flex-1">
             <div class="editable-title text-xs font-bold text-sky-800 tracking-wider inline-block px-1 py-0.5 rounded" contenteditable="true">
-              高中數學 ｜ 單元：指數函數與對數函數 ｜ 核心技能自主訓練卷
+              高中數學 ｜ 單元：指數函數與對數函數
             </div>
-            <h2 class="text-lg font-black text-slate-900 tracking-tight mt-0.5 flex items-center gap-2">
-              <span>【第一頁】四大基本題型特訓（一次僅使用一種對數律）</span>
-              <span class="text-xs px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-normal">共 20 題 ｜ 每題型 5 題</span>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight mt-0.5">
+              P1 - 基本題型
             </h2>
           </div>
           <div class="text-right text-xs text-slate-500 font-mono shrink-0">
-            <div>卷號：<span id="p1Serial" class="font-bold text-slate-800 text-sm">LOG-2026-8801</span></div>
+            <div>卷號：<span id="p1Serial" class="font-bold text-slate-800 text-sm">LOG-2917</span></div>
             <div>班級：______ 座號：___ 姓名：________</div>
           </div>
         </div>
       </div>
 
-      <!-- Content Grid: 4 Sections -->
-      <div class="flex-1 grid grid-cols-2 gap-x-4 gap-y-2">
+      <!-- Content Grid: 4 Sections - Uniform Blue Theme -->
+      <div class="flex-1 grid grid-cols-2 gap-x-5 gap-y-3">
         
         <!-- Section 1: 分合公式 -->
-        <div class="border border-sky-200 rounded-lg p-2.5 bg-sky-50/20 flex flex-col justify-between">
+        <div class="border border-sky-200 rounded-lg p-3 bg-sky-50/25 flex flex-col justify-between">
           <div>
-            <div class="flex items-center justify-between border-b border-sky-200 pb-1 mb-1">
-              <span class="text-xs font-bold text-sky-900 flex items-center gap-1">
+            <div class="flex items-center justify-between border-b border-sky-200 pb-1.5 mb-1.5">
+              <span class="text-xs font-bold text-sky-950 flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-sky-500 inline-block"></span>
-                一、分合公式（$\log_a xy = \log_a x + \log_a y$ / 差轉商）
+                一、分合公式
               </span>
-              <span class="text-[10px] text-sky-600 font-mono">1~5 題</span>
             </div>
-            <div id="p1-sec1-list" class="space-y-0.5"></div>
+            <div id="p1-sec1-list" class="space-y-1"></div>
           </div>
         </div>
 
         <!-- Section 2: 次係公式 -->
-        <div class="border border-indigo-200 rounded-lg p-2.5 bg-indigo-50/20 flex flex-col justify-between">
+        <div class="border border-sky-200 rounded-lg p-3 bg-sky-50/25 flex flex-col justify-between">
           <div>
-            <div class="flex items-center justify-between border-b border-indigo-200 pb-1 mb-1">
-              <span class="text-xs font-bold text-indigo-900 flex items-center gap-1">
-                <span class="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span>
-                二、次係公式（$\log_{a^n}(x^m) = \frac{m}{n}\log_a x$）
+            <div class="flex items-center justify-between border-b border-sky-200 pb-1.5 mb-1.5">
+              <span class="text-xs font-bold text-sky-950 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-sky-500 inline-block"></span>
+                二、次係公式
               </span>
-              <span class="text-[10px] text-indigo-600 font-mono">6~10 題</span>
             </div>
-            <div id="p1-sec2-list" class="space-y-0.5"></div>
+            <div id="p1-sec2-list" class="space-y-1"></div>
           </div>
         </div>
 
         <!-- Section 3: 換底與倒數公式 -->
-        <div class="border border-emerald-200 rounded-lg p-2.5 bg-emerald-50/20 flex flex-col justify-between">
+        <div class="border border-sky-200 rounded-lg p-3 bg-sky-50/25 flex flex-col justify-between">
           <div>
-            <div class="flex items-center justify-between border-b border-emerald-200 pb-1 mb-1">
-              <span class="text-xs font-bold text-emerald-900 flex items-center gap-1">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-                三、換底與倒數公式（$\log_a b \cdot \log_b c = \log_a c$ ｜ 倒數相消）
+            <div class="flex items-center justify-between border-b border-sky-200 pb-1.5 mb-1.5">
+              <span class="text-xs font-bold text-sky-950 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-sky-500 inline-block"></span>
+                三、換底與倒數公式
               </span>
-              <span class="text-[10px] text-emerald-600 font-mono">11~15 題</span>
             </div>
-            <div id="p1-sec3-list" class="space-y-0.5"></div>
+            <div id="p1-sec3-list" class="space-y-1"></div>
           </div>
         </div>
 
         <!-- Section 4: 底真對調與消底公式 -->
-        <div class="border border-amber-200 rounded-lg p-2.5 bg-amber-50/20 flex flex-col justify-between">
+        <div class="border border-sky-200 rounded-lg p-3 bg-sky-50/25 flex flex-col justify-between">
           <div>
-            <div class="flex items-center justify-between border-b border-amber-200 pb-1 mb-1">
-              <span class="text-xs font-bold text-amber-900 flex items-center gap-1">
-                <span class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
-                四、底真對調與消底（$a^{\log_a x} = x$ ｜ $x^{\log_a y} = y^{\log_a x}$）
+            <div class="flex items-center justify-between border-b border-sky-200 pb-1.5 mb-1.5">
+              <span class="text-xs font-bold text-sky-950 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-sky-500 inline-block"></span>
+                四、底真對調與消底
               </span>
-              <span class="text-[10px] text-amber-600 font-mono">16~20 題</span>
             </div>
-            <div id="p1-sec4-list" class="space-y-0.5"></div>
+            <div id="p1-sec4-list" class="space-y-1"></div>
           </div>
         </div>
 
@@ -316,49 +350,42 @@
 
       <!-- Page 1 Footer -->
       <div class="border-t border-slate-200 pt-1.5 mt-2 flex justify-between text-[11px] text-slate-400">
-        <div>AhaZone 數理自主研習平台 ｜ 章節：指數函數與對數函數 ｜ 對數律四大公式基礎檢驗卷</div>
-        <div>第一頁（共二頁）</div>
+        <div>AhaZone 數理自主研習平台 ｜ 高中數學：指數函數與對數函數</div>
+        <div>P1（共二頁）</div>
       </div>
     </div>
 
 
-    <!-- ==================== PAGE 2: 綜合題型（題型徹底打散 30 題） ==================== -->
+    <!-- ==================== PAGE 2: P2 - 綜合題型（20 題，單欄佈局，卷面無難度註解） ==================== -->
     <div id="page2" class="a4-page">
       
       <!-- Exam Header -->
       <div class="border-b-2 border-slate-900 pb-2 mb-2">
         <div class="flex justify-between items-start">
           <div class="flex-1">
-            <div class="editable-title text-xs font-bold text-indigo-800 tracking-wider inline-block px-1 py-0.5 rounded" contenteditable="true">
-              高中數學 ｜ 單元：指數函數與對數函數 ｜ 綜合實戰練功試卷
+            <div class="editable-title text-xs font-bold text-sky-800 tracking-wider inline-block px-1 py-0.5 rounded" contenteditable="true">
+              高中數學 ｜ 單元：指數函數與對數函數
             </div>
-            <h2 class="text-lg font-black text-slate-900 tracking-tight mt-0.5 flex items-center gap-2">
-              <span>【第二頁】綜合題型實戰演練（共 30 題 ｜ 題型打散隨機抽選）</span>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight mt-0.5">
+              P2 - 綜合題型
             </h2>
-            <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-500">
-              <span class="flex items-center gap-1"><span class="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold font-mono text-[10px]">C</span> 基礎綜合（2公式，15題）</span>
-              <span class="flex items-center gap-1"><span class="px-1.5 py-0.2 rounded bg-sky-100 text-sky-800 font-bold font-mono text-[10px]">B</span> 進階綜合（3公式，10題）</span>
-              <span class="flex items-center gap-1"><span class="px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 font-bold font-mono text-[10px]">A</span> 極限挑戰（4公式全開，5題）</span>
-              <span class="text-slate-400 ml-1">※ 題型打散不聚類，培養隨機破題敏銳度</span>
-            </div>
           </div>
           <div class="text-right text-xs text-slate-500 font-mono shrink-0">
-            <div>卷號：<span id="p2Serial" class="font-bold text-slate-800 text-sm">LOG-2026-8801</span></div>
+            <div>卷號：<span id="p2Serial" class="font-bold text-slate-800 text-sm">LOG-2917</span></div>
             <div>得分：___________</div>
           </div>
         </div>
       </div>
 
-      <!-- 30 Mixed Questions in 2-Column Balanced Layout -->
-      <div class="flex-1 grid grid-cols-2 gap-x-5 gap-y-1 text-slate-800 text-xs">
-        <div id="p2-col1" class="space-y-1"></div>
-        <div id="p2-col2" class="space-y-1"></div>
+      <!-- 20 Mixed Questions in Clean Single Column Layout -->
+      <div class="flex-1 flex flex-col justify-between py-1 border border-sky-200 rounded-lg px-4 bg-sky-50/15">
+        <div id="p2-single-col" class="space-y-0.5"></div>
       </div>
 
       <!-- Page 2 Footer -->
       <div class="border-t border-slate-200 pt-1.5 mt-2 flex justify-between text-[11px] text-slate-400">
-        <div>AhaZone 數理自主研習平台 ｜ 章節：指數函數與對數函數 ｜ 嚴選純對數律運算演練試卷</div>
-        <div>第二頁（共二頁）</div>
+        <div>AhaZone 數理自主研習平台 ｜ 高中數學：指數函數與對數函數</div>
+        <div>P2（共二頁）</div>
       </div>
     </div>
 
@@ -368,13 +395,13 @@
       <div class="border-b-2 border-slate-900 pb-2 mb-3">
         <div class="flex justify-between items-start">
           <div>
-            <div class="text-xs font-bold text-emerald-800 tracking-wider">AhaZone 快速核對標準解答單</div>
+            <div class="text-xs font-bold text-sky-800 tracking-wider">AhaZone 快速核對標準解答單</div>
             <h2 class="text-xl font-black text-slate-900 tracking-tight mt-0.5">
-              指數函數與對數函數：對數律訓練卷 ｜ 標準答案與所用公式一覽
+              標準答案與公式對照表（<span id="p3TierLabel">A 卷</span>）
             </h2>
           </div>
           <div class="text-right text-xs text-slate-500 font-mono">
-            <div>卷號：<span id="p3Serial" class="font-bold text-slate-800 text-sm">LOG-2026-8801</span></div>
+            <div>卷號：<span id="p3Serial" class="font-bold text-slate-800 text-sm">LOG-2917</span></div>
             <div id="answerTimestamp">2026-11-13</div>
           </div>
         </div>
@@ -382,27 +409,27 @@
 
       <div class="flex-1 space-y-4">
         <!-- Page 1 Answers (20 題) -->
-        <div class="border border-slate-200 rounded-lg p-3">
-          <h3 class="font-bold text-sm text-slate-800 mb-2 border-b pb-1 flex items-center justify-between">
-            <span>第一頁：四大基本題型答案（20 題）</span>
+        <div class="border border-sky-200 rounded-lg p-3 bg-sky-50/20">
+          <h3 class="font-bold text-sm text-sky-950 mb-2 border-b border-sky-200 pb-1 flex items-center justify-between">
+            <span>P1 - 基本題型答案（20 題）</span>
             <span class="text-xs text-slate-500 font-normal">純單一公式演練（1~5 分合 ｜ 6~10 次係 ｜ 11~15 換底倒數 ｜ 16~20 底真消底）</span>
           </h3>
           <div id="ans-p1-grid" class="grid grid-cols-4 gap-2 text-xs"></div>
         </div>
 
-        <!-- Page 2 Answers (30 題) -->
-        <div class="border border-slate-200 rounded-lg p-3">
-          <h3 class="font-bold text-sm text-slate-800 mb-2 border-b pb-1 flex items-center justify-between">
-            <span>第二頁：綜合題型答案（30 題 ｜ 題型打散抽選）</span>
-            <span class="text-xs text-slate-500 font-normal">標註對應難度 C(2式) / B(3式) / A(4式全開) 與公式分析</span>
+        <!-- Page 2 Answers (20 題) -->
+        <div class="border border-sky-200 rounded-lg p-3 bg-sky-50/20">
+          <h3 class="font-bold text-sm text-sky-950 mb-2 border-b border-sky-200 pb-1 flex items-center justify-between">
+            <span>P2 - 綜合題型答案（20 題）</span>
+            <span class="text-xs text-slate-500 font-normal">教師核對專用：標記難度等級與所用公式組合</span>
           </h3>
-          <div id="ans-p2-grid" class="grid grid-cols-3 gap-2 text-xs"></div>
+          <div id="ans-p2-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs"></div>
         </div>
       </div>
 
       <!-- Page 3 Footer -->
       <div class="border-t border-slate-200 pt-1.5 mt-2 flex justify-between text-[11px] text-slate-400">
-        <div>答案皆經數論精準回代驗算 ｜ 無乘法公式干擾 ｜ 題型打散深化破題直覺</div>
+        <div>答案皆經數論精準回代驗算 ｜ 卷面純淨簡潔 ｜ 專注熟練對數律</div>
         <div>解答頁（完）</div>
       </div>
     </div>
@@ -413,11 +440,12 @@
   <script>
     // State Variables
     let currentSeed = '';
+    let currentTier = 'A'; // 'A' | 'B' | 'C'
     let showInlineAnswers = false;
     let showAnswerPage = true;
     let worksheetData = {
       p1: { sec1: [], sec2: [], sec3: [], sec4: [] },
-      p2: [] // 30 mixed questions
+      p2: [] // 20 mixed questions
     };
 
     // Fast 32-bit PRNG (Mulberry32)
@@ -460,7 +488,7 @@
       return a;
     }
 
-    // KaTeX Helper
+    // KaTeX Helper - strictly avoids scrollbars
     function renderMath(el, latex, display = false) {
       if (!window.katex) {
         el.textContent = latex;
@@ -479,7 +507,6 @@
     function genP1Sec1() {
       const questions = [];
       
-      // Q1: log_b x + log_b y = log_b(b^k) = k
       const b1 = pick([2, 3, 5, 6]);
       const k1 = b1 === 2 ? 3 : 2;
       const target1 = Math.pow(b1, k1);
@@ -495,7 +522,6 @@
         note: '分合相加化為積'
       });
 
-      // Q2: log_b x - log_b y = log_b(x/y) = k
       const b2 = pick([2, 3, 5]);
       const k2 = pick([2, 3]);
       const target2 = Math.pow(b2, k2);
@@ -507,7 +533,6 @@
         note: '分合相減化為商'
       });
 
-      // Q3: 分數分合
       const q3Options = [
         { l: `\\log_{10}\\frac{25}{3} + \\log_{10} 12 =`, a: '2' },
         { l: `\\log_{10}\\frac{50}{7} + \\log_{10} 14 =`, a: '2' },
@@ -517,7 +542,6 @@
       const q3 = pick(q3Options);
       questions.push({ latex: q3.l, ans: q3.a, note: '分數型相加分合' });
 
-      // Q4: 三項分合
       const q4Options = [
         { l: `\\log_3 54 + \\log_3 12 - \\log_3 8 =`, a: '4' },
         { l: `\\log_2 48 + \\log_2 6 - \\log_2 9 =`, a: '5' },
@@ -527,7 +551,6 @@
       const q4 = pick(q4Options);
       questions.push({ latex: q4.l, ans: q4.a, note: '三項混合分合' });
 
-      // Q5: 經典真數分數消項
       const q5Options = [
         { l: `\\log_{10}\\frac{50}{9} - \\log_{10}\\frac{3}{70} + \\log_{10}\\frac{27}{35} =`, a: '2' },
         { l: `\\log_{2}\\frac{14}{5} + \\log_{2}\\frac{20}{7} =`, a: '3' },
@@ -544,7 +567,6 @@
     function genP1Sec2() {
       const questions = [];
 
-      // Q6: log_{b^n} b^m = m/n
       const q6Pool = [
         { l: `\\log_4 8 =`, a: `\\frac{3}{2}` },
         { l: `\\log_{27} 9 =`, a: `\\frac{2}{3}` },
@@ -555,7 +577,6 @@
       const q6 = pick(q6Pool);
       questions.push({ latex: q6.l, ans: q6.a, note: '次係公式基本分數型' });
 
-      // Q7: 底數次方提出為分母
       const q7Pool = [
         { l: `\\log_{32} 2 =`, a: `\\frac{1}{5}` },
         { l: `\\log_{16} 2 =`, a: `\\frac{1}{4}` },
@@ -565,7 +586,6 @@
       const q7 = pick(q7Pool);
       questions.push({ latex: q7.l, ans: q7.a, note: '底數次方提出為分母' });
 
-      // Q8: 根號底數 log_{\sqrt{b}} b^m = 2m
       const q8Pool = [
         { l: `\\log_{\\sqrt{3}} 27 =`, a: '6' },
         { l: `\\log_{\\sqrt{2}} 8 =`, a: '6' },
@@ -575,7 +595,6 @@
       const q8 = pick(q8Pool);
       questions.push({ latex: q8.l, ans: q8.a, note: '根號底數係數倍增' });
 
-      // Q9: 根號真數
       const q9Pool = [
         { l: `\\log_{25} \\sqrt[3]{5} =`, a: `\\frac{1}{6}` },
         { l: `\\log_{4} \\sqrt{2} =`, a: `\\frac{1}{4}` },
@@ -585,7 +604,6 @@
       const q9 = pick(q9Pool);
       questions.push({ latex: q9.l, ans: q9.a, note: '根號真數化為分數次' });
 
-      // Q10: 純次係同類項整數相加減
       const q10Pool = [
         { l: `\\log_{\\sqrt{2}} 4 + \\log_3 81 - \\log_{\\frac{1}{5}} 25 =`, a: '10' },
         { l: `\\log_{\\sqrt{3}} 9 + \\log_2 64 + \\log_{\\frac{1}{2}} 8 =`, a: '7' },
@@ -602,7 +620,6 @@
     function genP1Sec3() {
       const questions = [];
 
-      // Q11: 兩項連鎖相消
       const q11Pool = [
         { l: `\\log_2 5 \\cdot \\log_5 8 =`, a: '3' },
         { l: `\\log_3 7 \\cdot \\log_7 9 =`, a: '2' },
@@ -612,7 +629,6 @@
       const q11 = pick(q11Pool);
       questions.push({ latex: q11.l, ans: q11.a, note: '雙項換底連鎖律' });
 
-      // Q12: 三項連鎖相消
       const q12Pool = [
         { l: `\\log_2 3 \\cdot \\log_3 5 \\cdot \\log_5 4 =`, a: '2' },
         { l: `\\log_3 4 \\cdot \\log_4 5 \\cdot \\log_5 9 =`, a: '2' },
@@ -621,7 +637,6 @@
       const q12 = pick(q12Pool);
       questions.push({ latex: q12.l, ans: q12.a, note: '三項換底連鎖律' });
 
-      // Q13: 換底商式還原
       const q13Pool = [
         { l: `\\frac{\\log_7 125}{\\log_7 5} =`, a: '3' },
         { l: `\\frac{\\log_3 64}{\\log_3 4} =`, a: '3' },
@@ -631,7 +646,6 @@
       const q13 = pick(q13Pool);
       questions.push({ latex: q13.l, ans: q13.a, note: '換底公式逆推還原' });
 
-      // Q14: 倒數相乘化簡
       const q14Pool = [
         { l: `(\\log_2 5)(\\log_5 2) + (\\log_3 7)(\\log_7 3) =`, a: '2' },
         { l: `3(\\log_4 9)(\\log_9 4) - (\\log_5 8)(\\log_8 5) =`, a: '2' },
@@ -640,7 +654,6 @@
       const q14 = pick(q14Pool);
       questions.push({ latex: q14.l, ans: q14.a, note: '倒數乘積互消為1' });
 
-      // Q15: 四項連鎖長鏈相消
       const q15Pool = [
         { l: `\\log_2 3 \\cdot \\log_3 5 \\cdot \\log_5 7 \\cdot \\log_7 16 =`, a: '4' },
         { l: `\\log_3 2 \\cdot \\log_2 5 \\cdot \\log_5 7 \\cdot \\log_7 81 =`, a: '4' },
@@ -656,7 +669,6 @@
     function genP1Sec4() {
       const questions = [];
 
-      // Q16: a^{\log_a k} = k
       const k16 = pick([5, 7, 11, 13, 17]);
       const b16 = pick([2, 3]);
       questions.push({
@@ -665,7 +677,6 @@
         note: '直接消底公式'
       });
 
-      // Q17: 常用對數直接消底
       const k17 = pick([6, 8, 12, 15, 23]);
       questions.push({
         latex: `10^{\\log ${k17}} =`,
@@ -673,7 +684,6 @@
         note: '常用對數消底'
       });
 
-      // Q18: 兩項直接消底相加
       const q18Pool = [
         { l: `10^{\\log 6} + 3^{\\log_3 4} =`, a: '10' },
         { l: `2^{\\log_2 9} + 5^{\\log_5 7} =`, a: '16' },
@@ -682,7 +692,6 @@
       const q18 = pick(q18Pool);
       questions.push({ latex: q18.l, ans: q18.a, note: '消底後加減運算' });
 
-      // Q19: (b^2)^{\log_b k} = k^2
       const q19Pool = [
         { l: `4^{\\log_2 5} =`, a: '25' },
         { l: `9^{\\log_3 4} =`, a: '16' },
@@ -692,7 +701,6 @@
       const q19 = pick(q19Pool);
       questions.push({ latex: q19.l, ans: q19.a, note: '底數次方消底' });
 
-      // Q20: 底真對調化簡求值
       const q20Pool = [
         { l: `3^{\\log_9 16} =`, a: '4' },
         { l: `2^{\\log_4 49} =`, a: '7' },
@@ -705,11 +713,10 @@
       return questions;
     }
 
-    // ==================== PAGE 2: 30 題綜合題庫（題型徹底打散抽選） ====================
+    // ==================== PAGE 2: 綜合題庫 (純對數律，無乘法公式) ====================
 
-    // C 難度（2 種公式）超豐富題庫池
+    // C 難度（2 種公式）題庫池
     const TIER_C_MASTER_POOL = [
-      // 次係 + 分合
       { l: `2\\log_6 2 + \\log_6 9 =`, a: '2', f: '次係 + 分合', t: 'C' },
       { l: `2\\log_2 6 - \\log_2 9 =`, a: '2', f: '次係 + 分合', t: 'C' },
       { l: `3\\log 2 + \\log 125 =`, a: '3', f: '次係 + 分合', t: 'C' },
@@ -722,8 +729,6 @@
       { l: `2\\log_3 \\frac{5}{2} + 2\\log_3 \\frac{6}{5} =`, a: '2', f: '次係 + 分合', t: 'C' },
       { l: `3\\log_2 \\frac{4}{3} + \\log_2 \\frac{27}{8} =`, a: '3', f: '次係 + 分合', t: 'C' },
       { l: `2\\log_7 14 - \\log_7 4 =`, a: '2', f: '次係 + 分合', t: 'C' },
-
-      // 次係 + 換底連鎖
       { l: `(\\log_2 9)(\\log_3 8) =`, a: '6', f: '次係 + 換底連鎖', t: 'C' },
       { l: `(\\log_3 25)(\\log_5 27) =`, a: '6', f: '次係 + 換底連鎖', t: 'C' },
       { l: `(\\log_2 27)(\\log_{\\sqrt{3}} 5)(\\log_5 4) =`, a: '12', f: '次係 + 換底連鎖', t: 'C' },
@@ -733,8 +738,6 @@
       { l: `(\\log_8 9)(\\log_3 4) =`, a: `\\frac{4}{3}`, f: '次係 + 換底連鎖', t: 'C' },
       { l: `(\\log_7 16)(\\log_2 49) =`, a: '8', f: '次係 + 換底連鎖', t: 'C' },
       { l: `(\\log_9 8)(\\log_2 27) =`, a: `\\frac{9}{2}`, f: '次係 + 換底連鎖', t: 'C' },
-
-      // 換底/倒數 + 消底
       { l: `3^{\\frac{\\log 5}{\\log 3}} =`, a: '5', f: '換底 + 消底', t: 'C' },
       { l: `5^{\\frac{1}{\\log_2 5}} =`, a: '2', f: '倒數 + 消底', t: 'C' },
       { l: `7^{\\frac{\\log 9}{\\log 7}} =`, a: '9', f: '換底 + 消底', t: 'C' },
@@ -745,39 +748,26 @@
       { l: `2^{\\frac{1}{\\log_9 2}} =`, a: '9', f: '倒數 + 消底', t: 'C' }
     ];
 
-    // B 難度（3 種公式，純對數律無乘法公式）超豐富題庫池
+    // B 難度（3 種公式，純對數律無乘法公式）題庫池
     const TIER_B_MASTER_POOL = [
-      // 括號展開倒數連鎖
       { l: `(\\log_2 3 + \\log_4 9)(\\log_3 4 + \\log_9 2) =`, a: '5', f: '次係 + 換底倒數 + 同類項', t: 'B' },
       { l: `(\\log_3 2 + \\log_9 4)(\\log_2 9 + \\log_4 3) =`, a: '5', f: '次係 + 換底倒數 + 同類項', t: 'B' },
       { l: `(\\log_2 5 + \\log_4 25)(\\log_5 8 + \\log_{25} 8) =`, a: '9', f: '次係 + 換底倒數 + 同類項', t: 'B' },
       { l: `(\\log_3 5 + \\log_9 25)(\\log_5 9 + \\log_{25} 3) =`, a: '5', f: '次係 + 換底倒數 + 同類項', t: 'B' },
-      
-      // 次係 + 換底 + 消底
       { l: `2^{\\frac{\\log 9}{\\log 4}} + 5^{\\frac{\\log 8}{\\log 125}} =`, a: '5', f: '次係 + 換底 + 消底', t: 'B' },
       { l: `3^{\\frac{\\log 16}{\\log 9}} + 2^{\\frac{\\log 27}{\\log 8}} =`, a: '7', f: '次係 + 換底 + 消底', t: 'B' },
       { l: `5^{\\frac{\\log 4}{\\log 25}} + 7^{\\frac{\\log 81}{\\log 49}} =`, a: '11', f: '次係 + 換底 + 消底', t: 'B' },
-      
-      // 倒數 + 次係 + 消底
       { l: `4^{\\frac{1}{\\log_3 2}} - 9^{\\frac{1}{\\log_2 3}} =`, a: '5', f: '倒數 + 次係 + 消底', t: 'B' },
       { l: `9^{\\frac{1}{\\log_2 3}} + 4^{\\frac{1}{\\log_5 2}} =`, a: '29', f: '倒數 + 次係 + 消底', t: 'B' },
       { l: `25^{\\frac{1}{\\log_2 5}} - 4^{\\frac{1}{\\log_3 2}} =`, a: '-5', f: '倒數 + 次係 + 消底', t: 'B' },
-      
-      // 分合 + 次係 + 消底
       { l: `2\\log 5 + \\log 4 + 3^{\\log_3 7} =`, a: '9', f: '分合 + 次係 + 消底', t: 'B' },
       { l: `2\\log_2 6 - \\log_2 9 + 5^{\\log_5 4} =`, a: '6', f: '分合 + 次係 + 消底', t: 'B' },
       { l: `3\\log_3 2 + \\log_3 \\frac{27}{8} + 10^{\\log 5} =`, a: '8', f: '分合 + 次係 + 消底', t: 'B' },
-      
-      // 分合 + 次係 + 倒數
       { l: `(\\log_2 12 - \\log_2 3)(\\log_3 18 - \\log_3 2) =`, a: '4', f: '分合 + 次係 + 倒數', t: 'B' },
       { l: `(\\log_5 50 - \\log_5 2)(\\log_2 24 - \\log_2 3) =`, a: '6', f: '分合 + 次係 + 倒數', t: 'B' },
-      
-      // 雙層對數嵌套基礎版
       { l: `\\log_2(\\log_3 81) + 2\\log_4(\\log_5 25) =`, a: '3', f: '雙層嵌套 + 次係 + 分合', t: 'B' },
       { l: `\\log_3(\\log_2 512) - \\log_2(\\log_3 81) =`, a: '0', f: '雙層嵌套 + 次係', t: 'B' },
       { l: `\\log_2(\\log_2 16) + 3^{\\log_3 5} - \\log_5 25 =`, a: '5', f: '雙層嵌套 + 消底 + 次係', t: 'B' },
-      
-      // 連鎖相乘 + 次係 + 消底
       { l: `(\\log_2 9 \\cdot \\log_3 8) + 10^{\\log 4} =`, a: '10', f: '次係 + 換底連鎖 + 消底', t: 'B' },
       { l: `(\\log_3 25 \\cdot \\log_5 27) - 2^{\\log_2 3} =`, a: '3', f: '次係 + 換底連鎖 + 消底', t: 'B' }
     ];
@@ -828,69 +818,81 @@
       }
     ];
 
-    // 生成打散的第二頁 30 題 (C:15 題, B:10 題, A:5 題，內部及彼此完全交織打散)
+    // 生成 P2 綜合題型 20 題（依選定難度 A / B / C 卷抽選，內部徹底隨機打散）
     function genP2Questions() {
-      // 隨機抽題
-      const pickedC = shuffle(TIER_C_MASTER_POOL).slice(0, 15);
-      const pickedB = shuffle(TIER_B_MASTER_POOL).slice(0, 10);
-      const pickedA = shuffle(TIER_A_MASTER_POOL).slice(0, 5);
-
-      // 為保證難度具備梯度但題型在同梯度內徹底打散：
-      // 前 15 題是徹底打散的 C 級各種題型（分合、換底、消底交互穿插）
-      // 中間 10 題是徹底打散的 B 級題型（嵌套、多項展開、倒數消底交替）
-      // 最後 5 題是 A 級四大公式挑戰題
-      const combined = [
-        ...shuffle(pickedC),
-        ...shuffle(pickedB),
-        ...shuffle(pickedA)
-      ];
-
-      return combined;
+      let selected = [];
+      if (currentTier === 'C') {
+        // C 卷：20 題全部來自 C 難度 (2公式)
+        selected = shuffle(TIER_C_MASTER_POOL).slice(0, 20);
+      } else if (currentTier === 'B') {
+        // B 卷：10 題 B + 10 題 C，徹底打散
+        const pickedB = shuffle(TIER_B_MASTER_POOL).slice(0, 10);
+        const pickedC = shuffle(TIER_C_MASTER_POOL).slice(0, 10);
+        selected = shuffle([...pickedB, ...pickedC]);
+      } else {
+        // A 卷 (預設)：5 題 A + 8 題 B + 7 題 C，徹底打散
+        const pickedA = shuffle(TIER_A_MASTER_POOL).slice(0, 5);
+        const pickedB = shuffle(TIER_B_MASTER_POOL).slice(0, 8);
+        const pickedC = shuffle(TIER_C_MASTER_POOL).slice(0, 7);
+        selected = shuffle([...pickedA, ...pickedB, ...pickedC]);
+      }
+      return selected;
     }
 
     // ==================== RENDERING LOGIC ====================
 
-    function renderQuestionRow(container, q, num) {
+    // P1 題目行渲染（無任何箭頭，無滾動條，乾淨清爽）
+    function renderP1Row(container, q, num) {
       const row = document.createElement('div');
-      row.className = 'question-card py-1 px-1.5 rounded flex items-center justify-between hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0';
+      row.className = 'question-card-p1 py-1 px-1 flex items-center justify-between border-b border-sky-100 last:border-b-0';
       
       const leftDiv = document.createElement('div');
-      leftDiv.className = 'flex items-center gap-1.5 flex-1 overflow-hidden';
+      leftDiv.className = 'flex items-center gap-2 flex-1';
 
       const numSpan = document.createElement('span');
-      numSpan.className = 'font-bold font-mono text-slate-400 text-xs w-6 shrink-0';
+      numSpan.className = 'font-bold font-mono text-slate-400 text-xs w-6 shrink-0 text-right';
       numSpan.textContent = `(${num})`;
 
-      // Tier Badge for Page 2
-      let badgeHtml = '';
-      if (q.t === 'C') {
-        badgeHtml = `<span class="px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold font-mono text-[9px] shrink-0 mr-0.5">C</span>`;
-      } else if (q.t === 'B') {
-        badgeHtml = `<span class="px-1 py-0.2 rounded bg-sky-100 text-sky-800 font-bold font-mono text-[9px] shrink-0 mr-0.5">B</span>`;
-      } else if (q.t === 'A') {
-        badgeHtml = `<span class="px-1 py-0.2 rounded bg-amber-100 text-amber-900 font-bold font-mono text-[9px] shrink-0 mr-0.5">A</span>`;
-      }
-
       const mathSpan = document.createElement('span');
-      mathSpan.className = 'font-serif text-slate-900 text-sm overflow-x-auto py-0.5';
+      mathSpan.className = 'math-content font-serif text-slate-900 text-base py-0.5';
       renderMath(mathSpan, q.latex || q.l, false);
 
       leftDiv.appendChild(numSpan);
-      if (badgeHtml) {
-        const bWrapper = document.createElement('span');
-        bWrapper.innerHTML = badgeHtml;
-        leftDiv.appendChild(bWrapper.firstElementChild);
-      }
       leftDiv.appendChild(mathSpan);
 
       // Inline Answer
       const ansSpan = document.createElement('span');
-      let badgeColor = 'sky';
-      if (q.t === 'C') badgeColor = 'emerald';
-      else if (q.t === 'A') badgeColor = 'amber';
-
-      ansSpan.className = `inline-answer font-bold font-mono px-2 py-0.5 rounded text-xs shrink-0 ml-2 bg-${badgeColor}-100 text-${badgeColor}-900 border border-${badgeColor}-300 ${showInlineAnswers ? '' : 'hidden'}`;
+      ansSpan.className = `inline-answer font-bold font-mono px-2 py-0.5 rounded text-xs shrink-0 ml-2 bg-sky-100 text-sky-900 border border-sky-300 ${showInlineAnswers ? '' : 'hidden'}`;
       renderMath(ansSpan, q.ans || q.a, false);
+
+      row.appendChild(leftDiv);
+      row.appendChild(ansSpan);
+      container.appendChild(row);
+    }
+
+    // P2 題目行渲染（單欄佈局，卷面無任何難度標籤）
+    function renderP2Row(container, q, num) {
+      const row = document.createElement('div');
+      row.className = 'question-card-p2 py-1.5 px-2 flex items-center justify-between border-b border-sky-100/70 last:border-b-0 hover:bg-sky-50/40 transition-colors';
+      
+      const leftDiv = document.createElement('div');
+      leftDiv.className = 'flex items-center gap-3 flex-1';
+
+      const numSpan = document.createElement('span');
+      numSpan.className = 'font-bold font-mono text-slate-400 text-sm w-7 shrink-0 text-right';
+      numSpan.textContent = `(${num})`;
+
+      const mathSpan = document.createElement('span');
+      mathSpan.className = 'math-content font-serif text-slate-900 text-base py-0.5';
+      renderMath(mathSpan, q.l, false);
+
+      leftDiv.appendChild(numSpan);
+      leftDiv.appendChild(mathSpan);
+
+      // Inline Answer
+      const ansSpan = document.createElement('span');
+      ansSpan.className = `inline-answer font-bold font-mono px-2.5 py-0.5 rounded text-xs shrink-0 ml-2 bg-sky-100 text-sky-900 border border-sky-300 ${showInlineAnswers ? '' : 'hidden'}`;
+      renderMath(ansSpan, q.a, false);
 
       row.appendChild(leftDiv);
       row.appendChild(ansSpan);
@@ -904,25 +906,19 @@
       const s4 = document.getElementById('p1-sec4-list');
       s1.innerHTML = ''; s2.innerHTML = ''; s3.innerHTML = ''; s4.innerHTML = '';
 
-      worksheetData.p1.sec1.forEach((q, i) => renderQuestionRow(s1, q, i + 1));
-      worksheetData.p1.sec2.forEach((q, i) => renderQuestionRow(s2, q, i + 6));
-      worksheetData.p1.sec3.forEach((q, i) => renderQuestionRow(s3, q, i + 11));
-      worksheetData.p1.sec4.forEach((q, i) => renderQuestionRow(s4, q, i + 16));
+      worksheetData.p1.sec1.forEach((q, i) => renderP1Row(s1, q, i + 1));
+      worksheetData.p1.sec2.forEach((q, i) => renderP1Row(s2, q, i + 6));
+      worksheetData.p1.sec3.forEach((q, i) => renderP1Row(s3, q, i + 11));
+      worksheetData.p1.sec4.forEach((q, i) => renderP1Row(s4, q, i + 16));
     }
 
     function renderPage2() {
-      const col1 = document.getElementById('p2-col1');
-      const col2 = document.getElementById('p2-col2');
-      col1.innerHTML = ''; col2.innerHTML = '';
+      const col = document.getElementById('p2-single-col');
+      col.innerHTML = '';
 
-      // 30 items split into 2 columns (1~15 on left, 16~30 on right)
+      // 20 items in a single clean column
       worksheetData.p2.forEach((q, i) => {
-        const num = i + 1;
-        if (num <= 15) {
-          renderQuestionRow(col1, q, num);
-        } else {
-          renderQuestionRow(col2, q, num);
-        }
+        renderP2Row(col, q, i + 1);
       });
     }
 
@@ -930,6 +926,8 @@
       const p1Grid = document.getElementById('ans-p1-grid');
       const p2Grid = document.getElementById('ans-p2-grid');
       p1Grid.innerHTML = ''; p2Grid.innerHTML = '';
+
+      document.getElementById('p3TierLabel').textContent = `${currentTier} 卷`;
 
       // Flatten P1 (20 items)
       const allP1 = [
@@ -941,33 +939,23 @@
 
       allP1.forEach((item, idx) => {
         const cell = document.createElement('div');
-        cell.className = 'border border-slate-200 rounded p-1.5 bg-slate-50 flex items-center justify-between font-mono';
+        cell.className = 'border border-sky-200 rounded p-1.5 bg-white flex items-center justify-between font-mono';
         cell.innerHTML = `<span class="text-slate-400 font-bold">(${idx + 1})</span>`;
         const ansSpan = document.createElement('span');
-        ansSpan.className = 'font-bold text-sky-800';
+        ansSpan.className = 'font-bold text-sky-900';
         renderMath(ansSpan, item.ans, false);
         cell.appendChild(ansSpan);
         p1Grid.appendChild(cell);
       });
 
-      // P2 (30 items)
+      // P2 (20 items) - detailed teacher view
       worksheetData.p2.forEach((item, idx) => {
         const cell = document.createElement('div');
-        cell.className = 'border border-slate-200 rounded p-1.5 bg-slate-50 flex items-center justify-between font-mono';
+        cell.className = 'border border-sky-200 rounded p-1.5 bg-white flex items-center justify-between font-mono';
         const num = idx + 1;
-        let badge = `<span class="px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold text-[9px] mr-1">C</span>`;
-        let ansClass = 'text-emerald-700 font-bold';
-        if (item.t === 'B') {
-          badge = `<span class="px-1 py-0.2 rounded bg-sky-100 text-sky-800 font-bold text-[9px] mr-1">B</span>`;
-          ansClass = 'text-sky-700 font-bold';
-        } else if (item.t === 'A') {
-          badge = `<span class="px-1 py-0.2 rounded bg-amber-100 text-amber-900 font-bold text-[9px] mr-1">A</span>`;
-          ansClass = 'text-amber-800 font-black';
-        }
-
-        cell.innerHTML = `<div class="flex items-center"><span class="text-slate-400 font-bold mr-1.5">(${num})</span>${badge}<span class="text-[10px] text-slate-500 font-sans hidden sm:inline truncate max-w-[90px]">${item.f}</span></div>`;
+        cell.innerHTML = `<div class="flex items-center"><span class="text-slate-400 font-bold mr-1.5">(${num})</span><span class="px-1 py-0.2 rounded bg-sky-100 text-sky-800 font-bold text-[9px] mr-1">${item.t}</span></div>`;
         const ansSpan = document.createElement('span');
-        ansSpan.className = ansClass;
+        ansSpan.className = 'font-bold text-sky-900';
         renderMath(ansSpan, item.a, false);
         cell.appendChild(ansSpan);
         p2Grid.appendChild(cell);
@@ -976,14 +964,27 @@
 
     // ==================== CONTROLLER FUNCTIONS ====================
 
+    function setTier(tier) {
+      currentTier = tier;
+      ['btnTierA', 'btnTierB', 'btnTierC'].forEach(id => {
+        const btn = document.getElementById(id);
+        btn.className = 'px-2.5 py-1 rounded font-bold transition text-slate-400 hover:text-white';
+      });
+      const activeBtn = document.getElementById(`btnTier${tier}`);
+      activeBtn.className = 'px-2.5 py-1 rounded font-bold transition bg-sky-600 text-white shadow-sm';
+
+      applySeed(currentSeed);
+    }
+
     function applySeed(seedStr) {
       currentSeed = seedStr;
-      rng = initPRNG(currentSeed);
+      rng = initPRNG(currentSeed + '-' + currentTier);
       
-      document.getElementById('serialBadge').textContent = currentSeed;
+      const fullSerial = currentSeed + ` (${currentTier}卷)`;
+      document.getElementById('serialBadge').textContent = fullSerial;
       document.getElementById('p1Serial').textContent = currentSeed;
-      document.getElementById('p2Serial').textContent = currentSeed;
-      document.getElementById('p3Serial').textContent = currentSeed;
+      document.getElementById('p2Serial').textContent = fullSerial;
+      document.getElementById('p3Serial').textContent = fullSerial;
       document.getElementById('seedInput').value = currentSeed;
 
       // Generate Data
@@ -1028,10 +1029,10 @@
       const p3 = document.getElementById('page3');
       if (showAnswerPage) {
         p3.style.display = 'flex';
-        document.getElementById('toggleAnswerPageText').textContent = '第3頁解答: 開';
+        document.getElementById('toggleAnswerPageText').textContent = '解答頁: 開';
       } else {
         p3.style.display = 'none';
-        document.getElementById('toggleAnswerPageText').textContent = '第3頁解答: 關';
+        document.getElementById('toggleAnswerPageText').textContent = '解答頁: 關';
       }
     }
 
