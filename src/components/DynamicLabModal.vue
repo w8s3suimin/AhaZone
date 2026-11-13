@@ -2,6 +2,7 @@
 import { ref, watch, onUnmounted } from 'vue';
 import { X, Maximize2, Minimize2, ExternalLink, RefreshCw, Lightbulb, Compass, FileText } from 'lucide-vue-next';
 import { ResourceItem } from '../types';
+import { renderRichMathText } from '../utils/mathRenderer';
 
 const props = defineProps<{
   resource: ResourceItem | null;
@@ -131,7 +132,7 @@ onUnmounted(() => {
 
           <div v-if="resource.ahaInsight" class="bg-[#0d1117] border border-[#30363d] rounded-md p-3 text-[#c9d1d9] leading-relaxed">
             <div class="font-bold text-amber-400 mb-1">探索目標：</div>
-            <div class="text-[#8b949e]">{{ resource.ahaInsight }}</div>
+            <div class="text-[#8b949e]" v-html="renderRichMathText(resource.ahaInsight)"></div>
           </div>
 
           <div v-if="resource.learningGoals && resource.learningGoals.length > 0" class="space-y-2">

@@ -2,6 +2,7 @@
 import { ref, computed, watch, onUnmounted } from 'vue';
 import { X, Download, FileText, CheckCircle, ExternalLink } from 'lucide-vue-next';
 import { ResourceItem } from '../types';
+import { renderRichMathText } from '../utils/mathRenderer';
 
 const props = defineProps<{
   resource: ResourceItem | null;
@@ -140,7 +141,7 @@ const downloadUrl = computed(() => {
         class="bg-[#0d1117] px-4 py-2 border-b border-[#30363d] text-xs text-[#c9d1d9] flex items-center gap-2"
       >
         <span class="text-amber-400 font-bold">訣竅 (Aha! Moment)：</span>
-        <span class="text-[#8b949e] truncate">{{ resource.ahaInsight }}</span>
+        <span class="text-[#8b949e] truncate" v-html="renderRichMathText(resource.ahaInsight)"></span>
       </div>
 
       <!-- PDF Embedded Viewer -->

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FileText, Download, Eye, ExternalLink, ArrowRight, Play, CheckCircle, Lightbulb } from 'lucide-vue-next';
 import { ResourceItem } from '../types';
+import { renderRichMathText } from '../utils/mathRenderer';
 
 const props = defineProps<{
   resource: ResourceItem;
@@ -85,7 +86,7 @@ const handleLaunchLab = () => {
         <Lightbulb class="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
         <div>
           <span class="text-amber-400 font-bold block mb-0.5">訣竅 (Aha! Moment)：</span>
-          <span class="text-[#8b949e]">{{ resource.ahaInsight }}</span>
+          <span class="text-[#8b949e]" v-html="renderRichMathText(resource.ahaInsight)"></span>
         </div>
       </div>
 

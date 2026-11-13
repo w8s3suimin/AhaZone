@@ -284,7 +284,7 @@ const chapterResources = computed(() => {
         class="px-3.5 py-2.5 rounded-md bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-xs sm:text-sm leading-relaxed"
       >
         <span class="text-amber-500 font-bold">課綱範圍說明：</span>
-        <span>{{ displayedScopeNotice }}</span>
+        <span v-html="renderRichMathText(displayedScopeNotice || '')"></span>
       </div>
 
       <!-- Aha! Insight Box -->
@@ -295,7 +295,7 @@ const chapterResources = computed(() => {
         <Lightbulb class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
         <div>
           <span class="text-amber-400 font-bold">訣竅 (Aha! Moment)：</span>
-          <span class="text-[#f0f6fc]">{{ displayedAhaInsight }}</span>
+          <span class="text-[#f0f6fc]" v-html="renderRichMathText(displayedAhaInsight || '')"></span>
         </div>
       </div>
     </div>
@@ -327,7 +327,7 @@ const chapterResources = computed(() => {
           <div class="flex items-center justify-between gap-2 border-b border-[#30363d] pb-2">
             <h4 class="text-sm sm:text-base font-bold text-[#f0f6fc] flex items-center gap-2">
               <span class="w-2 h-2 rounded-sm bg-amber-500"></span>
-              <span>{{ concept.title }}</span>
+              <span v-html="renderRichMathText(concept.title)"></span>
             </h4>
             <span 
               v-if="concept.track === 'mathA'"
@@ -389,7 +389,7 @@ const chapterResources = computed(() => {
                   v-if="renderFormulaItem(fItem).note" 
                   class="text-xs text-[#8b949e] ml-auto"
                 >
-                  備註：{{ renderFormulaItem(fItem).note }}
+                  備註：<span v-html="renderRichMathText(renderFormulaItem(fItem).note || '')"></span>
                 </span>
               </div>
             </div>
@@ -433,7 +433,7 @@ const chapterResources = computed(() => {
                   v-if="renderFormulaItem(fItem).note" 
                   class="text-xs text-[#8b949e] ml-auto"
                 >
-                  備註：{{ renderFormulaItem(fItem).note }}
+                  備註：<span v-html="renderRichMathText(renderFormulaItem(fItem).note || '')"></span>
                 </span>
               </div>
             </div>
@@ -461,7 +461,7 @@ const chapterResources = computed(() => {
                   v-if="renderFormulaItem(fItem).note" 
                   class="text-xs text-[#8b949e] ml-auto"
                 >
-                  備註：{{ renderFormulaItem(fItem).note }}
+                  備註：<span v-html="renderRichMathText(renderFormulaItem(fItem).note || '')"></span>
                 </span>
               </div>
             </div>
@@ -643,9 +643,7 @@ const chapterResources = computed(() => {
             <span class="px-2 py-0.5 rounded-md bg-[#161b22] text-amber-400 border border-[#30363d] text-xs font-bold">
               第 {{ q.questionNumber || qIdx + 1 }} 題
             </span>
-            <h4 class="text-sm sm:text-base font-bold text-[#f0f6fc]">
-              {{ q.title }}
-            </h4>
+            <h4 class="text-sm sm:text-base font-bold text-[#f0f6fc]" v-html="renderRichMathText(q.title)"></h4>
           </div>
 
           <p class="text-xs sm:text-sm text-[#c9d1d9] leading-relaxed p-3.5 rounded-md bg-[#161b22] border border-[#30363d]" v-html="renderRichMathText(q.question)"></p>
