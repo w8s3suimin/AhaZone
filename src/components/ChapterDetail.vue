@@ -143,6 +143,11 @@ const openSopSteps = ref<Record<number, boolean>>({});
 const toggleSopSteps = (idx: number) => {
   openSopSteps.value[idx] = !openSopSteps.value[idx];
 };
+
+// 確保解題關鍵字樣不重複
+const cleanMindsetText = (mindset: string) => {
+  return (mindset || '').replace(/^(?:破題心法|解題關鍵)[:：]\s*/, '');
+};
 const areAllSopStepsOpen = computed(() => {
   const list = displayedSopModules.value;
   if (!list || list.length === 0) return false;
@@ -523,13 +528,13 @@ const chapterResources = computed(() => {
             <span v-html="renderRichMathText(mod.question)"></span>
           </div>
 
-          <!-- 破題直覺心法提示 -->
+          <!-- 解題關鍵提示（標題使用原破題心法的琥珀色，內文使用一般白色以明確區隔層次） -->
           <div 
             v-if="mod.mindset"
-            class="px-3.5 py-2.5 rounded-md bg-[#161b22] border border-amber-500/30 text-xs sm:text-sm text-amber-300 leading-relaxed"
+            class="px-3.5 py-2.5 rounded-md bg-[#161b22] border border-amber-500/30 text-xs sm:text-sm text-[#f0f6fc] leading-relaxed"
           >
-            <span class="text-amber-500 font-bold">破題心法：</span>
-            <span v-html="renderRichMathText(mod.mindset)"></span>
+            <span class="text-amber-500 font-bold shrink-0">解題關鍵：</span>
+            <span v-html="renderRichMathText(cleanMindsetText(mod.mindset))"></span>
           </div>
 
           <!-- 折疊步驟開關按鈕 -->

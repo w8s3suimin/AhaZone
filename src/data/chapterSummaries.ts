@@ -1917,7 +1917,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       {
         moduleName: '題型一：指數方程的根與圖形',
         question: '試求超越方程式 $2^x = x + 3$ 共有幾個相異實根？其各實根分別落在哪些連續整數區間？',
-        mindset: '解題關鍵：看到指數與一次多項式混合，切忌直接代數硬解！將方程式「移項分家為 $y_1 = 2^x$ 與 $y_2 = x + 3$」，實根個數完全等價於兩圖形交點個數，再代入連續整數勘根確認交點區間！',
+        mindset: '看到指數與一次多項式混合，切忌直接代數硬解！將方程式「移項分家為 $y_1 = 2^x$ 與 $y_2 = x + 3$」，實根個數完全等價於兩圖形交點個數，再代入連續整數勘根確認交點區間！',
         diagramType: 'transcendental-roots-2x',
         steps: [
           {
@@ -1938,7 +1938,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       {
         moduleName: '題型二：指數函數進階求值',
         question: '設函數 $f(x) = \\frac{3^x + 3^{-x}}{3^x - 3^{-x}}$（其中 $x \\ne 0$）。若已知 $f(a) = 2$ 且 $f(b) = 4$，試求 $f(a+b)$ 之值。',
-        mindset: '解題關鍵：看見負指數與分母，切忌通分化簡陷入泥淖；「分子分母同乘 $3^x$」瞬間消去負次，化為一元一次整式結構，再利用指數律 $3^{2(a+b)} = 3^{2a} \\cdot 3^{2b}$ 快速求解！',
+        mindset: '看見負指數與分母，切忌通分化簡陷入泥淖；「分子分母同乘 $3^x$」瞬間消去負次，化為一元一次整式結構，再利用指數律 $3^{2(a+b)} = 3^{2a} \\cdot 3^{2b}$ 快速求解！',
         steps: [
           {
             label: '步驟 1【消去負指數：分子分母同乘 $3^x$ 整理基本型態】',
@@ -1958,7 +1958,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       {
         moduleName: '題型三：對數律的熟用',
         question: '試求數值式 $9^{\\log_3 2} + 2^{-\\log_4 9} - 5^{\\frac{\\log 2}{\\log 5}}$ 之值。',
-        mindset: '解題關鍵：次方帶有對數時，核心工具為「消底公式 $a^{\\log_a x} = x$」與「底真對調公式」！逐項化簡：底數化為同底整式、將指數係數收入對數內部、利用換底公式逆運算 $\\frac{\\log 2}{\\log 5} = \\log_5 2$ 瞬間消底！',
+        mindset: '次方帶有對數時，核心工具為「消底公式 $a^{\\log_a x} = x$」與「底真對調公式」！逐項化簡：底數化為同底整式、將指數係數收入對數內部、利用換底公式逆運算 $\\frac{\\log 2}{\\log 5} = \\log_5 2$ 瞬間消底！',
         steps: [
           {
             label: '步驟 1【第一項：底數化為同底消底】',
@@ -1982,7 +1982,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       {
         moduleName: '題型四：對數方程的根與圖形',
         question: '試問方程式 $x - \\log_2 |x| = 1$ 共有幾個實根？其中整數解為何？',
-        mindset: '解題關鍵：絕對值對數方程不可盲目代數硬解！首要步驟「寫下真數條件 $|x| > 0 \\Rightarrow x \\ne 0$」；接著「移項分家」為直線 $y_1 = x - 1$ 與對數對稱圖形 $y_2 = \\log_2 |x|$，以圖形交點個數定實根數，並代入整數值驗證精確解！',
+        mindset: '絕對值對數方程不可盲目代數硬解！首要步驟「寫下真數條件 $|x| > 0 \\Rightarrow x \\ne 0$」；接著「移項分家」為直線 $y_1 = x - 1$ 與對數對稱圖形 $y_2 = \\log_2 |x|$，以圖形交點個數定實根數，並代入整數值驗證精確解！',
         diagramType: 'log-absolute-roots',
         steps: [
           {
@@ -2003,7 +2003,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       {
         moduleName: '題型五：對數函數求值',
         question: '若直線 $x + y = k$ 與曲線 $y = 2^x$ 交點為 $P(a, b+2)$，與曲線 $y = \\log_2 x$ 交點為 $Q(3a-1, b-3)$，求數對 $(a, b)$ 及常數 $k$ 之值。',
-        mindset: '解題關鍵：看到反函數曲線與負斜率割線 $x + y = k$，嚴禁將坐標代回指數或對數硬解超越方程式！因直線 $L: x + y = k$（斜率 $m = -1$）垂直於反函數對稱軸 $y = x$（斜率乘積 $1 \\times (-1) = -1$），故交點 $P$ 與 $Q$ 互為對稱點！破題 SOP：純粹利用「線段中點必落在直線 $y = x$ 上」與「兩點連線割線斜率必為 $-1$」列聯立多項式求解！',
+        mindset: '看到反函數曲線與負斜率割線 $x + y = k$，嚴禁將坐標代回指數或對數硬解超越方程式！因直線 $L: x + y = k$（斜率 $m = -1$）垂直於反函數對稱軸 $y = x$（斜率乘積 $1 \\times (-1) = -1$），故交點 $P$ 與 $Q$ 互為對稱點！破題 SOP：純粹利用「線段中點必落在直線 $y = x$ 上」與「兩點連線割線斜率必為 $-1$」列聯立多項式求解！',
         diagramType: 'inverse-perpendicular-secant',
         steps: [
           {
@@ -2024,7 +2024,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       {
         moduleName: '題型六：七二法則的應用',
         question: '年利率為 $4.5\\%$，每年複利計息一次，若依七二法則（72 Rule）估算，本金翻倍約需多少年？並請說明其背後取自然對數 $\\ln$ 的原理依據。',
-        mindset: '解題關鍵：生活素養連續複利模型，翻倍期數 $n \\approx \\frac{72}{r}$，利率百分數數值直接代入 $r$ 心算秒殺！',
+        mindset: '生活素養連續複利模型，翻倍期數 $n \\approx \\frac{72}{r}$，利率百分數數值直接代入 $r$ 心算秒殺！',
         steps: [
           {
             label: '步驟 1：套用七二法則速算公式',
