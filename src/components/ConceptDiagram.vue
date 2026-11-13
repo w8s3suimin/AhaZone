@@ -530,7 +530,7 @@ function computeActionFormulaLatex(steps: StepRecord[], initFam: 'exp' | 'log'):
   if (lastStep.type === 'inverse') {
     const currState = computeTransformParams(steps, initFam);
     const currFmt = formatStateFormula(currState);
-    return `${highlight('x \\leftrightarrow y')} \\implies y = ${currFmt.formulaLatex.replace(/^y\s*=\s*/, '')}`;
+    return `${highlight('x \\leftrightarrow y')} \\Rightarrow y = ${currFmt.formulaLatex.replace(/^y\s*=\s*/, '')}`;
   }
 
   return formatStateFormula(computeTransformParams(steps, initFam)).formulaLatex;
@@ -732,7 +732,7 @@ const currentFeatureDisplay = computed(() => {
         <rect width="352" height="32" rx="8" fill="#0f172a" stroke="#1e293b" />
         <circle cx="16" cy="16" r="3" fill="#38bdf8" />
         <text x="28" y="20" fill="#94a3b8" font-size="11" font-family="sans-serif">
-          核心幾何特徵：<tspan fill="#34d399" font-weight="bold">v ⊥ a_c</tspan>（速度恆垂直於向心加速度）⟹ 向心力不做功，僅改變方向
+          核心幾何特徵：<tspan fill="#34d399" font-weight="bold">v ⊥ a_c</tspan>（速度恆垂直於向心加速度）⇒ 向心力不做功，僅改變方向
         </text>
       </g>
     </svg>
@@ -1046,7 +1046,7 @@ const currentFeatureDisplay = computed(() => {
 
       <!-- Distance L indicator -->
       <line x1="70" y1="155" x2="310" y2="155" stroke="#475569" stroke-dasharray="2 2" stroke-width="1" />
-      <text x="170" y="168" fill="#94a3b8" font-size="10" font-family="sans-serif">雙狹縫至光屏距離 L ⟹ 條紋間距 Δy = (L/d)λ</text>
+      <text x="170" y="168" fill="#94a3b8" font-size="10" font-family="sans-serif">雙狹縫至光屏距離 L ⇒ 條紋間距 Δy = (L/d)λ</text>
     </svg>
 
     <!-- ========================================================================= -->
@@ -1107,7 +1107,7 @@ const currentFeatureDisplay = computed(() => {
       <text x="250" y="70" fill="#f59e0b" font-size="10" font-weight="bold" font-family="sans-serif">帕申系 (紅外光)</text>
 
       <text x="100" y="190" fill="#94a3b8" font-size="10" font-family="sans-serif">
-        光子能量 hf = |E₂ - E₁| ⟹ 躍遷至基態釋放最高能量紫外光
+        光子能量 hf = |E₂ - E₁| ⇒ 躍遷至基態釋放最高能量紫外光
       </text>
     </svg>
 
@@ -2008,7 +2008,7 @@ const currentFeatureDisplay = computed(() => {
       <!-- Bottom Insight Legend -->
       <div
         class="w-full px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-center font-sans"
-        v-html="renderRichMathText('幾何割線核心：**$L: x + y = k$ 斜率為 $-1$，垂直於對稱軸 $y = x$** $\\implies$ $P$、$Q$ 互為對稱點：中點 $M$ 必在 $y = x$ 上，且直線 $PQ$ 斜率為 $-1$！')"
+        v-html="renderRichMathText('幾何割線核心：**$L: x + y = k$ 斜率為 $-1$，垂直於對稱軸 $y = x$** $\\Rightarrow$ $P$、$Q$ 互為對稱點：中點 $M$ 必在 $y = x$ 上，且直線 $PQ$ 斜率為 $-1$！')"
       ></div>
     </div>
 

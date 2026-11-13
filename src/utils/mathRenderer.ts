@@ -59,7 +59,7 @@ export function formulaToLatex(raw: string): string {
        .replace(/Δ/g, '\\Delta ')
        .replace(/Σ/g, '\\sum ');
 
-  // 4. 運算與關係符號
+  // 4. 運算與關係符號（將寬版 ⟹ / \implies 轉為標準半寬 \Rightarrow，節省版面）
   s = s.replace(/·/g, ' \\cdot ')
        .replace(/×/g, ' \\times ')
        .replace(/≥/g, ' \\ge ')
@@ -68,8 +68,14 @@ export function formulaToLatex(raw: string): string {
        .replace(/≈/g, ' \\approx ')
        .replace(/±/g, ' \\pm ')
        .replace(/∓/g, ' \\mp ')
-       .replace(/⟹/g, ' \\implies ')
-       .replace(/⟺/g, ' \\iff ');
+       .replace(/⟹/g, ' \\Rightarrow ')
+       .replace(/⇒/g, ' \\Rightarrow ')
+       .replace(/\\implies\b/g, '\\Rightarrow')
+       .replace(/\\Longrightarrow\b/g, '\\Rightarrow')
+       .replace(/⟺/g, ' \\Leftrightarrow ')
+       .replace(/⇔/g, ' \\Leftrightarrow ')
+       .replace(/\\iff\b/g, '\\Leftrightarrow')
+       .replace(/\\Longleftrightarrow\b/g, '\\Leftrightarrow');
 
   // 5. 根號轉換：√(A) 或 √A
   s = s.replace(/√\(([^()]+)\)/g, '\\sqrt{$1}');
@@ -186,7 +192,7 @@ export function renderRichMathText(text: string): string {
         return text;
       }
     }
-    if (text.includes('\\frac') || text.includes('\\sqrt') || text.includes('\\implies') || text.includes('\\log') || text.includes('\\cdot')) {
+    if (text.includes('\\frac') || text.includes('\\sqrt') || text.includes('\\implies') || text.includes('\\Rightarrow') || text.includes('\\log') || text.includes('\\cdot')) {
       try {
         const latex = formulaToLatex(text);
         return katex.renderToString(`\\displaystyle ${latex}`, {
@@ -201,7 +207,8 @@ export function renderRichMathText(text: string): string {
   }
 
   // 2. 自動容錯：若 $ 符號為奇數個（代表末端有未關閉的 $），自動補上閉合 $
-  let sanitized = text;
+  // 同時將寬版 ⟹ / ⟺ 統一替換為窄版 ⇒ / ⇔ 節約版面
+  let sanitized = text.replace(/⟹/g, '⇒').replace(/⟺/g, '⇔');
   const dollarCount = (sanitized.match(/\$/g) || []).length;
   if (dollarCount % 2 !== 0) {
     sanitized = sanitized + '$';

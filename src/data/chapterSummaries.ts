@@ -228,7 +228,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '孟德爾單性雜交與棋盤方格',
         description: '單基因遺傳中顯性等位基因以大寫 A 表示，隱性以小寫 a 表示。異型合子 Aa × Aa 雜交，子代表型比為 3:1，基因型比為 1:2:1：',
         formulas: [
-          '雜合子自交基因型比：Aa \\times Aa \\implies AA : Aa : aa = 1 : 2 : 1',
+          '雜合子自交基因型比：Aa \\times Aa \\Rightarrow AA : Aa : aa = 1 : 2 : 1',
           '雜合子自交表型比：\\text{顯性} : \\text{隱性} = 3 : 1'
         ]
       },
@@ -524,7 +524,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '高爐煉鐵化學反應',
         description: '煤焦 (C) 燃燒生成一氧化碳 (CO) 作為主要還原劑：',
         formulas: [
-          '高爐煉鐵核心反應：Fe_2O_3 + 3CO \\implies 2Fe + 3CO_2'
+          '高爐煉鐵核心反應：Fe_2O_3 + 3CO \\Rightarrow 2Fe + 3CO_2'
         ]
       }
     ],
@@ -549,7 +549,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         description: '25°C 下中性 pH = 7，酸性 pH < 7，鹼性 pH > 7。中和反應恆放熱：',
         formulas: [
           '水的離子積常數：[H^+][OH^-] = 10^{-14} \\quad (25^\\circ\\text{C})',
-          '酸鹼中和淨反應：H^+ + OH^- \\implies H_2O + \\text{熱量}'
+          '酸鹼中和淨反應：H^+ + OH^- \\Rightarrow H_2O + \\text{熱量}'
         ]
       }
     ],
@@ -600,7 +600,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '皂化反應與清潔原理',
         description: '油脂加強鹼反應生成肥皂（脂肪酸鈉）與甘油（丙三醇），以食鹽水進行鹽析分離：',
         formulas: [
-          '皂化反應通式：\\text{油脂} + \\text{強鹼 (NaOH)} \\implies \\text{肥皂} + \\text{甘油}'
+          '皂化反應通式：\\text{油脂} + \\text{強鹼 (NaOH)} \\Rightarrow \\text{肥皂} + \\text{甘油}'
         ]
       },
       {
@@ -1520,9 +1520,9 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '絕對值幾何距離法',
         description: '利用數線幾何距離快速求解，免去代數分段討論：',
         formulas: [
-          '等式解：|x - a| = d \\implies x = a \\pm d',
-          '區間解：|x - c| < r \\implies c - r < x < c + r',
-          '兩側解：|x - c| > r \\implies x > c + r \\text{ 或 } x < c - r'
+          '等式解：|x - a| = d \\Rightarrow x = a \\pm d',
+          '區間解：|x - c| < r \\Rightarrow c - r < x < c + r',
+          '兩側解：|x - c| > r \\Rightarrow x > c + r \\text{ 或 } x < c - r'
         ]
       },
       {
@@ -1866,8 +1866,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         title: '1. 指數符號與指數方程式本質（降階化為多項式）',
         description: '指數率運算前提為底數必須滿足 $a > 0, b > 0$。超越指數方程本質無神奇公式，核心手法是「降階化為多項式」：',
         formulas: [
-          '同底對應：a^{f(x)} = a^{g(x)} \\implies f(x) = g(x) \\quad (a > 0, a \\ne 1)',
-          '變數代換法：t = a^x \\quad (t > 0) \\implies f(t) = 0 \\quad (化為整式方程式求解)'
+          '同底對應：a^{f(x)} = a^{g(x)} \\Rightarrow f(x) = g(x) \\quad (a > 0, a \\ne 1)',
+          '變數代換法：t = a^x \\quad (t > 0) \\Rightarrow f(t) = 0 \\quad (化為整式方程式求解)'
         ],
         track: 'common'
       },
@@ -1886,7 +1886,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       },
       {
         title: '3. 函數圖形幾何變換與對稱性',
-        description: '<div class="overflow-x-auto my-3 pb-1.5"><table class="w-full text-xs sm:text-sm text-left border-collapse border border-slate-800 rounded-xl overflow-hidden bg-slate-950/70 shadow-inner"><thead class="bg-slate-900/90 text-slate-200 font-semibold border-b border-slate-800"><tr><th class="p-3 border-r border-slate-800 whitespace-nowrap w-28">變換動作</th><th class="p-3 border-r border-slate-800 min-w-[180px] w-1/3">代數變換操作</th><th class="p-3 min-w-[280px]">範例</th></tr></thead><tbody class="text-slate-200 divide-y divide-slate-800/60"><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60">Y 平移</td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">$y = f(x) + k$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 上移 $2$ 單位 $\\implies y = 2^x + 2$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 上移 $2$ 單位 $\\implies y = \\log_2 x + 2$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60">Y 伸縮</td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">$y = k \\cdot f(x)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 垂直伸長 $2$ 倍 $\\implies y = 2 \\cdot 2^x = 2^{x+1}$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 垂直伸長 $2$ 倍 $\\implies y = 2\\log_2 x$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60">X 平移</td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">$x \\to x - h \\iff y = f(x - h)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 右移 $2$ 單位 $\\implies y = 2^{x-2}$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 右移 $2$ 單位 $\\implies y = \\log_2(x - 2)$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60">X 伸縮</td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">$x \\to \\frac{x}{k} \\iff y = f\\left(\\frac{x}{k}\\right)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 水平伸長 $2$ 倍 $\\implies y = 2^{\\frac{x}{2}}$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 水平伸長 $2$ 倍 $\\implies y = \\log_2\\left(\\frac{x}{2}\\right) = \\log_2 x - 1$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60"><div>上下翻轉</div><div class="text-[11px] text-slate-400 font-normal mt-0.5">（對稱 $x$ 軸）</div></td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">整體乘負號 $y = -f(x)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 上下翻轉 $\\implies y = -2^x$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 上下翻轉 $\\implies y = -\\log_2 x = \\log_{\\frac{1}{2}} x$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60"><div>左右翻轉</div><div class="text-[11px] text-slate-400 font-normal mt-0.5">（對稱 $y$ 軸）</div></td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">自變數代負號 $x \\to -x \\iff y = f(-x)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 左右翻轉 $\\implies y = 2^{-x} = \\left(\\frac{1}{2}\\right)^x$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 左右翻轉 $\\implies y = \\log_2(-x)$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60"><div>反函數對稱</div><div class="text-[11px] text-slate-400 font-normal mt-0.5">（對稱直線 $y = x$）</div></td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">交換變數 $x$ 與 $y \\iff y = f^{-1}(x)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 對稱直線 $y = x$ $\\implies y = \\log_2 x$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 對稱直線 $y = x$ $\\implies y = 2^x$</div></td></tr></tbody></table></div>\n\n<div class="mt-2.5 px-3.5 py-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs sm:text-sm text-slate-300 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span><span><strong>基準點定位原則</strong>：以基準特徵點 $(0, 1)$（指數）或 $(1, 0)$（對數）為移動錨點，先判斷翻轉（負號位置）與伸縮，再套用平移。</span></div>',
+        description: '<div class="overflow-x-auto my-3 pb-1.5"><table class="w-full text-xs sm:text-sm text-left border-collapse border border-slate-800 rounded-xl overflow-hidden bg-slate-950/70 shadow-inner"><thead class="bg-slate-900/90 text-slate-200 font-semibold border-b border-slate-800"><tr><th class="p-3 border-r border-slate-800 whitespace-nowrap w-28">變換動作</th><th class="p-3 border-r border-slate-800 min-w-[180px] w-1/3">代數變換操作</th><th class="p-3 min-w-[280px]">範例</th></tr></thead><tbody class="text-slate-200 divide-y divide-slate-800/60"><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60">Y 平移</td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">$y = f(x) + k$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 上移 $2$ 單位 $\\Rightarrow y = 2^x + 2$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 上移 $2$ 單位 $\\Rightarrow y = \\log_2 x + 2$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60">Y 伸縮</td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">$y = k \\cdot f(x)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 垂直伸長 $2$ 倍 $\\Rightarrow y = 2 \\cdot 2^x = 2^{x+1}$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 垂直伸長 $2$ 倍 $\\Rightarrow y = 2\\log_2 x$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60">X 平移</td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">$x \\to x - h \\iff y = f(x - h)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 右移 $2$ 單位 $\\Rightarrow y = 2^{x-2}$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 右移 $2$ 單位 $\\Rightarrow y = \\log_2(x - 2)$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60">X 伸縮</td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">$x \\to \\frac{x}{k} \\iff y = f\\left(\\frac{x}{k}\\right)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 水平伸長 $2$ 倍 $\\Rightarrow y = 2^{\\frac{x}{2}}$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 水平伸長 $2$ 倍 $\\Rightarrow y = \\log_2\\left(\\frac{x}{2}\\right) = \\log_2 x - 1$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60"><div>上下翻轉</div><div class="text-[11px] text-slate-400 font-normal mt-0.5">（對稱 $x$ 軸）</div></td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">整體乘負號 $y = -f(x)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 上下翻轉 $\\Rightarrow y = -2^x$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 上下翻轉 $\\Rightarrow y = -\\log_2 x = \\log_{\\frac{1}{2}} x$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60"><div>左右翻轉</div><div class="text-[11px] text-slate-400 font-normal mt-0.5">（對稱 $y$ 軸）</div></td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">自變數代負號 $x \\to -x \\iff y = f(-x)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 左右翻轉 $\\Rightarrow y = 2^{-x} = \\left(\\frac{1}{2}\\right)^x$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 左右翻轉 $\\Rightarrow y = \\log_2(-x)$</div></td></tr><tr class="hover:bg-slate-900/40 transition-colors"><td class="p-3 font-bold text-slate-200 whitespace-nowrap border-r border-slate-800/60"><div>反函數對稱</div><div class="text-[11px] text-slate-400 font-normal mt-0.5">（對稱直線 $y = x$）</div></td><td class="p-3 font-mono text-slate-200 border-r border-slate-800/60 whitespace-nowrap">交換變數 $x$ 與 $y \\iff y = f^{-1}(x)$</td><td class="p-3 space-y-1.5"><div><span class="text-slate-400 font-medium mr-1.5">指數：</span>$y = 2^x$ 對稱直線 $y = x$ $\\Rightarrow y = \\log_2 x$</div><div><span class="text-slate-400 font-medium mr-1.5">對數：</span>$y = \\log_2 x$ 對稱直線 $y = x$ $\\Rightarrow y = 2^x$</div></td></tr></tbody></table></div>\n\n<div class="mt-2.5 px-3.5 py-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs sm:text-sm text-slate-300 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span><span><strong>基準點定位原則</strong>：以基準特徵點 $(0, 1)$（指數）或 $(1, 0)$（對數）為移動錨點，先判斷翻轉（負號位置）與伸縮，再套用平移。</span></div>',
         diagramType: 'function-transformation',
         diagramPosition: 'top',
         formulas: [],
@@ -1898,8 +1898,8 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         formulas: [
           '分合公式：\\log_a(xy) = \\log_a x + \\log_a y, \\quad \\log_a\\left(\\frac{x}{y}\\right) = \\log_a x - \\log_a y',
           '次係公式合體版：\\log_{a^n}(x^m) = \\frac{m}{n} \\log_a x',
-          '換底與倒數公式：\\log_a b = \\frac{\\log_c b}{\\log_c a} \\implies \\log_a b = \\frac{1}{\\log_b a}',
-          '底真對調公式：x^{\\log_a y} = y^{\\log_a x} \\implies a^{\\log_a x} = x'
+          '換底與倒數公式：\\log_a b = \\frac{\\log_c b}{\\log_c a} \\Rightarrow \\log_a b = \\frac{1}{\\log_b a}',
+          '底真對調公式：x^{\\log_a y} = y^{\\log_a x} \\Rightarrow a^{\\log_a x} = x'
         ],
         track: 'common'
       },
@@ -1930,7 +1930,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
           },
           {
             label: '步驟 3【勘根檢驗與交點判定】',
-            text: '方程式的相異實根個數與函數圖形的交點個數完全等價：\n• **負向交點 A**：\n  在 $x = -3$ 時，$y_1(-3) = 2^{-3} = \\frac{1}{8} > 0 = y_2(-3)$（指數在直線上方）；\n  在 $x = -2$ 時，$y_1(-2) = 2^{-2} = \\frac{1}{4} < 1 = y_2(-2)$（直線反超指數，在上方）；\n  $\\implies$ 兩圖形必在負向相交於交點 A，實根落在區間 $x \\in (-3, -2)$！\n• **正向交點 B**：\n  在 $x = 2$ 時，$y_1(2) = 2^2 = 4 < 5 = y_2(2)$（直線仍在指數上方）；\n  在 $x = 3$ 時，$y_1(3) = 2^3 = 8 > 6 = y_2(3)$（指數大幅反超直線，在上方）；\n  $\\implies$ 兩圖形必在正向相交於交點 B，實根落在區間 $x \\in (2, 3)$！\n• **趨勢分析**：當 $x \\ge 3$ 後，指數函數以幾何級數急遽暴增，成長速度遠超任何一次直線，右方絕不再有交點；左向 $x \\to -\\infty$ 指數恆正漸近於 0 而直線走向負無窮大，左方亦無交點。'
+            text: '方程式的相異實根個數與函數圖形的交點個數完全等價：\n• **負向交點 A**：\n  在 $x = -3$ 時，$y_1(-3) = 2^{-3} = \\frac{1}{8} > 0 = y_2(-3)$（指數在直線上方）；\n  在 $x = -2$ 時，$y_1(-2) = 2^{-2} = \\frac{1}{4} < 1 = y_2(-2)$（直線反超指數，在上方）；\n  $\\Rightarrow$ 兩圖形必在負向相交於交點 A，實根落在區間 $x \\in (-3, -2)$！\n• **正向交點 B**：\n  在 $x = 2$ 時，$y_1(2) = 2^2 = 4 < 5 = y_2(2)$（直線仍在指數上方）；\n  在 $x = 3$ 時，$y_1(3) = 2^3 = 8 > 6 = y_2(3)$（指數大幅反超直線，在上方）；\n  $\\Rightarrow$ 兩圖形必在正向相交於交點 B，實根落在區間 $x \\in (2, 3)$！\n• **趨勢分析**：當 $x \\ge 3$ 後，指數函數以幾何級數急遽暴增，成長速度遠超任何一次直線，右方絕不再有交點；左向 $x \\to -\\infty$ 指數恆正漸近於 0 而直線走向負無窮大，左方亦無交點。'
           }
         ],
         answer: '恰有 2 個相異實根，分別落在連續整數區間 $(-3, -2)$ 與 $(2, 3)$ 之中。'
@@ -1946,7 +1946,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
           },
           {
             label: '步驟 2【令新變數求出整體值 $3^{2a}$ 與 $3^{2b}$】',
-            text: '設 $A = 3^{2a}, B = 3^{2b}$：\n• 代入 $f(a) = 2$：\n$$\\frac{A + 1}{A - 1} = 2 \\implies A + 1 = 2A - 2 \\implies A = 3^{2a} = 3$$\n• 代入 $f(b) = 4$：\n$$\\frac{B + 1}{B - 1} = 4 \\implies B + 1 = 4B - 4 \\implies 3B = 5 \\implies B = 3^{2b} = \\frac{5}{3}$$'
+            text: '設 $A = 3^{2a}, B = 3^{2b}$：\n• 代入 $f(a) = 2$：\n$$\\frac{A + 1}{A - 1} = 2 \\Rightarrow A + 1 = 2A - 2 \\Rightarrow A = 3^{2a} = 3$$\n• 代入 $f(b) = 4$：\n$$\\frac{B + 1}{B - 1} = 4 \\Rightarrow B + 1 = 4B - 4 \\Rightarrow 3B = 5 \\Rightarrow B = 3^{2b} = \\frac{5}{3}$$'
           },
           {
             label: '步驟 3【目標導向：利用指數律求出 $f(a+b)$】',
@@ -1982,12 +1982,12 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       {
         moduleName: '題型四：對數方程的根與圖形',
         question: '試問方程式 $x - \\log_2 |x| = 1$ 共有幾個實根？其中整數解為何？',
-        mindset: '解題關鍵：絕對值對數方程不可盲目代數硬解！首要步驟「寫下真數條件 $|x| > 0 \\implies x \\ne 0$」；接著「移項分家」為直線 $y_1 = x - 1$ 與對數對稱圖形 $y_2 = \\log_2 |x|$，以圖形交點個數定實根數，並代入整數值驗證精確解！',
+        mindset: '解題關鍵：絕對值對數方程不可盲目代數硬解！首要步驟「寫下真數條件 $|x| > 0 \\Rightarrow x \\ne 0$」；接著「移項分家」為直線 $y_1 = x - 1$ 與對數對稱圖形 $y_2 = \\log_2 |x|$，以圖形交點個數定實根數，並代入整數值驗證精確解！',
         diagramType: 'log-absolute-roots',
         steps: [
           {
             label: '步驟 1【先定真數條件，移項分家】',
-            text: '• **真數條件**：對數真數必須嚴格大於 0，故 $|x| > 0 \\implies x \\ne 0$（原點為漸近線，無解）。\n• **移項分家**：將方程式移項拆成兩獨立函數：\n$$y_1 = x - 1 \\quad (斜率為 1 之直線), \\qquad y_2 = \\log_2 |x| \\quad (對稱於 y 軸之左右雙臂對數圖形)$$'
+            text: '• **真數條件**：對數真數必須嚴格大於 0，故 $|x| > 0 \\Rightarrow x \\ne 0$（原點為漸近線，無解）。\n• **移項分家**：將方程式移項拆成兩獨立函數：\n$$y_1 = x - 1 \\quad (斜率為 1 之直線), \\qquad y_2 = \\log_2 |x| \\quad (對稱於 y 軸之左右雙臂對數圖形)$$'
           },
           {
             label: '步驟 2【標定基準點與繪製對稱圖形】',
@@ -2008,11 +2008,11 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         steps: [
           {
             label: '步驟 1【列中點條件：中點必在對稱軸 $y = x$ 上】',
-            text: '因函數 $y = 2^x$ 與 $y = \\log_2 x$ 互為反函數，對稱軸為直線 $y = x$。\n直線 $L: x + y = k$ 的斜率為 $-1$，垂直於對稱軸 $y = x$（$1 \\times (-1) = -1$），故交點 $P$ 與 $Q$ 互為對稱點。\n線段 $PQ$ 的中點坐標為 $\\left(\\frac{x_P + x_Q}{2}, \\frac{y_P + y_Q}{2}\\right)$，必落在直線 $y = x$ 上：\n$$\\frac{x_P + x_Q}{2} = \\frac{y_P + y_Q}{2} \\iff x_P + x_Q = y_P + y_Q$$\n將 $P(a, b+2)$ 與 $Q(3a-1, b-3)$ 代入：\n$$a + (3a - 1) = (b + 2) + (b - 3) \\implies 4a - 1 = 2b - 1 \\implies 2a = b \\quad \\text{--- (式 1)}$$'
+            text: '因函數 $y = 2^x$ 與 $y = \\log_2 x$ 互為反函數，對稱軸為直線 $y = x$。\n直線 $L: x + y = k$ 的斜率為 $-1$，垂直於對稱軸 $y = x$（$1 \\times (-1) = -1$），故交點 $P$ 與 $Q$ 互為對稱點。\n線段 $PQ$ 的中點坐標為 $\\left(\\frac{x_P + x_Q}{2}, \\frac{y_P + y_Q}{2}\\right)$，必落在直線 $y = x$ 上：\n$$\\frac{x_P + x_Q}{2} = \\frac{y_P + y_Q}{2} \\iff x_P + x_Q = y_P + y_Q$$\n將 $P(a, b+2)$ 與 $Q(3a-1, b-3)$ 代入：\n$$a + (3a - 1) = (b + 2) + (b - 3) \\Rightarrow 4a - 1 = 2b - 1 \\Rightarrow 2a = b \\quad \\text{--- (式 1)}$$'
           },
           {
             label: '步驟 2【列割線斜率條件：直線 $PQ$ 斜率必為 $-1$】',
-            text: '直線 $PQ$ 即為直線 $L$，其斜率必為 $-1$：\n$$\\frac{y_Q - y_P}{x_Q - x_P} = -1 \\iff y_Q - y_P = -(x_Q - x_P)$$\n代入點坐標計算：\n$$\\frac{(b - 3) - (b + 2)}{(3a - 1) - a} = -1 \\implies \\frac{-5}{2a - 1} = -1 \\implies 2a - 1 = 5 \\implies 2a = 6 \\implies a = 3$$'
+            text: '直線 $PQ$ 即為直線 $L$，其斜率必為 $-1$：\n$$\\frac{y_Q - y_P}{x_Q - x_P} = -1 \\iff y_Q - y_P = -(x_Q - x_P)$$\n代入點坐標計算：\n$$\\frac{(b - 3) - (b + 2)}{(3a - 1) - a} = -1 \\Rightarrow \\frac{-5}{2a - 1} = -1 \\Rightarrow 2a - 1 = 5 \\Rightarrow 2a = 6 \\Rightarrow a = 3$$'
           },
           {
             label: '步驟 3【代回求值與常數 $k$】',
@@ -2032,7 +2032,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
           },
           {
             label: '步驟 2：解析背後自然對數 $\\ln$ 推導原理',
-            text: '依複利本利和達到本金 2 倍之方程式：\n$$(1 + r\\%)^n = 2$$\n兩邊取以自然底數 $e \\approx 2.71828$ 為底的自然對數 $\\ln$：\n$$n \\ln(1 + r\\%) = \\ln 2 \\approx 0.693$$\n當利率 $r\\%$ 較小時，利用泰勒一階近似 $\\ln(1 + r\\%) \\approx r\\% = \\frac{r}{100}$：\n$$n \\cdot \\frac{r}{100} \\approx 0.693 \\implies n \\approx \\frac{69.3}{r} \\approx \\frac{72}{r}$$\n（數學上以 72 代替 69.3，是因為 72 擁有豐富的整數因數 2, 3, 4, 6, 8, 9, 12，便於日常心算快速估計）'
+            text: '依複利本利和達到本金 2 倍之方程式：\n$$(1 + r\\%)^n = 2$$\n兩邊取以自然底數 $e \\approx 2.71828$ 為底的自然對數 $\\ln$：\n$$n \\ln(1 + r\\%) = \\ln 2 \\approx 0.693$$\n當利率 $r\\%$ 較小時，利用泰勒一階近似 $\\ln(1 + r\\%) \\approx r\\% = \\frac{r}{100}$：\n$$n \\cdot \\frac{r}{100} \\approx 0.693 \\Rightarrow n \\approx \\frac{69.3}{r} \\approx \\frac{72}{r}$$\n（數學上以 72 代替 69.3，是因為 72 擁有豐富的整數因數 2, 3, 4, 6, 8, 9, 12，便於日常心算快速估計）'
           }
         ],
         answer: '本金翻倍約需 16 年',
@@ -2040,7 +2040,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
       }
     ],
     pitfalls: [
-      '【陷阱一：對數方程式解題時「忘記回頭驗算真數條件」】盲點：使用對數律合併方程式後，順利解出一元二次方程式的兩根，卻常直接把負根填入答案。避坑指引：「真數永遠要大於 0，動手算前先寫緊箍咒！」在套用任何對數律之前，第一行必須強制寫下範圍限制（如 $x + 3 > 0$ 且 $x - 1 > 0 \\implies x > 1$）。最後算出的候選根必須通過該條件檢驗，不合者立即剔除。',
+      '【陷阱一：對數方程式解題時「忘記回頭驗算真數條件」】盲點：使用對數律合併方程式後，順利解出一元二次方程式的兩根，卻常直接把負根填入答案。避坑指引：「真數永遠要大於 0，動手算前先寫緊箍咒！」在套用任何對數律之前，第一行必須強制寫下範圍限制（如 $x + 3 > 0$ 且 $x - 1 > 0 \\Rightarrow x > 1$）。最後算出的候選根必須通過該條件檢驗，不合者立即剔除。',
       '【陷阱二：圖形水平伸縮時「搞錯對稱中軸」與「伸縮方向混淆」】盲點：題目要求「水平方向伸長 3 倍」，學生常誤寫為 $y = f(3x)$；或不清楚以哪條線為基準縮放。避坑指引：(1) 中心軸鎖定：上下伸縮是「對 $x$ 軸做縮放」，$x$ 軸上的點不動；左右伸縮是「對 $y$ 軸做縮放」，只有 $y$ 軸上的點保持不動。(2) 外部觀察補償法：先將變數加括號。若坐標要放大為 3 倍，內部必須替換為 $\\left(\\frac{x}{3}\\right)$ 才能還原原函數值。',
       '【陷阱三：盲目解未知數，忽略題目只問「整體代換值」】盲點：解題時強迫症發作，非要把次方上的 $x$ 精確解出來，看到無法直接用整數表示的次方就卡關停滯。避坑指引：「題目問什麼，就求到什麼為止。」若題目只問 $2^x$ 或兩點斜率需要的差值，將 $2^x$ 當作一個整體變數求解即可，不需要多花時間把 $x$ 算出來。',
       '【陷阱四：反函數垂直割線交點「嚴禁硬解超越方程式」】盲點：將未知點坐標硬代回指數或對數方程式（例如 $2^a = b+2$ 且 $\\log_2(3a-1) = b-3$），產生無法以代數法解析的二元超越方程式，導致運算卡死。避坑指引：直線 $L: x + y = k$（斜率 $m = -1$）垂直於反函數對稱軸 $y = x$（斜率乘積 $1 \\times (-1) = -1$），故交點 $P$ 與 $Q$ 互為對稱點！請完全避開指數與對數運算，純粹利用幾何特徵列聯立多項式：① 線段 $PQ$ 的中點必落在直線 $y = x$ 上（$x_P + x_Q = y_P + y_Q$）；② 直線 $PQ$ 的斜率必為 $-1$（$y_Q - y_P = -(x_Q - x_P)$），輕鬆秒殺求出未知數！'
@@ -2768,7 +2768,7 @@ export const CHAPTER_SUMMARIES: Record<string, ChapterSummary> = {
         formulas: [
           'm_1 末速：v_1\' = \\frac{m_1 - m_2}{m_1 + m_2} v_1 + \\frac{2m_2}{m_1 + m_2} v_2',
           'm_2 末速：v_2\' = \\frac{2m_1}{m_1 + m_2} v_1 + \\frac{m_2 - m_1}{m_1 + m_2} v_2',
-          '接近速率等於分離速率：v_1 - v_2 = -(v_1\' - v_2\')  \\implies e = 1'
+          '接近速率等於分離速率：v_1 - v_2 = -(v_1\' - v_2\')  \\Rightarrow e = 1'
         ]
       },
       {
