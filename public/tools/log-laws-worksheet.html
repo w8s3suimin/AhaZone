@@ -503,34 +503,40 @@
 
     // ==================== GENERATOR FUNCTIONS ====================
     
-    // Page 1: Type 1 - 分合公式 (5 題)
+    // Page 1: Type 1 - 分合公式 (5 題：前 2 題練習拆分，後 3 題練習合併)
     function genP1Sec1() {
       const questions = [];
       
-      const b1 = pick([2, 3, 5, 6]);
-      const k1 = b1 === 2 ? 3 : 2;
-      const target1 = Math.pow(b1, k1);
-      let x1 = 1;
-      if (b1 === 2) { x1 = pick([2, 4]); }
-      else if (b1 === 3) { x1 = pick([3]); }
-      else if (b1 === 5) { x1 = pick([5]); }
-      else if (b1 === 6) { x1 = pick([4, 9]); }
-      const y1 = target1 / x1;
+      // Q1: 真數乘積拆開（分必拆）
+      const q1Pool = [
+        { l: `\\text{若 } \\log_2 3 = k \\text{，求 } \\log_2 6 - k =`, a: '1', n: '乘積拆分：\\log_2 6 = 1 + \\log_2 3' },
+        { l: `\\text{若 } \\log_3 2 = k \\text{，求 } \\log_3 6 - k =`, a: '1', n: '乘積拆分：\\log_3 6 = 1 + \\log_3 2' },
+        { l: `\\text{若 } \\log_5 3 = k \\text{，求 } \\log_5 15 - k =`, a: '1', n: '乘積拆分：\\log_5 15 = 1 + \\log_5 3' },
+        { l: `\\text{若 } \\log_7 2 = k \\text{，求 } \\log_7 14 - k =`, a: '1', n: '乘積拆分：\\log_7 14 = 1 + \\log_7 2' },
+        { l: `\\text{若 } \\log_{10} 3 = k \\text{，求 } \\log_{10} 30 - k =`, a: '1', n: '乘積拆分：\\log_{10} 30 = 1 + \\log_{10} 3' },
+        { l: `\\text{若 } \\log_2 5 = k \\text{，求 } \\log_2 10 - k =`, a: '1', n: '乘積拆分：\\log_2 10 = 1 + \\log_2 5' }
+      ];
+      const q1 = pick(q1Pool);
       questions.push({
-        latex: `\\log_{${b1}} ${x1} + \\log_{${b1}} ${y1} =`,
-        ans: `${k1}`,
-        note: '分合相加化為積'
+        latex: q1.l,
+        ans: q1.a,
+        note: q1.n
       });
 
-      const b2 = pick([2, 3, 5]);
-      const k2 = pick([2, 3]);
-      const target2 = Math.pow(b2, k2);
-      const y2 = randInt(2, 5);
-      const x2 = target2 * y2;
+      // Q2: 真數商式拆開（分必拆）
+      const q2Pool = [
+        { l: `\\text{若 } \\log 2 = a \\text{，求 } \\log 5 + a =`, a: '1', n: '商式拆分：\\log 5 = \\log(10/2) = 1 - \\log 2' },
+        { l: `\\text{若 } \\log_2 3 = m \\text{，求 } \\log_2\\frac{2}{3} + m =`, a: '1', n: '商式拆分：\\log_2(2/3) = 1 - \\log_2 3' },
+        { l: `\\text{若 } \\log_3 5 = m \\text{，求 } \\log_3\\frac{3}{5} + m =`, a: '1', n: '商式拆分：\\log_3(3/5) = 1 - \\log_3 5' },
+        { l: `\\text{若 } \\log_5 2 = m \\text{，求 } \\log_5\\frac{5}{2} + m =`, a: '1', n: '商式拆分：\\log_5(5/2) = 1 - \\log_5 2' },
+        { l: `\\text{若 } \\log_7 3 = m \\text{，求 } \\log_7\\frac{7}{3} + m =`, a: '1', n: '商式拆分：\\log_7(7/3) = 1 - \\log_7 3' },
+        { l: `\\text{若 } \\log 5 = b \\text{，求 } \\log 2 + b =`, a: '1', n: '商式拆分：\\log 2 = \\log(10/5) = 1 - \\log 5' }
+      ];
+      const q2 = pick(q2Pool);
       questions.push({
-        latex: `\\log_{${b2}} ${x2} - \\log_{${b2}} ${y2} =`,
-        ans: `${k2}`,
-        note: '分合相減化為商'
+        latex: q2.l,
+        ans: q2.a,
+        note: q2.n
       });
 
       const q3Options = [
